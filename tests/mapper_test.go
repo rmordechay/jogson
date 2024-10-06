@@ -1,42 +1,90 @@
-package jsonmapper
+package tests
 
 import (
-	"fmt"
+	"github.com/rmordechay/json-mapper"
 	"github.com/stretchr/testify/assert"
-	"log"
+	"os"
+	"strings"
 	"testing"
 )
 
-func TestParseJsonObjectFromString(t *testing.T) {
-	assert.Empty(t, []int{})
+const jsonStrObject = `{"name": "Jason"}`
+const jsonStrArray = `[{"name":  "Jason"},{"name":  "Chris"}]`
 
+func TestParseJsonObjectFromString(t *testing.T) {
+	mapper, err := jsonmapper.GetMapperFromString(jsonStrObject)
+	assert.NoError(t, err)
+
+	actual := removeWhiteSpaces(mapper.Object.String())
+	expected := removeWhiteSpaces(jsonStrObject)
+
+	assert.True(t, mapper.IsObject)
+	assert.Equal(t, expected, actual)
 }
 
 func TestParseJsonArrayFromString(t *testing.T) {
+	mapper, err := jsonmapper.GetMapperFromString(jsonStrArray)
+	assert.NoError(t, err)
 
+	actual := removeWhiteSpaces(mapper.Array.String())
+	expected := removeWhiteSpaces(jsonStrArray)
+
+	assert.True(t, mapper.IsArray)
+	assert.Equal(t, expected, actual)
 }
 
 func TestParseJsonObjectFromBytes(t *testing.T) {
+	mapper, err := jsonmapper.GetMapperFromBytes([]byte(jsonStrObject))
+	assert.NoError(t, err)
 
+	actual := removeWhiteSpaces(mapper.Object.String())
+	expected := removeWhiteSpaces(jsonStrObject)
+
+	assert.True(t, mapper.IsObject)
+	assert.Equal(t, expected, actual)
 }
 
 func TestParseJsonArrayFromBytes(t *testing.T) {
+	mapper, err := jsonmapper.GetMapperFromBytes([]byte(jsonStrArray))
+	assert.NoError(t, err)
 
+	actual := removeWhiteSpaces(mapper.Array.String())
+	expected := removeWhiteSpaces(jsonStrArray)
+
+	assert.True(t, mapper.IsArray)
+	assert.Equal(t, expected, actual)
 }
-func TestParseJsonObjectFromFile(t *testing.T) {
 
+func TestParseJsonObjectFromFile(t *testing.T) {
+	path := "test_object.json"
+	mapper, err := jsonmapper.GetMapperFromFile(path)
+	assert.NoError(t, err)
+
+	actual := removeWhiteSpaces(mapper.Object.String())
+	fileExpected, err := os.ReadFile(path)
+	expected := removeWhiteSpaces(string(fileExpected))
+
+	assert.NoError(t, err)
+	assert.True(t, mapper.IsObject)
+	assert.Equal(t, expected, actual)
 }
 
 func TestParseJsonArrayFromFile(t *testing.T) {
+	path := "test_array.json"
+	mapper, err := jsonmapper.GetMapperFromFile(path)
+	assert.NoError(t, err)
 
+	actual := removeWhiteSpaces(mapper.Array.String())
+	fileExpected, err := os.ReadFile(path)
+	expected := removeWhiteSpaces(string(fileExpected))
+
+	assert.NoError(t, err)
+	assert.True(t, mapper.IsArray)
+	assert.Equal(t, expected, actual)
 }
 
-func TestMapper(t *testing.T) {
-	mapper, err := GetMapperFromFile("test.json")
-	if err != nil {
-		log.Fatal(err)
-	}
-	find := mapper.Object.Get("field1").Array
-	get := find.Get(0)
-	fmt.Println(get)
+func removeWhiteSpaces(data string) string {
+	s := strings.ReplaceAll(data, " ", "")
+	s = strings.ReplaceAll(s, "\n", "")
+	return s
 }

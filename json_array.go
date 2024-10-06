@@ -19,3 +19,10 @@ func (a JsonArray) String() string {
 	marshal, _ := json.Marshal(a.elements)
 	return string(marshal)
 }
+
+func (a JsonArray) Get(key int) JsonMapper {
+	if key >= a.Length {
+		panic("index out of bound")
+	}
+	return getMapperFromField(a.elements[key])
+}

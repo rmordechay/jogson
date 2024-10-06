@@ -33,7 +33,7 @@ func (o JsonObject) Find(key string) JsonMapper {
 			return field
 		}
 		if field.IsObject {
-			return field.AsObject.Find(key)
+			return field.Object.Find(key)
 		}
 	}
 	return JsonMapper{}
