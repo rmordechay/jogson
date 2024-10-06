@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"json-mapper/mapper"
 )
 
 func main() {
@@ -20,15 +19,16 @@ func main() {
   		"field5": 6,
   		"field6": 7
 	}`
-	const jsonStr1 = `[{"roi": 2}, {"roi": 2}]`
-	mapperObject, err := mapper.GetMapper(jsonStr)
+	mapper, err := GetMapper(jsonStr)
 	if err != nil {
 		panic(err)
 	}
-	t := mapperObject.AsObject.Get("field3").AsObject.Get("field2").AsArray
+	t := mapper.AsObject.Get("field3").AsObject.Get("field2").AsArray
 	//get := t.Get("field3").AsObject
+	fmt.Println(mapper)
 	for _, v := range t.Elements() {
 		object := v.AsObject
+		fmt.Println(v)
 		for k1, v1 := range object.Elements() {
 			fmt.Println(k1)
 			fmt.Println(v1)

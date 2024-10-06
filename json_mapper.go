@@ -1,22 +1,10 @@
-package mapper
+package main
 
 import (
 	"encoding/json"
 	"fmt"
 	"log"
 	"reflect"
-)
-
-type JsonType int
-
-const (
-	Bool JsonType = iota
-	Int
-	Float
-	String
-	Object
-	Array
-	Null
 )
 
 type Json struct {
@@ -34,60 +22,6 @@ type Json struct {
 	AsString string
 	AsObject JsonObject
 	AsArray  JsonArray
-}
-
-func (j Json) getType() JsonType {
-	if j.IsBool {
-		return Bool
-	} else if j.IsInt {
-		return Int
-	} else if j.IsFloat {
-		return Float
-	} else if j.IsString {
-		return String
-	} else if j.IsObject {
-		return Object
-	} else if j.IsArray {
-		return Array
-	}
-	return Null
-}
-
-func (j Json) String() string {
-	switch j.getType() {
-	case Bool:
-		return fmt.Sprintf("%v", j.AsBool)
-	case Int:
-		return fmt.Sprintf("%v", j.AsInt)
-	case Float:
-		return fmt.Sprintf("%v", j.AsFloat)
-	case String:
-		return fmt.Sprintf("%v", j.AsString)
-	case Object:
-		return fmt.Sprintf("%v", j.AsObject)
-	case Array:
-		return fmt.Sprintf("%v", j.AsArray)
-	case Null:
-		return fmt.Sprintf("%v", nil)
-	}
-	return ""
-}
-
-type JsonArray struct {
-	elements []interface{}
-}
-
-type JsonObject struct {
-	object map[string]interface{}
-}
-
-func (o JsonObject) Get(key string) Json {
-	for k, v := range o.object {
-		if k == key {
-			return getMapperFromField(v)
-		}
-	}
-	return Json{}
 }
 
 func GetMapper(data string) (Json, error) {
@@ -136,6 +70,7 @@ func getMapperFromField(data interface{}) Json {
 		mapper.IsArray = true
 		var ja JsonArray
 		ja.elements = data.([]interface{})
+		ja.Length = len(ja.elements)
 		mapper.AsArray = ja
 	case nil:
 		mapper.IsNull = true
@@ -147,22 +82,6 @@ func getMapperFromField(data interface{}) Json {
 
 func isJsonArray(data string) bool {
 	return data[0] == '['
-}
-
-func (a JsonArray) Elements() []Json {
-	jsons := make([]Json, 0, len(a.elements))
-	for _, element := range a.elements {
-		jsons = append(jsons, getMapperFromField(element))
-	}
-	return jsons
-}
-
-func (o JsonObject) Elements() map[string]Json {
-	jsons := make(map[string]Json)
-	for k, v := range o.object {
-		jsons[k] = getMapperFromField(v)
-	}
-	return jsons
 }
 
 func parseJsonObject(data string) (JsonObject, error) {
@@ -183,4 +102,21 @@ func parseJsonArray(data string) (JsonArray, error) {
 	}
 	ja.elements = arr
 	return ja, nil
+}
+
+func (j Json) String() string {
+	if j.IsBool {
+		return fmt.Sprintf("%v", j.AsBool)
+	} else if j.IsInt {
+		return fmt.Sprintf("%v", j.AsInt)
+	} else if j.IsFloat {
+		return fmt.Sprintf("%v", j.AsFloat)
+	} else if j.IsString {
+		return fmt.Sprintf("%v", j.AsString)
+	} else if j.IsObject {
+		return fmt.Sprintf("%v", j.AsObject)
+	} else if j.IsArray {
+		return fmt.Sprintf("%v", j.AsArray)
+	}
+	return ""
 }
