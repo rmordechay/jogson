@@ -28,19 +28,27 @@ type Mapper struct {
 	Err error
 }
 
-func GetMapperFromFile(path string) (Mapper, error) {
+func CreateMapperFromStruct[T any](s T) (Mapper, error) {
+	jsonBytes, err := marshal(s)
+	if err != nil {
+		return Mapper{}, err
+	}
+	return CreateMapper(jsonBytes)
+}
+
+func CreateMapperFromFile(path string) (Mapper, error) {
 	file, err := os.ReadFile(path)
 	if err != nil {
 		return Mapper{}, err
 	}
-	return GetMapperFromString(string(file))
+	return CreateMapper(file)
 }
 
-func GetMapperFromBytes(data []byte) (Mapper, error) {
-	return GetMapperFromString(string(data))
+func CreateMapperFromString(data string) (Mapper, error) {
+	return CreateMapper([]byte(data))
 }
 
-func GetMapperFromString(data string) (Mapper, error) {
+func CreateMapper(data []byte) (Mapper, error) {
 	var mapper Mapper
 	if isJsonArray(data) {
 		mapper.IsArray = true
@@ -138,17 +146,20 @@ func getMapperFromField(data *interface{}) Mapper {
 	return mapper
 }
 
-func isJsonArray(data string) bool {
+func isJsonArray(data []byte) bool {
 	return data[0] == '['
 }
 
-func marshal(v any) []byte {
+func marshal(v interface{}) ([]byte, error) {
 	var json = jsoniter.ConfigCompatibleWithStandardLibrary
-	jsonBytes, _ := json.Marshal(v)
-	return jsonBytes
+	jsonBytes, err := json.Marshal(v)
+	if err != nil {
+		return nil, err
+	}
+	return jsonBytes, nil
 }
 
-func unmarshal(data []byte, v any) error {
+func unmarshal(data []byte, v interface{}) error {
 	var json = jsoniter.ConfigCompatibleWithStandardLibrary
 	return json.Unmarshal(data, &v)
 }

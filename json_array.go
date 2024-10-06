@@ -76,13 +76,14 @@ func Filter(arr JsonArray, f func(mapper Mapper) bool) []Mapper {
 }
 
 func (a JsonArray) String() string {
-	return string(marshal(a.elements))
+	jsonBytes, _ := marshal(a.elements)
+	return string(jsonBytes)
 }
 
-func parseJsonArray(data string) (JsonArray, error) {
+func parseJsonArray(data []byte) (JsonArray, error) {
 	var ja JsonArray
 	var arr []*interface{}
-	err := unmarshal([]byte(data), &arr)
+	err := unmarshal(data, &arr)
 	if err != nil {
 		return JsonArray{}, err
 	}
@@ -94,9 +95,8 @@ func convertArray[T JsonType](data []T) JsonArray {
 	var arr JsonArray
 	result := make([]*interface{}, len(data))
 	for i, v := range data {
-		var a interface{}
-		a = v
-		result[i] = &a
+		var valAny interface{} = v
+		result[i] = &valAny
 	}
 	arr.elements = result
 	return arr

@@ -34,6 +34,20 @@ func TestWriteObjectBool(t *testing.T) {
 	assert.Equal(t, true, objElements["bool"].AsBool)
 }
 
+func TestWriteObject(t *testing.T) {
+	obj := jsonmapper.CreateEmptyJsonObject()
+	obj = obj.AddKeyValue("strings", []string{"string1", "string2", "string4"})
+	objElements := obj.Elements()
+
+	stringArray := objElements["strings"].Array
+	arrayElements := stringArray.Elements()
+
+	assert.True(t, objElements["strings"].IsArray)
+	assert.Equal(t, 3, stringArray.Length())
+	assert.Equal(t, "string1", arrayElements[0].AsString)
+	assert.Equal(t, "string4", arrayElements[2].AsString)
+}
+
 func TestWriteObjectArrayStrings(t *testing.T) {
 	obj := jsonmapper.CreateEmptyJsonObject()
 	obj = obj.AddKeyValue("strings", []string{"string1", "string2", "string4"})

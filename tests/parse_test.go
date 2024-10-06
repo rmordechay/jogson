@@ -10,7 +10,7 @@ import (
 )
 
 func TestParseJsonObjectFromString(t *testing.T) {
-	mapper, err := jsonmapper.GetMapperFromString(jsonObjectTest)
+	mapper, err := jsonmapper.CreateMapperFromString(jsonObjectTest)
 	assert.NoError(t, err)
 
 	actual := removeWhiteSpaces(mapper.Object.String())
@@ -21,7 +21,7 @@ func TestParseJsonObjectFromString(t *testing.T) {
 }
 
 func TestParseJsonArrayFromString(t *testing.T) {
-	mapper, err := jsonmapper.GetMapperFromString(jsonArrayTest)
+	mapper, err := jsonmapper.CreateMapperFromString(jsonArrayTest)
 	assert.NoError(t, err)
 
 	actual := removeWhiteSpaces(mapper.Array.String())
@@ -33,7 +33,7 @@ func TestParseJsonArrayFromString(t *testing.T) {
 }
 
 func TestParseJsonArrayFromStringWithNulls(t *testing.T) {
-	mapper, err := jsonmapper.GetMapperFromString(jsonArrayWithNullTest)
+	mapper, err := jsonmapper.CreateMapperFromString(jsonArrayWithNullTest)
 	assert.NoError(t, err)
 
 	actual := removeWhiteSpaces(mapper.Array.String())
@@ -45,7 +45,7 @@ func TestParseJsonArrayFromStringWithNulls(t *testing.T) {
 }
 
 func TestParseJsonObjectFromBytes(t *testing.T) {
-	mapper, err := jsonmapper.GetMapperFromBytes([]byte(jsonObjectTest))
+	mapper, err := jsonmapper.CreateMapper([]byte(jsonObjectTest))
 	assert.NoError(t, err)
 
 	actual := removeWhiteSpaces(mapper.Object.String())
@@ -56,7 +56,7 @@ func TestParseJsonObjectFromBytes(t *testing.T) {
 }
 
 func TestParseJsonArrayFromBytes(t *testing.T) {
-	mapper, err := jsonmapper.GetMapperFromBytes([]byte(jsonArrayTest))
+	mapper, err := jsonmapper.CreateMapper([]byte(jsonArrayTest))
 	assert.NoError(t, err)
 
 	actual := removeWhiteSpaces(mapper.Array.String())
@@ -69,7 +69,7 @@ func TestParseJsonArrayFromBytes(t *testing.T) {
 
 func TestParseJsonObjectFromFile(t *testing.T) {
 	path := "files/test_object.json"
-	mapper, err := jsonmapper.GetMapperFromFile(path)
+	mapper, err := jsonmapper.CreateMapperFromFile(path)
 	assert.NoError(t, err)
 
 	actual := removeWhiteSpaces(mapper.Object.String())
@@ -83,7 +83,7 @@ func TestParseJsonObjectFromFile(t *testing.T) {
 
 func TestParseJsonArrayFromFile(t *testing.T) {
 	path := "files/test_array.json"
-	mapper, err := jsonmapper.GetMapperFromFile(path)
+	mapper, err := jsonmapper.CreateMapperFromFile(path)
 	assert.NoError(t, err)
 
 	actual := removeWhiteSpaces(mapper.Array.String())
@@ -97,7 +97,7 @@ func TestParseJsonArrayFromFile(t *testing.T) {
 }
 
 func TestParseTime(t *testing.T) {
-	mapper, err := jsonmapper.GetMapperFromString(jsonTimeTest)
+	mapper, err := jsonmapper.CreateMapperFromString(jsonTimeTest)
 	assert.NoError(t, err)
 	actualTime1 := mapper.Object.Get("time1").AsTime()
 	actualTime2 := mapper.Object.Get("time2").AsTime()

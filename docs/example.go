@@ -13,7 +13,7 @@ func main() {
 	  "age": 43
 	}
 	`
-	mapper, err := jsonmapper.GetMapperFromString(jsonString)
+	mapper, err := jsonmapper.CreateMapperFromString(jsonString)
 	if err != nil {
 		log.Fatal(err)
 	}

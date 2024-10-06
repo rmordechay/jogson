@@ -7,7 +7,7 @@ import (
 )
 
 func TestArrayFilter(t *testing.T) {
-	arr, err := jsonmapper.GetMapperFromString(jsonArrayTest)
+	arr, err := jsonmapper.CreateMapperFromString(jsonArrayTest)
 	assert.NoError(t, err)
 	isNameChris := func(element jsonmapper.Mapper) bool {
 		return element.Object.Get("name").AsString == "Chris"
@@ -18,7 +18,7 @@ func TestArrayFilter(t *testing.T) {
 }
 
 func TestArrayMapString(t *testing.T) {
-	arr, err := jsonmapper.GetMapperFromString(jsonArrayTest)
+	arr, err := jsonmapper.CreateMapperFromString(jsonArrayTest)
 	assert.NoError(t, err)
 	getNames := func(element jsonmapper.Mapper) string {
 		return element.Object.Get("name").AsString
@@ -30,7 +30,7 @@ func TestArrayMapString(t *testing.T) {
 }
 
 func TestArrayMapObject(t *testing.T) {
-	arr, err := jsonmapper.GetMapperFromString(jsonArrayTest)
+	arr, err := jsonmapper.CreateMapperFromString(jsonArrayTest)
 	assert.NoError(t, err)
 	getNames := func(element jsonmapper.Mapper) jsonmapper.JsonObject {
 		return element.Object
@@ -44,7 +44,7 @@ func TestArrayMapObject(t *testing.T) {
 }
 
 func TestArrayForEach(t *testing.T) {
-	arr, err := jsonmapper.GetMapperFromString(jsonArrayTest)
+	arr, err := jsonmapper.CreateMapperFromString(jsonArrayTest)
 	assert.NoError(t, err)
 	wasVisited := false
 	jsonmapper.ForEach(arr.Array, func(element jsonmapper.Mapper) {

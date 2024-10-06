@@ -108,7 +108,8 @@ func FilterObject(obj JsonObject, f func(key string, mapper Mapper) bool) []Mapp
 }
 
 func (o JsonObject) String() string {
-	return string(marshal(o.object))
+	jsonBytes, _ := marshal(o.object)
+	return string(jsonBytes)
 }
 
 func createJsonObject(data interface{}) JsonObject {
@@ -121,9 +122,9 @@ func createJsonObject(data interface{}) JsonObject {
 	return obj
 }
 
-func parseJsonObject(data string) (JsonObject, error) {
+func parseJsonObject(data []byte) (JsonObject, error) {
 	var jo JsonObject
-	err := unmarshal([]byte(data), &jo.object)
+	err := unmarshal(data, &jo.object)
 	if err != nil {
 		return JsonObject{}, err
 	}
