@@ -47,10 +47,6 @@ func (o JsonObject) AddKeyValue(k string, value interface{}) {
 	o.object[k] = value
 }
 
-func (o JsonObject) String() string {
-	return string(marshal(o.object))
-}
-
 func CreateEmptyJsonObject() JsonObject {
 	var obj JsonObject
 	obj.object = make(map[string]interface{})
@@ -61,6 +57,10 @@ func CreateJsonObject(data interface{}) JsonObject {
 	var obj JsonObject
 	obj.object = data.(map[string]interface{})
 	return obj
+}
+
+func (o JsonObject) String() string {
+	return string(marshal(o.object))
 }
 
 func parseJsonObject(data string) (JsonObject, error) {

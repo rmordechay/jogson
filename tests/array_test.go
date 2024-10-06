@@ -17,7 +17,7 @@ func TestArrayFilter(t *testing.T) {
 	assert.Equal(t, "Chris", filteredArr[0].Object.Get("name").AsString)
 }
 
-func TestArrayMap(t *testing.T) {
+func TestArrayMapString(t *testing.T) {
 	arr, err := jsonmapper.GetMapperFromString(jsonStrArray)
 	assert.NoError(t, err)
 	getNames := func(element jsonmapper.Mapper) string {
@@ -27,6 +27,20 @@ func TestArrayMap(t *testing.T) {
 	assert.Equal(t, 2, len(mappedArr))
 	assert.Contains(t, mappedArr, "Jason")
 	assert.Contains(t, mappedArr, "Chris")
+}
+
+func TestArrayMapObject(t *testing.T) {
+	arr, err := jsonmapper.GetMapperFromString(jsonStrArray)
+	assert.NoError(t, err)
+	getNames := func(element jsonmapper.Mapper) jsonmapper.JsonObject {
+		return element.Object
+	}
+	var mappedArr = jsonmapper.Map(arr.Array, getNames)
+	assert.Equal(t, 2, len(mappedArr))
+	expected1 := mappedArr[0].Get("name").AsString
+	expected2 := mappedArr[1].Get("name").AsString
+	assert.Equal(t, expected1, "Jason")
+	assert.Equal(t, expected2, "Chris")
 }
 
 func TestArrayForEach(t *testing.T) {

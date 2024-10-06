@@ -1,13 +1,13 @@
 package jsonmapper
 
 type JsonArray struct {
-	length   int
-	elements []interface{}
+	//length   int
+	elements *[]interface{}
 }
 
 func Map[T JsonType](arr JsonArray, f func(mapper Mapper) T) []T {
 	var jsonMappers []T
-	for _, element := range arr.elements {
+	for _, element := range *arr.elements {
 		field := f(getMapperFromField(element))
 		jsonMappers = append(jsonMappers, field)
 	}
@@ -15,14 +15,14 @@ func Map[T JsonType](arr JsonArray, f func(mapper Mapper) T) []T {
 }
 
 func ForEach(arr JsonArray, f func(mapper Mapper)) {
-	for _, element := range arr.elements {
+	for _, element := range *arr.elements {
 		f(getMapperFromField(element))
 	}
 }
 
 func Filter(arr JsonArray, f func(mapper Mapper) bool) []Mapper {
 	var jsonMappers []Mapper
-	for _, element := range arr.elements {
+	for _, element := range *arr.elements {
 		field := getMapperFromField(element)
 		if f(field) {
 			jsonMappers = append(jsonMappers, field)
@@ -32,8 +32,8 @@ func Filter(arr JsonArray, f func(mapper Mapper) bool) []Mapper {
 }
 
 func (a JsonArray) Elements() []Mapper {
-	jsons := make([]Mapper, 0, len(a.elements))
-	for _, element := range a.elements {
+	jsons := make([]Mapper, 0, len(*a.elements))
+	for _, element := range *a.elements {
 		jsons = append(jsons, getMapperFromField(element))
 	}
 	return jsons
@@ -43,28 +43,32 @@ func (a JsonArray) Get(key int) Mapper {
 	if key >= a.Length() {
 		panic("index out of bound")
 	}
-	return getMapperFromField(a.elements[key])
+	return getMapperFromField((*a.elements)[key])
 }
 
 func (a JsonArray) Length() int {
-	return a.length
+	return len(*a.elements)
 }
 
-func (a JsonArray) String() string {
-	return string(marshal(a.elements))
+func (a JsonArray) AddValue(value interface{}) {
+	*a.elements = append(*a.elements, &value)
 }
 
 func CreateEmptyJsonArray() JsonArray {
 	var arr JsonArray
-	arr.elements = make([]interface{}, 0)
+	elements := make([]interface{}, 0)
+	arr.elements = &elements
 	return arr
 }
 
 func CreateJsonArray(data interface{}) JsonArray {
 	var arr JsonArray
-	arr.elements = data.([]interface{})
-	arr.length = len(arr.elements)
+	arr.elements = data.(*[]interface{})
 	return arr
+}
+
+func (a JsonArray) String() string {
+	return string(marshal(a.elements))
 }
 
 func parseJsonArray(data string) (JsonArray, error) {
@@ -74,8 +78,7 @@ func parseJsonArray(data string) (JsonArray, error) {
 	if err != nil {
 		return JsonArray{}, err
 	}
-	ja.elements = arr
-	ja.length = len(ja.elements)
+	ja.elements = &arr
 	return ja, nil
 }
 
@@ -85,7 +88,6 @@ func convertArray[T JsonType](data []T) JsonArray {
 	for i, v := range data {
 		result[i] = v
 	}
-	arr.elements = result
-	arr.length = len(arr.elements)
+	arr.elements = &result
 	return arr
 }
