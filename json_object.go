@@ -1,6 +1,8 @@
 package jsonmapper
 
 type Object interface {
+	Keys() []string
+	Values() []Mapper
 	Has(key string) bool
 	Get(key string) Mapper
 	Find(key string) Mapper
@@ -11,6 +13,22 @@ type Object interface {
 
 type JsonObject struct {
 	object map[string]*interface{}
+}
+
+func (o JsonObject) Keys() []string {
+	keys := make([]string, 0, len(o.object))
+	for key := range o.object {
+		keys = append(keys, key)
+	}
+	return keys
+}
+
+func (o JsonObject) Values() []Mapper {
+	values := make([]Mapper, 0, len(o.object))
+	for _, v := range o.object {
+		values = append(values, getMapperFromField(v))
+	}
+	return values
 }
 
 func (o JsonObject) Has(key string) bool {
