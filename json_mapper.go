@@ -7,7 +7,7 @@ import (
 	"reflect"
 )
 
-type Json struct {
+type JsonMapper struct {
 	IsBool   bool
 	IsInt    bool
 	IsFloat  bool
@@ -24,28 +24,28 @@ type Json struct {
 	AsArray  JsonArray
 }
 
-func GetMapper(data string) (Json, error) {
-	var mapper Json
+func GetMapper(data string) (JsonMapper, error) {
+	var mapper JsonMapper
 	if isJsonArray(data) {
 		mapper.IsArray = true
 		array, err := parseJsonArray(data)
 		if err != nil {
-			return Json{}, err
+			return JsonMapper{}, err
 		}
 		mapper.AsArray = array
 	} else {
 		mapper.IsObject = true
 		object, err := parseJsonObject(data)
 		if err != nil {
-			return Json{}, err
+			return JsonMapper{}, err
 		}
 		mapper.AsObject = object
 	}
 	return mapper, nil
 }
 
-func getMapperFromField(data interface{}) Json {
-	var mapper Json
+func getMapperFromField(data interface{}) JsonMapper {
+	var mapper JsonMapper
 	switch data.(type) {
 	case bool:
 		mapper.IsBool = true
@@ -104,7 +104,7 @@ func parseJsonArray(data string) (JsonArray, error) {
 	return ja, nil
 }
 
-func (j Json) String() string {
+func (j JsonMapper) String() string {
 	if j.IsBool {
 		return fmt.Sprintf("%v", j.AsBool)
 	} else if j.IsInt {

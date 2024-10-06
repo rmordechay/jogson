@@ -17,17 +17,30 @@ func (o JsonObject) Has(key string) bool {
 	return false
 }
 
-func (o JsonObject) Get(key string) Json {
+func (o JsonObject) Get(key string) JsonMapper {
 	for k, v := range o.object {
 		if k == key {
 			return getMapperFromField(v)
 		}
 	}
-	return Json{}
+	return JsonMapper{}
 }
 
-func (o JsonObject) Elements() map[string]Json {
-	jsons := make(map[string]Json)
+func (o JsonObject) Find(key string) JsonMapper {
+	for k, v := range o.object {
+		field := getMapperFromField(v)
+		if k == key {
+			return field
+		}
+		if field.IsObject {
+			return field.AsObject.Find(key)
+		}
+	}
+	return JsonMapper{}
+}
+
+func (o JsonObject) Elements() map[string]JsonMapper {
+	jsons := make(map[string]JsonMapper)
 	for k, v := range o.object {
 		jsons[k] = getMapperFromField(v)
 	}

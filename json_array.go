@@ -7,8 +7,8 @@ type JsonArray struct {
 	elements []interface{}
 }
 
-func (a JsonArray) Elements() []Json {
-	jsons := make([]Json, 0, len(a.elements))
+func (a JsonArray) Elements() []JsonMapper {
+	jsons := make([]JsonMapper, 0, len(a.elements))
 	for _, element := range a.elements {
 		jsons = append(jsons, getMapperFromField(element))
 	}
