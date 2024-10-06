@@ -1,8 +1,16 @@
 [
   {
-    "name": "Jason"
+    "name": "Jason",
+    "names": [
+      "George",
+      "Dana"
+    ]
   },
   {
-    "name": "Chris"
+    "name": "Chris",
+    "names": [
+      "Naomi",
+      "Diego"
+    ]
   }
 ]

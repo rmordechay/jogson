@@ -43,6 +43,10 @@ func (o JsonObject) Elements() map[string]JsonMapper {
 	return jsons
 }
 
+func (o JsonObject) AddKeyValue(k string, value interface{}) {
+	o.object[k] = value
+}
+
 func (o JsonObject) String() string {
 	return string(marshal(o.object))
 }

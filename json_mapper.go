@@ -8,8 +8,11 @@ import (
 	"reflect"
 )
 
+type JsonType interface {
+	int | string | float64 | bool
+}
+
 type JsonMapper struct {
-	writer   JsonWriter
 	IsBool   bool
 	IsInt    bool
 	IsFloat  bool
@@ -58,6 +61,12 @@ func GetMapperFromString(data string) (JsonMapper, error) {
 	return mapper, nil
 }
 
+func CreateEmptyJsonObject() JsonObject {
+	jsonObject := JsonObject{}
+	jsonObject.object = make(map[string]interface{})
+	return jsonObject
+}
+
 func getMapperFromField(data interface{}) JsonMapper {
 	var mapper JsonMapper
 	switch data.(type) {
@@ -80,6 +89,14 @@ func getMapperFromField(data interface{}) JsonMapper {
 		var jo JsonObject
 		jo.object = data.(map[string]interface{})
 		mapper.Object = jo
+	case []float64:
+		addArray(data.([]float64), &mapper)
+	case []int:
+		addArray(data.([]int), &mapper)
+	case []string:
+		addArray(data.([]string), &mapper)
+	case []bool:
+		addArray(data.([]bool), &mapper)
 	case []interface{}:
 		mapper.IsArray = true
 		var ja JsonArray
@@ -89,9 +106,21 @@ func getMapperFromField(data interface{}) JsonMapper {
 	case nil:
 		mapper.IsNull = true
 	default:
-		log.Fatalf("%v not implemented", reflect.TypeOf(data))
+		log.Fatalf("getMapperFromField failed. %v not implemented.", reflect.TypeOf(data))
 	}
 	return mapper
+}
+
+func addArray[T JsonType](data []T, mapper *JsonMapper) {
+	mapper.IsArray = true
+	var ja JsonArray
+	result := make([]interface{}, len(data))
+	for i, v := range data {
+		result[i] = v
+	}
+	ja.elements = result
+	ja.Length = len(ja.elements)
+	mapper.Array = ja
 }
 
 func isJsonArray(data string) bool {
@@ -115,6 +144,7 @@ func parseJsonArray(data string) (JsonArray, error) {
 		return JsonArray{}, err
 	}
 	ja.elements = arr
+	ja.Length = len(ja.elements)
 	return ja, nil
 }
 
