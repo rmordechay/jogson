@@ -119,7 +119,7 @@ func getMapperFromField(data interface{}) Mapper {
 	case nil:
 		mapper.IsNull = true
 	default:
-		log.Fatalf("getMapperFromField failed. %v not implemented.", reflect.TypeOf(data))
+		log.Fatalf("JSON conversion failed. %v not implemented.", reflect.TypeOf(data))
 	}
 	return mapper
 }

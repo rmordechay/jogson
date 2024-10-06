@@ -43,8 +43,9 @@ func (o JsonObject) Elements() map[string]Mapper {
 	return jsons
 }
 
-func (o JsonObject) AddKeyValue(k string, value interface{}) {
+func (o JsonObject) AddKeyValue(k string, value interface{}) JsonObject {
 	o.object[k] = value
+	return o
 }
 
 func CreateEmptyJsonObject() JsonObject {

@@ -8,35 +8,35 @@ import (
 
 func TestWriteObjectString(t *testing.T) {
 	obj := jsonmapper.CreateEmptyJsonObject()
-	obj.AddKeyValue("name", "chris")
+	obj = obj.AddKeyValue("name", "chris")
 	objElements := obj.Elements()
 	assert.Equal(t, "chris", objElements["name"].String())
 }
 
 func TestWriteObjectInt(t *testing.T) {
 	obj := jsonmapper.CreateEmptyJsonObject()
-	obj.AddKeyValue("int", 2)
+	obj = obj.AddKeyValue("int", 2)
 	objElements := obj.Elements()
 	assert.Equal(t, 2, objElements["int"].AsInt)
 }
 
 func TestWriteObjectFloat(t *testing.T) {
 	obj := jsonmapper.CreateEmptyJsonObject()
-	obj.AddKeyValue("float", 2.5)
+	obj = obj.AddKeyValue("float", 2.5)
 	objElements := obj.Elements()
 	assert.Equal(t, 2.5, objElements["float"].AsFloat)
 }
 
 func TestWriteObjectBool(t *testing.T) {
 	obj := jsonmapper.CreateEmptyJsonObject()
-	obj.AddKeyValue("bool", true)
+	obj = obj.AddKeyValue("bool", true)
 	objElements := obj.Elements()
 	assert.Equal(t, true, objElements["bool"].AsBool)
 }
 
 func TestWriteObjectArrayStrings(t *testing.T) {
 	obj := jsonmapper.CreateEmptyJsonObject()
-	obj.AddKeyValue("strings", []string{"string1", "string2", "string4"})
+	obj = obj.AddKeyValue("strings", []string{"string1", "string2", "string4"})
 	objElements := obj.Elements()
 
 	stringArray := objElements["strings"].Array
@@ -50,7 +50,7 @@ func TestWriteObjectArrayStrings(t *testing.T) {
 
 func TestWriteObjectArrayInt(t *testing.T) {
 	obj := jsonmapper.CreateEmptyJsonObject()
-	obj.AddKeyValue("numbers", []int{1, 2, 4})
+	obj = obj.AddKeyValue("numbers", []int{1, 2, 4})
 	objElements := obj.Elements()
 
 	numberArray := objElements["numbers"].Array
@@ -64,7 +64,7 @@ func TestWriteObjectArrayInt(t *testing.T) {
 
 func TestWriteObjectArrayFloat(t *testing.T) {
 	obj := jsonmapper.CreateEmptyJsonObject()
-	obj.AddKeyValue("numbers", []float64{1.5, 2.0, 4.2})
+	obj = obj.AddKeyValue("numbers", []float64{1.5, 2.0, 4.2})
 	objElements := obj.Elements()
 
 	numberArray := objElements["numbers"].Array
@@ -78,6 +78,11 @@ func TestWriteObjectArrayFloat(t *testing.T) {
 
 func TestWriteArrayFloat(t *testing.T) {
 	arr := jsonmapper.CreateEmptyJsonArray()
-	arr.AddValue(1)
-	assert.Equal(t, 1, arr.Length())
+	arr = arr.AddValue(1)
+	arr = arr.AddValue(4)
+	arr = arr.AddValue(6)
+	assert.Equal(t, 3, arr.Length())
+	assert.Equal(t, 1, arr.Get(0).AsInt)
+	assert.Equal(t, 4, arr.Get(1).AsInt)
+	assert.Equal(t, 6, arr.Get(2).AsInt)
 }
