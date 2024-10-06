@@ -2,7 +2,6 @@ package jsonmapper
 
 type JsonArray interface {
 	Elements() []Mapper
-	Filter(func(element Mapper) bool) []Mapper
 	Get(key int) Mapper
 	String() string
 	Length() int
@@ -13,11 +12,26 @@ type jsonArray struct {
 	elements []interface{}
 }
 
-func (a jsonArray) Filter(comparisonFunc func(mapper Mapper) bool) []Mapper {
+func Map[T JsonType](arr JsonArray, f func(mapper Mapper) T) []T {
+	var jsonMappers []T
+	for _, element := range arr.(jsonArray).elements {
+		field := f(getMapperFromField(element))
+		jsonMappers = append(jsonMappers, field)
+	}
+	return jsonMappers
+}
+
+func ForEach(arr JsonArray, f func(mapper Mapper)) {
+	for _, element := range arr.(jsonArray).elements {
+		f(getMapperFromField(element))
+	}
+}
+
+func Filter(arr JsonArray, f func(mapper Mapper) bool) []Mapper {
 	var jsonMappers []Mapper
-	for _, element := range a.elements {
+	for _, element := range arr.(jsonArray).elements {
 		field := getMapperFromField(element)
-		if comparisonFunc(field) {
+		if f(field) {
 			jsonMappers = append(jsonMappers, field)
 		}
 	}
