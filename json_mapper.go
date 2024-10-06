@@ -12,7 +12,7 @@ type JsonType interface {
 	int | string | float64 | bool | map[string]interface{} | []interface{}
 }
 
-type JsonMapper struct {
+type Mapper struct {
 	IsBool   bool
 	IsInt    bool
 	IsFloat  bool
@@ -29,39 +29,39 @@ type JsonMapper struct {
 	Array    JsonArray
 }
 
-func GetMapperFromFile(path string) (JsonMapper, error) {
+func GetMapperFromFile(path string) (Mapper, error) {
 	file, err := os.ReadFile(path)
 	if err != nil {
-		return JsonMapper{}, err
+		return Mapper{}, err
 	}
 	return GetMapperFromString(string(file))
 }
 
-func GetMapperFromBytes(data []byte) (JsonMapper, error) {
+func GetMapperFromBytes(data []byte) (Mapper, error) {
 	return GetMapperFromString(string(data))
 }
 
-func GetMapperFromString(data string) (JsonMapper, error) {
-	var mapper JsonMapper
+func GetMapperFromString(data string) (Mapper, error) {
+	var mapper Mapper
 	if isJsonArray(data) {
 		mapper.IsArray = true
 		array, err := parseJsonArray(data)
 		if err != nil {
-			return JsonMapper{}, err
+			return Mapper{}, err
 		}
 		mapper.Array = array
 	} else {
 		mapper.IsObject = true
 		object, err := parseJsonObject(data)
 		if err != nil {
-			return JsonMapper{}, err
+			return Mapper{}, err
 		}
 		mapper.Object = object
 	}
 	return mapper, nil
 }
 
-func (j JsonMapper) String() string {
+func (j Mapper) String() string {
 	if j.IsBool {
 		return fmt.Sprintf("%v", j.AsBool)
 	} else if j.IsInt {
@@ -78,8 +78,8 @@ func (j JsonMapper) String() string {
 	return ""
 }
 
-func getMapperFromField(data interface{}) JsonMapper {
-	var mapper JsonMapper
+func getMapperFromField(data interface{}) Mapper {
+	var mapper Mapper
 	switch data.(type) {
 	case bool:
 		mapper.IsBool = true

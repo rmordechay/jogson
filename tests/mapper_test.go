@@ -8,9 +8,6 @@ import (
 	"testing"
 )
 
-const jsonStrObject = `{"name": "Jason"}`
-const jsonStrArray = `[{"name":  "Jason"},{"name":  "Chris"}]`
-
 func TestParseJsonObjectFromString(t *testing.T) {
 	mapper, err := jsonmapper.GetMapperFromString(jsonStrObject)
 	assert.NoError(t, err)

@@ -2,9 +2,9 @@ package jsonmapper
 
 type JsonObject interface {
 	Has(key string) bool
-	Get(key string) JsonMapper
-	Find(key string) JsonMapper
-	Elements() map[string]JsonMapper
+	Get(key string) Mapper
+	Find(key string) Mapper
+	Elements() map[string]Mapper
 	AddKeyValue(k string, value interface{})
 	String() string
 }
@@ -22,16 +22,16 @@ func (o jsonObject) Has(key string) bool {
 	return false
 }
 
-func (o jsonObject) Get(key string) JsonMapper {
+func (o jsonObject) Get(key string) Mapper {
 	for k, v := range o.object {
 		if k == key {
 			return getMapperFromField(v)
 		}
 	}
-	return JsonMapper{}
+	return Mapper{}
 }
 
-func (o jsonObject) Find(key string) JsonMapper {
+func (o jsonObject) Find(key string) Mapper {
 	for k, v := range o.object {
 		field := getMapperFromField(v)
 		if k == key {
@@ -41,11 +41,11 @@ func (o jsonObject) Find(key string) JsonMapper {
 			return field.Object.Find(key)
 		}
 	}
-	return JsonMapper{}
+	return Mapper{}
 }
 
-func (o jsonObject) Elements() map[string]JsonMapper {
-	jsons := make(map[string]JsonMapper)
+func (o jsonObject) Elements() map[string]Mapper {
+	jsons := make(map[string]Mapper)
 	for k, v := range o.object {
 		jsons[k] = getMapperFromField(v)
 	}

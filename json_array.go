@@ -1,8 +1,9 @@
 package jsonmapper
 
 type JsonArray interface {
-	Elements() []JsonMapper
-	Get(key int) JsonMapper
+	Elements() []Mapper
+	Filter(func(element Mapper) bool) []Mapper
+	Get(key int) Mapper
 	String() string
 	Length() int
 }
@@ -12,15 +13,26 @@ type jsonArray struct {
 	elements []interface{}
 }
 
-func (a jsonArray) Elements() []JsonMapper {
-	jsons := make([]JsonMapper, 0, len(a.elements))
+func (a jsonArray) Filter(comparisonFunc func(mapper Mapper) bool) []Mapper {
+	var jsonMappers []Mapper
+	for _, element := range a.elements {
+		field := getMapperFromField(element)
+		if comparisonFunc(field) {
+			jsonMappers = append(jsonMappers, field)
+		}
+	}
+	return jsonMappers
+}
+
+func (a jsonArray) Elements() []Mapper {
+	jsons := make([]Mapper, 0, len(a.elements))
 	for _, element := range a.elements {
 		jsons = append(jsons, getMapperFromField(element))
 	}
 	return jsons
 }
 
-func (a jsonArray) Get(key int) JsonMapper {
+func (a jsonArray) Get(key int) Mapper {
 	if key >= a.Length() {
 		panic("index out of bound")
 	}
