@@ -11,7 +11,8 @@ func TestObjectGetKeys(t *testing.T) {
 	assert.NoError(t, err)
 	keys := obj.Object.Keys()
 	assert.Equal(t, 2, len(keys))
-	assert.Equal(t, []string{"name", "age"}, keys)
+	assert.Contains(t, keys, "name")
+	assert.Contains(t, keys, "age")
 }
 
 func TestObjectGetValues(t *testing.T) {

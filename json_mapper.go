@@ -1,8 +1,8 @@
 package jsonmapper
 
 import (
-	"encoding/json"
 	"fmt"
+	jsoniter "github.com/json-iterator/go"
 	"log"
 	"os"
 	"reflect"
@@ -143,10 +143,12 @@ func isJsonArray(data string) bool {
 }
 
 func marshal(v any) []byte {
+	var json = jsoniter.ConfigCompatibleWithStandardLibrary
 	jsonBytes, _ := json.Marshal(v)
 	return jsonBytes
 }
 
 func unmarshal(data []byte, v any) error {
+	var json = jsoniter.ConfigCompatibleWithStandardLibrary
 	return json.Unmarshal(data, &v)
 }

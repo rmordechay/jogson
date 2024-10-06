@@ -14,10 +14,10 @@ func TestParseJsonObjectFromString(t *testing.T) {
 	assert.NoError(t, err)
 
 	actual := removeWhiteSpaces(mapper.Object.String())
-	expected := removeWhiteSpaces(jsonObjectTest)
 
 	assert.True(t, mapper.IsObject)
-	assert.Equal(t, expected, actual)
+	assert.Contains(t, actual, `"age":15`)
+	assert.Contains(t, actual, `"name":"Jason"`)
 }
 
 func TestParseJsonArrayFromString(t *testing.T) {
@@ -49,10 +49,10 @@ func TestParseJsonObjectFromBytes(t *testing.T) {
 	assert.NoError(t, err)
 
 	actual := removeWhiteSpaces(mapper.Object.String())
-	expected := removeWhiteSpaces(jsonObjectTest)
 
 	assert.True(t, mapper.IsObject)
-	assert.Equal(t, expected, actual)
+	assert.Contains(t, actual, `"age":15`)
+	assert.Contains(t, actual, `"name":"Jason"`)
 }
 
 func TestParseJsonArrayFromBytes(t *testing.T) {

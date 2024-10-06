@@ -81,16 +81,6 @@ func CreateEmptyJsonObject() JsonObject {
 	return obj
 }
 
-func createJsonObject(data interface{}) JsonObject {
-	var obj JsonObject
-	var object = make(map[string]*interface{})
-	for k, v := range data.(map[string]interface{}) {
-		object[k] = &v
-	}
-	obj.object = object
-	return obj
-}
-
 func ForEachObject(obj JsonObject, f func(key string, mapper Mapper)) {
 	for k, element := range obj.object {
 		f(k, getMapperFromField(element))
@@ -119,6 +109,16 @@ func FilterObject(obj JsonObject, f func(key string, mapper Mapper) bool) []Mapp
 
 func (o JsonObject) String() string {
 	return string(marshal(o.object))
+}
+
+func createJsonObject(data interface{}) JsonObject {
+	var obj JsonObject
+	var object = make(map[string]*interface{})
+	for k, v := range data.(map[string]interface{}) {
+		object[k] = &v
+	}
+	obj.object = object
+	return obj
 }
 
 func parseJsonObject(data string) (JsonObject, error) {
