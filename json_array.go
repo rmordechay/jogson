@@ -6,7 +6,7 @@ import (
 )
 
 type JsonArray struct {
-	elements []interface{}
+	elements []*interface{}
 }
 
 func (a JsonArray) Elements() []Mapper {
@@ -32,20 +32,20 @@ func (a JsonArray) Length() int {
 }
 
 func (a JsonArray) AddValue(value interface{}) JsonArray {
-	a.elements = append(a.elements, value)
+	a.elements = append(a.elements, &value)
 	return a
 }
 
 func CreateEmptyJsonArray() JsonArray {
 	var arr JsonArray
-	elements := make([]interface{}, 0)
+	elements := make([]*interface{}, 0)
 	arr.elements = elements
 	return arr
 }
 
 func CreateJsonArray(data interface{}) JsonArray {
 	var arr JsonArray
-	arr.elements = data.([]interface{})
+	arr.elements = data.([]*interface{})
 	return arr
 }
 
@@ -81,7 +81,7 @@ func (a JsonArray) String() string {
 
 func parseJsonArray(data string) (JsonArray, error) {
 	var ja JsonArray
-	var arr []interface{}
+	var arr []*interface{}
 	err := unmarshal([]byte(data), &arr)
 	if err != nil {
 		return JsonArray{}, err
@@ -92,9 +92,11 @@ func parseJsonArray(data string) (JsonArray, error) {
 
 func convertArray[T JsonType](data []T) JsonArray {
 	var arr JsonArray
-	result := make([]interface{}, len(data))
+	result := make([]*interface{}, len(data))
 	for i, v := range data {
-		result[i] = v
+		var a interface{}
+		a = v
+		result[i] = &a
 	}
 	arr.elements = result
 	return arr

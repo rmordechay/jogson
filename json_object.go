@@ -1,5 +1,14 @@
 package jsonmapper
 
+type Object interface {
+	Has(key string) bool
+	Get(key string) Mapper
+	Find(key string) Mapper
+	Elements() map[string]Mapper
+	AddKeyValue(k string, value interface{}) JsonObject
+	String() string
+}
+
 type JsonObject struct {
 	object map[string]interface{}
 }
@@ -58,6 +67,32 @@ func CreateJsonObject(data interface{}) JsonObject {
 	var obj JsonObject
 	obj.object = data.(map[string]interface{})
 	return obj
+}
+
+func ForEachObject(obj JsonObject, f func(key string, mapper Mapper)) {
+	for k, element := range obj.object {
+		f(k, getMapperFromField(element))
+	}
+}
+
+func MapObject[T JsonType](obj JsonObject, f func(key string, mapper Mapper) T) []T {
+	var jsonMappers []T
+	for k, element := range obj.object {
+		field := f(k, getMapperFromField(element))
+		jsonMappers = append(jsonMappers, field)
+	}
+	return jsonMappers
+}
+
+func FilterObject(obj JsonObject, f func(key string, mapper Mapper) bool) []Mapper {
+	var jsonMappers []Mapper
+	for k, element := range obj.object {
+		field := getMapperFromField(element)
+		if f(k, field) {
+			jsonMappers = append(jsonMappers, field)
+		}
+	}
+	return jsonMappers
 }
 
 func (o JsonObject) String() string {

@@ -41,7 +41,7 @@ func TestParseJsonArrayFromStringWithNulls(t *testing.T) {
 
 	assert.True(t, mapper.IsArray)
 	assert.Equal(t, expected, actual)
-	assert.Equal(t, mapper.Array.Length(), 2)
+	assert.Equal(t, 3, mapper.Array.Length())
 }
 
 func TestParseJsonObjectFromBytes(t *testing.T) {
