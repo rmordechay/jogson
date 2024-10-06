@@ -10,7 +10,7 @@ type Object interface {
 }
 
 type JsonObject struct {
-	object map[string]interface{}
+	object map[string]*interface{}
 }
 
 func (o JsonObject) Has(key string) bool {
@@ -53,19 +53,23 @@ func (o JsonObject) Elements() map[string]Mapper {
 }
 
 func (o JsonObject) AddKeyValue(k string, value interface{}) JsonObject {
-	o.object[k] = value
+	o.object[k] = &value
 	return o
 }
 
 func CreateEmptyJsonObject() JsonObject {
 	var obj JsonObject
-	obj.object = make(map[string]interface{})
+	obj.object = make(map[string]*interface{})
 	return obj
 }
 
-func CreateJsonObject(data interface{}) JsonObject {
+func createJsonObject(data interface{}) JsonObject {
 	var obj JsonObject
-	obj.object = data.(map[string]interface{})
+	var object = make(map[string]*interface{})
+	for k, v := range data.(map[string]interface{}) {
+		object[k] = &v
+	}
+	obj.object = object
 	return obj
 }
 

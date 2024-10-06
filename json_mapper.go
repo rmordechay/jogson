@@ -91,48 +91,49 @@ func (m Mapper) String() string {
 	return ""
 }
 
-func getMapperFromField(data interface{}) Mapper {
+func getMapperFromField(data *interface{}) Mapper {
 	var mapper Mapper
-	switch data.(type) {
+	value := *data
+	switch value.(type) {
 	case bool:
 		mapper.IsBool = true
-		mapper.AsBool = data.(bool)
+		mapper.AsBool = value.(bool)
 	case int:
 		mapper.IsInt = true
-		mapper.AsInt = data.(int)
+		mapper.AsInt = value.(int)
 	case float64:
-		if data == float64(int(data.(float64))) {
+		if value == float64(int(value.(float64))) {
 			mapper.IsInt = true
-			mapper.AsInt = int(data.(float64))
+			mapper.AsInt = int(value.(float64))
 		} else {
 			mapper.IsFloat = true
 		}
-		mapper.AsFloat = data.(float64)
+		mapper.AsFloat = value.(float64)
 	case string:
 		mapper.IsString = true
-		mapper.AsString = data.(string)
+		mapper.AsString = value.(string)
 	case []float64:
 		mapper.IsArray = true
-		mapper.Array = convertArray(data.([]float64))
+		mapper.Array = convertArray(value.([]float64))
 	case []int:
 		mapper.IsArray = true
-		mapper.Array = convertArray(data.([]int))
+		mapper.Array = convertArray(value.([]int))
 	case []string:
 		mapper.IsArray = true
-		mapper.Array = convertArray(data.([]string))
+		mapper.Array = convertArray(value.([]string))
 	case []bool:
 		mapper.IsArray = true
-		mapper.Array = convertArray(data.([]bool))
+		mapper.Array = convertArray(value.([]bool))
 	case []interface{}:
 		mapper.IsArray = true
-		mapper.Array = CreateJsonArray(data)
+		mapper.Array = CreateJsonArray(value)
 	case map[string]interface{}:
 		mapper.IsObject = true
-		mapper.Object = CreateJsonObject(data)
+		mapper.Object = createJsonObject(value)
 	case nil:
 		mapper.IsNull = true
 	default:
-		log.Fatalf("JSON conversion failed. %v not implemented.", reflect.TypeOf(data))
+		log.Fatalf("JSON conversion for %v failed. %v not implemented.", value, reflect.TypeOf(data))
 	}
 	return mapper
 }
