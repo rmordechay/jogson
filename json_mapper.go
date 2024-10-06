@@ -61,10 +61,21 @@ func GetMapperFromString(data string) (JsonMapper, error) {
 	return mapper, nil
 }
 
-func CreateEmptyJsonObject() JsonObject {
-	jsonObject := JsonObject{}
-	jsonObject.object = make(map[string]interface{})
-	return jsonObject
+func (j JsonMapper) String() string {
+	if j.IsBool {
+		return fmt.Sprintf("%v", j.AsBool)
+	} else if j.IsInt {
+		return fmt.Sprintf("%v", j.AsInt)
+	} else if j.IsFloat {
+		return fmt.Sprintf("%v", j.AsFloat)
+	} else if j.IsString {
+		return fmt.Sprintf("%v", j.AsString)
+	} else if j.IsObject {
+		return fmt.Sprintf("%v", j.Object)
+	} else if j.IsArray {
+		return fmt.Sprintf("%v", j.Array)
+	}
+	return ""
 }
 
 func getMapperFromField(data interface{}) JsonMapper {
@@ -84,25 +95,24 @@ func getMapperFromField(data interface{}) JsonMapper {
 	case string:
 		mapper.IsString = true
 		mapper.AsString = data.(string)
-	case map[string]interface{}:
-		mapper.IsObject = true
-		var jo JsonObject
-		jo.object = data.(map[string]interface{})
-		mapper.Object = jo
 	case []float64:
-		addArray(data.([]float64), &mapper)
+		mapper.IsArray = true
+		mapper.Array = convertArray(data.([]float64))
 	case []int:
-		addArray(data.([]int), &mapper)
+		mapper.IsArray = true
+		mapper.Array = convertArray(data.([]int))
 	case []string:
-		addArray(data.([]string), &mapper)
+		mapper.IsArray = true
+		mapper.Array = convertArray(data.([]string))
 	case []bool:
-		addArray(data.([]bool), &mapper)
+		mapper.IsArray = true
+		mapper.Array = convertArray(data.([]bool))
 	case []interface{}:
 		mapper.IsArray = true
-		var ja JsonArray
-		ja.elements = data.([]interface{})
-		ja.Length = len(ja.elements)
-		mapper.Array = ja
+		mapper.Array = CreateJsonArray(data)
+	case map[string]interface{}:
+		mapper.IsObject = true
+		mapper.Object = CreateJsonObject(data)
 	case nil:
 		mapper.IsNull = true
 	default:
@@ -111,58 +121,8 @@ func getMapperFromField(data interface{}) JsonMapper {
 	return mapper
 }
 
-func addArray[T JsonType](data []T, mapper *JsonMapper) {
-	mapper.IsArray = true
-	var ja JsonArray
-	result := make([]interface{}, len(data))
-	for i, v := range data {
-		result[i] = v
-	}
-	ja.elements = result
-	ja.Length = len(ja.elements)
-	mapper.Array = ja
-}
-
 func isJsonArray(data string) bool {
 	return data[0] == '['
-}
-
-func parseJsonObject(data string) (JsonObject, error) {
-	var jo JsonObject
-	err := unmarshal([]byte(data), &jo.object)
-	if err != nil {
-		return JsonObject{}, err
-	}
-	return jo, nil
-}
-
-func parseJsonArray(data string) (JsonArray, error) {
-	var ja JsonArray
-	var arr []interface{}
-	err := unmarshal([]byte(data), &arr)
-	if err != nil {
-		return JsonArray{}, err
-	}
-	ja.elements = arr
-	ja.Length = len(ja.elements)
-	return ja, nil
-}
-
-func (j JsonMapper) String() string {
-	if j.IsBool {
-		return fmt.Sprintf("%v", j.AsBool)
-	} else if j.IsInt {
-		return fmt.Sprintf("%v", j.AsInt)
-	} else if j.IsFloat {
-		return fmt.Sprintf("%v", j.AsFloat)
-	} else if j.IsString {
-		return fmt.Sprintf("%v", j.AsString)
-	} else if j.IsObject {
-		return fmt.Sprintf("%v", j.Object)
-	} else if j.IsArray {
-		return fmt.Sprintf("%v", j.Array)
-	}
-	return ""
 }
 
 func marshal(v any) []byte {
