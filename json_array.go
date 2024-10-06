@@ -1,5 +1,10 @@
 package jsonmapper
 
+import (
+	"errors"
+	"fmt"
+)
+
 type JsonArray struct {
 	elements []interface{}
 }
@@ -12,11 +17,14 @@ func (a JsonArray) Elements() []Mapper {
 	return jsons
 }
 
-func (a JsonArray) Get(key int) Mapper {
-	if key >= a.Length() {
-		panic("index out of bound")
+func (a JsonArray) Get(i int) Mapper {
+	if i >= a.Length() {
+		indexErr := fmt.Sprintf("index out of range [%v] with length %v", i, a.Length())
+		var mapper Mapper
+		mapper.Err = errors.New(indexErr)
+		return mapper
 	}
-	return getMapperFromField((a.elements)[key])
+	return getMapperFromField((a.elements)[i])
 }
 
 func (a JsonArray) Length() int {

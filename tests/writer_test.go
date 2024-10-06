@@ -85,4 +85,5 @@ func TestWriteArrayFloat(t *testing.T) {
 	assert.Equal(t, 1, arr.Get(0).AsInt)
 	assert.Equal(t, 4, arr.Get(1).AsInt)
 	assert.Equal(t, 6, arr.Get(2).AsInt)
+	assert.Equal(t, 0, arr.Get(3).AsInt)
 }

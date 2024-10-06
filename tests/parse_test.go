@@ -10,22 +10,34 @@ import (
 )
 
 func TestParseJsonObjectFromString(t *testing.T) {
-	mapper, err := jsonmapper.GetMapperFromString(jsonStrObject)
+	mapper, err := jsonmapper.GetMapperFromString(jsonObjectTest)
 	assert.NoError(t, err)
 
 	actual := removeWhiteSpaces(mapper.Object.String())
-	expected := removeWhiteSpaces(jsonStrObject)
+	expected := removeWhiteSpaces(jsonObjectTest)
 
 	assert.True(t, mapper.IsObject)
 	assert.Equal(t, expected, actual)
 }
 
 func TestParseJsonArrayFromString(t *testing.T) {
-	mapper, err := jsonmapper.GetMapperFromString(jsonStrArray)
+	mapper, err := jsonmapper.GetMapperFromString(jsonArrayTest)
 	assert.NoError(t, err)
 
 	actual := removeWhiteSpaces(mapper.Array.String())
-	expected := removeWhiteSpaces(jsonStrArray)
+	expected := removeWhiteSpaces(jsonArrayTest)
+
+	assert.True(t, mapper.IsArray)
+	assert.Equal(t, expected, actual)
+	assert.Equal(t, mapper.Array.Length(), 2)
+}
+
+func TestParseJsonArrayFromStringWithNulls(t *testing.T) {
+	mapper, err := jsonmapper.GetMapperFromString(jsonArrayWithNullTest)
+	assert.NoError(t, err)
+
+	actual := removeWhiteSpaces(mapper.Array.String())
+	expected := removeWhiteSpaces(jsonArrayWithNullTest)
 
 	assert.True(t, mapper.IsArray)
 	assert.Equal(t, expected, actual)
@@ -33,22 +45,22 @@ func TestParseJsonArrayFromString(t *testing.T) {
 }
 
 func TestParseJsonObjectFromBytes(t *testing.T) {
-	mapper, err := jsonmapper.GetMapperFromBytes([]byte(jsonStrObject))
+	mapper, err := jsonmapper.GetMapperFromBytes([]byte(jsonObjectTest))
 	assert.NoError(t, err)
 
 	actual := removeWhiteSpaces(mapper.Object.String())
-	expected := removeWhiteSpaces(jsonStrObject)
+	expected := removeWhiteSpaces(jsonObjectTest)
 
 	assert.True(t, mapper.IsObject)
 	assert.Equal(t, expected, actual)
 }
 
 func TestParseJsonArrayFromBytes(t *testing.T) {
-	mapper, err := jsonmapper.GetMapperFromBytes([]byte(jsonStrArray))
+	mapper, err := jsonmapper.GetMapperFromBytes([]byte(jsonArrayTest))
 	assert.NoError(t, err)
 
 	actual := removeWhiteSpaces(mapper.Array.String())
-	expected := removeWhiteSpaces(jsonStrArray)
+	expected := removeWhiteSpaces(jsonArrayTest)
 
 	assert.True(t, mapper.IsArray)
 	assert.Equal(t, expected, actual)
@@ -56,7 +68,7 @@ func TestParseJsonArrayFromBytes(t *testing.T) {
 }
 
 func TestParseJsonObjectFromFile(t *testing.T) {
-	path := "test_object.json"
+	path := "files/test_object.json"
 	mapper, err := jsonmapper.GetMapperFromFile(path)
 	assert.NoError(t, err)
 
@@ -70,7 +82,7 @@ func TestParseJsonObjectFromFile(t *testing.T) {
 }
 
 func TestParseJsonArrayFromFile(t *testing.T) {
-	path := "test_array.json"
+	path := "files/test_array.json"
 	mapper, err := jsonmapper.GetMapperFromFile(path)
 	assert.NoError(t, err)
 
@@ -85,7 +97,7 @@ func TestParseJsonArrayFromFile(t *testing.T) {
 }
 
 func TestParseTime(t *testing.T) {
-	mapper, err := jsonmapper.GetMapperFromString(jsonStrTime)
+	mapper, err := jsonmapper.GetMapperFromString(jsonTimeTest)
 	assert.NoError(t, err)
 	actualTime1 := mapper.Object.Get("time1").AsTime()
 	actualTime2 := mapper.Object.Get("time2").AsTime()
