@@ -4,32 +4,6 @@ type JsonArray struct {
 	elements []interface{}
 }
 
-func Map[T JsonType](arr JsonArray, f func(mapper Mapper) T) []T {
-	var jsonMappers []T
-	for _, element := range arr.elements {
-		field := f(getMapperFromField(element))
-		jsonMappers = append(jsonMappers, field)
-	}
-	return jsonMappers
-}
-
-func ForEach(arr JsonArray, f func(mapper Mapper)) {
-	for _, element := range arr.elements {
-		f(getMapperFromField(element))
-	}
-}
-
-func Filter(arr JsonArray, f func(mapper Mapper) bool) []Mapper {
-	var jsonMappers []Mapper
-	for _, element := range arr.elements {
-		field := getMapperFromField(element)
-		if f(field) {
-			jsonMappers = append(jsonMappers, field)
-		}
-	}
-	return jsonMappers
-}
-
 func (a JsonArray) Elements() []Mapper {
 	jsons := make([]Mapper, 0, len(a.elements))
 	for _, element := range a.elements {
@@ -65,6 +39,32 @@ func CreateJsonArray(data interface{}) JsonArray {
 	var arr JsonArray
 	arr.elements = data.([]interface{})
 	return arr
+}
+
+func Map[T JsonType](arr JsonArray, f func(mapper Mapper) T) []T {
+	var jsonMappers []T
+	for _, element := range arr.elements {
+		field := f(getMapperFromField(element))
+		jsonMappers = append(jsonMappers, field)
+	}
+	return jsonMappers
+}
+
+func ForEach(arr JsonArray, f func(mapper Mapper)) {
+	for _, element := range arr.elements {
+		f(getMapperFromField(element))
+	}
+}
+
+func Filter(arr JsonArray, f func(mapper Mapper) bool) []Mapper {
+	var jsonMappers []Mapper
+	for _, element := range arr.elements {
+		field := getMapperFromField(element)
+		if f(field) {
+			jsonMappers = append(jsonMappers, field)
+		}
+	}
+	return jsonMappers
 }
 
 func (a JsonArray) String() string {

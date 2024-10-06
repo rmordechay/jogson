@@ -6,6 +6,7 @@ import (
 	"log"
 	"os"
 	"reflect"
+	"time"
 )
 
 type JsonType interface {
@@ -61,19 +62,30 @@ func GetMapperFromString(data string) (Mapper, error) {
 	return mapper, nil
 }
 
-func (j Mapper) String() string {
-	if j.IsBool {
-		return fmt.Sprintf("%v", j.AsBool)
-	} else if j.IsInt {
-		return fmt.Sprintf("%v", j.AsInt)
-	} else if j.IsFloat {
-		return fmt.Sprintf("%v", j.AsFloat)
-	} else if j.IsString {
-		return fmt.Sprintf("%v", j.AsString)
-	} else if j.IsObject {
-		return fmt.Sprintf("%v", j.Object)
-	} else if j.IsArray {
-		return fmt.Sprintf("%v", j.Array)
+func (m Mapper) AsTime(layout string) time.Time {
+	if !m.IsString {
+		panic("could not convert current type to time")
+	}
+	parsedTime, err := time.Parse(layout, m.AsString)
+	if err != nil {
+		panic(err)
+	}
+	return parsedTime
+}
+
+func (m Mapper) String() string {
+	if m.IsBool {
+		return fmt.Sprintf("%v", m.AsBool)
+	} else if m.IsInt {
+		return fmt.Sprintf("%v", m.AsInt)
+	} else if m.IsFloat {
+		return fmt.Sprintf("%v", m.AsFloat)
+	} else if m.IsString {
+		return fmt.Sprintf("%v", m.AsString)
+	} else if m.IsObject {
+		return fmt.Sprintf("%v", m.Object)
+	} else if m.IsArray {
+		return fmt.Sprintf("%v", m.Array)
 	}
 	return ""
 }
