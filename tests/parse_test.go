@@ -44,7 +44,7 @@ func TestParseJsonArrayFromStringWithNulls(t *testing.T) {
 	assert.Equal(t, 3, mapper.Array.Length())
 }
 
-func TestParseJsonObjectFromByte2s(t *testing.T) {
+func TestParseJsonObjectFromBytes(t *testing.T) {
 	mapper, err := jsonmapper.GetMapperFromBytes([]byte(jsonObjectTest))
 	assert.NoError(t, err)
 
