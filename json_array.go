@@ -1,4 +1,4 @@
-package main
+package jsonmapper
 
 import "encoding/json"
 
