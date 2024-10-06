@@ -9,7 +9,7 @@ import (
 )
 
 type JsonType interface {
-	int | string | float64 | bool
+	int | string | float64 | bool | map[string]interface{} | []interface{}
 }
 
 type JsonMapper struct {
@@ -84,6 +84,9 @@ func getMapperFromField(data interface{}) JsonMapper {
 	case bool:
 		mapper.IsBool = true
 		mapper.AsBool = data.(bool)
+	case int:
+		mapper.IsInt = true
+		mapper.AsInt = data.(int)
 	case float64:
 		if data == float64(int(data.(float64))) {
 			mapper.IsInt = true

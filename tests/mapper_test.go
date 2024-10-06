@@ -31,7 +31,7 @@ func TestParseJsonArrayFromString(t *testing.T) {
 
 	assert.True(t, mapper.IsArray)
 	assert.Equal(t, expected, actual)
-	assert.Equal(t, mapper.Array.Length, 2)
+	assert.Equal(t, mapper.Array.Length(), 2)
 }
 
 func TestParseJsonObjectFromBytes(t *testing.T) {
@@ -54,7 +54,7 @@ func TestParseJsonArrayFromBytes(t *testing.T) {
 
 	assert.True(t, mapper.IsArray)
 	assert.Equal(t, expected, actual)
-	assert.Equal(t, mapper.Array.Length, 2)
+	assert.Equal(t, mapper.Array.Length(), 2)
 }
 
 func TestParseJsonObjectFromFile(t *testing.T) {
@@ -83,7 +83,7 @@ func TestParseJsonArrayFromFile(t *testing.T) {
 	assert.NoError(t, err)
 	assert.True(t, mapper.IsArray)
 	assert.Equal(t, expected, actual)
-	assert.Equal(t, mapper.Array.Length, 2)
+	assert.Equal(t, mapper.Array.Length(), 2)
 }
 
 func removeWhiteSpaces(data string) string {
