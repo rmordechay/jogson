@@ -1,4 +1,4 @@
-# JSON Helper Library for Go
+# JSON Mapper Library for Go
 
 [![GoDoc](https://pkg.go.dev/badge/badge)](https://pkg.go.dev/github.com/rmordechay/json-mapper)
 
