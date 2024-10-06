@@ -1,9 +1,5 @@
 package jsonmapper
 
-import (
-	"encoding/json"
-)
-
 type JsonObject struct {
 	object map[string]interface{}
 }
@@ -48,6 +44,5 @@ func (o JsonObject) Elements() map[string]JsonMapper {
 }
 
 func (o JsonObject) String() string {
-	marshal, _ := json.Marshal(o.object)
-	return string(marshal)
+	return string(marshal(o.object))
 }

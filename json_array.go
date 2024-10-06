@@ -1,7 +1,5 @@
 package jsonmapper
 
-import "encoding/json"
-
 type JsonArray struct {
 	Length   int
 	elements []interface{}
@@ -15,14 +13,13 @@ func (a JsonArray) Elements() []JsonMapper {
 	return jsons
 }
 
-func (a JsonArray) String() string {
-	marshal, _ := json.Marshal(a.elements)
-	return string(marshal)
-}
-
 func (a JsonArray) Get(key int) JsonMapper {
 	if key >= a.Length {
 		panic("index out of bound")
 	}
 	return getMapperFromField(a.elements[key])
+}
+
+func (a JsonArray) String() string {
+	return string(marshal(a.elements))
 }

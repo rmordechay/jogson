@@ -9,6 +9,7 @@ import (
 )
 
 type JsonMapper struct {
+	writer   JsonWriter
 	IsBool   bool
 	IsInt    bool
 	IsFloat  bool
@@ -99,7 +100,7 @@ func isJsonArray(data string) bool {
 
 func parseJsonObject(data string) (JsonObject, error) {
 	var jo JsonObject
-	err := json.Unmarshal([]byte(data), &jo.object)
+	err := unmarshal([]byte(data), &jo.object)
 	if err != nil {
 		return JsonObject{}, err
 	}
@@ -109,7 +110,7 @@ func parseJsonObject(data string) (JsonObject, error) {
 func parseJsonArray(data string) (JsonArray, error) {
 	var ja JsonArray
 	var arr []interface{}
-	err := json.Unmarshal([]byte(data), &arr)
+	err := unmarshal([]byte(data), &arr)
 	if err != nil {
 		return JsonArray{}, err
 	}
@@ -132,4 +133,13 @@ func (j JsonMapper) String() string {
 		return fmt.Sprintf("%v", j.Array)
 	}
 	return ""
+}
+
+func marshal(v any) []byte {
+	jsonBytes, _ := json.Marshal(v)
+	return jsonBytes
+}
+
+func unmarshal(data []byte, v any) error {
+	return json.Unmarshal(data, &v)
 }
