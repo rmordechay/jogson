@@ -9,7 +9,7 @@ import (
 )
 
 type JsonType interface {
-	int | string | float64 | bool | map[string]interface{} | []interface{}
+	int | string | float64 | bool | JsonObject | JsonArray
 }
 
 type Mapper struct {
