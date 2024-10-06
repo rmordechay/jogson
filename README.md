@@ -29,8 +29,8 @@ func main() {
     if mapper.IsObject {
         name := mapper.Object.Get("name").AsString
         age := mapper.Object.Get("age").AsInt
-        fmt.Println("Name is: ", name)
-        fmt.Println("Name is: ", age)
+        fmt.Println("Name is ", name)  // outputs: Name is Jason
+        fmt.Println("Age is ", age)    // outputs: Age is 43
     }
 }
 
