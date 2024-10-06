@@ -9,10 +9,6 @@ import (
 	"time"
 )
 
-type JsonType interface {
-	int | string | float64 | bool | JsonObject | JsonArray
-}
-
 type Mapper struct {
 	IsBool   bool
 	IsInt    bool
@@ -28,6 +24,8 @@ type Mapper struct {
 	AsString string
 	Object   JsonObject
 	Array    JsonArray
+
+	Err error
 }
 
 func GetMapperFromFile(path string) (Mapper, error) {
@@ -62,15 +60,18 @@ func GetMapperFromString(data string) (Mapper, error) {
 	return mapper, nil
 }
 
-func (m Mapper) AsTime(layout string) time.Time {
+func (m Mapper) AsTime() time.Time {
 	if !m.IsString {
-		panic("could not convert current type to time")
+		m.Err = fmt.Errorf("could not convert current type %v to time", m.String())
+		return time.Time{}
 	}
-	parsedTime, err := time.Parse(layout, m.AsString)
-	if err != nil {
-		panic(err)
+	for _, layout := range timeLayouts {
+		parsedTime, err := time.Parse(layout, m.AsString)
+		if err == nil {
+			return parsedTime
+		}
 	}
-	return parsedTime
+	return time.Time{}
 }
 
 func (m Mapper) String() string {
