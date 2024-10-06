@@ -2,7 +2,7 @@ package docs
 
 import (
 	"fmt"
-	jsonmapper "github.com/rmordechay/json-mapper"
+	"github.com/rmordechay/jsonmapper"
 	"log"
 )
 

@@ -1,7 +1,7 @@
 package tests
 
 import (
-	jsonmapper "github.com/rmordechay/json-mapper"
+	"github.com/rmordechay/jsonmapper"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )

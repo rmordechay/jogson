@@ -1,40 +1,26 @@
 package tests
 
 import (
-	jsonmapper "github.com/rmordechay/json-mapper"
+	"github.com/rmordechay/jsonmapper"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
 
-func TestWriteObjectString(t *testing.T) {
+func TestWriteStringToObject(t *testing.T) {
 	obj := jsonmapper.CreateEmptyJsonObject()
 	obj = obj.AddKeyValue("name", "chris")
 	objElements := obj.Elements()
 	assert.Equal(t, "chris", objElements["name"].String())
 }
 
-func TestWriteObjectInt(t *testing.T) {
+func TestWriteIntToObject(t *testing.T) {
 	obj := jsonmapper.CreateEmptyJsonObject()
 	obj = obj.AddKeyValue("int", 2)
 	objElements := obj.Elements()
 	assert.Equal(t, 2, objElements["int"].AsInt)
 }
 
-func TestWriteObjectFloat(t *testing.T) {
-	obj := jsonmapper.CreateEmptyJsonObject()
-	obj = obj.AddKeyValue("float", 2.5)
-	objElements := obj.Elements()
-	assert.Equal(t, 2.5, objElements["float"].AsFloat)
-}
-
-func TestWriteObjectBool(t *testing.T) {
-	obj := jsonmapper.CreateEmptyJsonObject()
-	obj = obj.AddKeyValue("bool", true)
-	objElements := obj.Elements()
-	assert.Equal(t, true, objElements["bool"].AsBool)
-}
-
-func TestWriteObject(t *testing.T) {
+func TestWriteArrayStringToObject(t *testing.T) {
 	obj := jsonmapper.CreateEmptyJsonObject()
 	obj = obj.AddKeyValue("strings", []string{"string1", "string2", "string4"})
 	objElements := obj.Elements()
@@ -48,7 +34,21 @@ func TestWriteObject(t *testing.T) {
 	assert.Equal(t, "string4", arrayElements[2].AsString)
 }
 
-func TestWriteObjectArrayStrings(t *testing.T) {
+func TestWriteFloatToObject(t *testing.T) {
+	obj := jsonmapper.CreateEmptyJsonObject()
+	obj = obj.AddKeyValue("float", 2.5)
+	objElements := obj.Elements()
+	assert.Equal(t, 2.5, objElements["float"].AsFloat)
+}
+
+func TestWriteBoolToObject(t *testing.T) {
+	obj := jsonmapper.CreateEmptyJsonObject()
+	obj = obj.AddKeyValue("bool", true)
+	objElements := obj.Elements()
+	assert.Equal(t, true, objElements["bool"].AsBool)
+}
+
+func TestWriteArrayStringsToObject(t *testing.T) {
 	obj := jsonmapper.CreateEmptyJsonObject()
 	obj = obj.AddKeyValue("strings", []string{"string1", "string2", "string4"})
 	objElements := obj.Elements()
@@ -76,7 +76,7 @@ func TestWriteObjectArrayInt(t *testing.T) {
 	assert.Equal(t, 4, arrayElements[2].AsInt)
 }
 
-func TestWriteObjectArrayFloat(t *testing.T) {
+func TestWriteArrayFloatToObject(t *testing.T) {
 	obj := jsonmapper.CreateEmptyJsonObject()
 	obj = obj.AddKeyValue("numbers", []float64{1.5, 2.0, 4.2})
 	objElements := obj.Elements()
@@ -90,7 +90,7 @@ func TestWriteObjectArrayFloat(t *testing.T) {
 	assert.Equal(t, 4.2, arrayElements[2].AsFloat)
 }
 
-func TestWriteArrayFloat(t *testing.T) {
+func TestWriteFloatsArray(t *testing.T) {
 	arr := jsonmapper.CreateEmptyJsonArray()
 	arr = arr.AddValue(1)
 	arr = arr.AddValue(4)

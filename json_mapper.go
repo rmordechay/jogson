@@ -163,3 +163,14 @@ func unmarshal(data []byte, v interface{}) error {
 	var json = jsoniter.ConfigCompatibleWithStandardLibrary
 	return json.Unmarshal(data, &v)
 }
+
+func iter(data []byte) {
+	var json = jsoniter.ConfigCompatibleWithStandardLibrary
+	iterator := json.BorrowIterator(data)
+	defer json.ReturnIterator(iterator)
+
+	fmt.Printf("%v\n", iterator.WhatIsNext())
+	iterator.ReadArray()
+	fmt.Printf("%v\n", iterator.WhatIsNext())
+	fmt.Printf("%v\n", iterator.ReadObject())
+}

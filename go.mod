@@ -1,4 +1,4 @@
-module github.com/rmordechay/json-mapper
+module github.com/rmordechay/jsonmapper
 
 require (
 	github.com/json-iterator/go v1.1.12

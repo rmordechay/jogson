@@ -1,7 +1,7 @@
 package tests
 
 import (
-	jsonmapper "github.com/rmordechay/json-mapper"
+	"github.com/rmordechay/jsonmapper"
 	"github.com/stretchr/testify/assert"
 	"os"
 	"strings"
@@ -67,6 +67,18 @@ func TestParseJsonArrayFromBytes(t *testing.T) {
 	assert.Equal(t, mapper.Array.Length(), 2)
 }
 
+func TestParseJsonArrayFromStruct(t *testing.T) {
+	testStruct := struct {
+		Name string `json:"name"`
+		Age  int    `json:"age"`
+	}{"John", 15}
+	mapper, err := jsonmapper.CreateMapperFromStruct(testStruct)
+	assert.NoError(t, err)
+	assert.True(t, mapper.IsObject)
+	assert.Equal(t, "John", mapper.Object.Get("name").AsString)
+	assert.Equal(t, 15, mapper.Object.Get("age").AsInt)
+}
+
 func TestParseJsonObjectFromFile(t *testing.T) {
 	path := "files/test_object.json"
 	mapper, err := jsonmapper.CreateMapperFromFile(path)
@@ -108,6 +120,11 @@ func TestParseTime(t *testing.T) {
 	assert.Equal(t, expectedTime1, actualTime1)
 	assert.Equal(t, expectedTime2, actualTime2)
 	assert.Equal(t, expectedTime3, actualTime3)
+}
+
+func TestSandbox(t *testing.T) {
+	_, err := jsonmapper.CreateMapperFromString(jsonArrayTest)
+	assert.NoError(t, err)
 }
 
 func removeWhiteSpaces(data string) string {
