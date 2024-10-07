@@ -9,6 +9,13 @@ type JsonArray struct {
 	elements []*interface{}
 }
 
+func NewArray() JsonArray {
+	var arr JsonArray
+	elements := make([]*interface{}, 0)
+	arr.elements = elements
+	return arr
+}
+
 func (a JsonArray) Elements() []Mapper {
 	jsons := make([]Mapper, 0, len(a.elements))
 	for _, element := range a.elements {
@@ -36,43 +43,21 @@ func (a JsonArray) AddValue(value interface{}) JsonArray {
 	return a
 }
 
-func CreateEmptyJsonArray() JsonArray {
-	var arr JsonArray
-	elements := make([]*interface{}, 0)
-	arr.elements = elements
-	return arr
-}
-
-func CreateJsonArray(data interface{}) JsonArray {
-	var arr JsonArray
-	arr.elements = data.([]*interface{})
-	return arr
-}
-
-func Map[T JsonType](arr JsonArray, f func(mapper Mapper) T) []T {
-	var jsonMappers []T
-	for _, element := range arr.elements {
-		field := f(getMapperFromField(element))
-		jsonMappers = append(jsonMappers, field)
-	}
-	return jsonMappers
-}
-
-func ForEach(arr JsonArray, f func(mapper Mapper)) {
-	for _, element := range arr.elements {
+func (a JsonArray) ForEach(f func(mapper Mapper)) {
+	for _, element := range a.elements {
 		f(getMapperFromField(element))
 	}
 }
 
-func Filter(arr JsonArray, f func(mapper Mapper) bool) []Mapper {
-	var jsonMappers []Mapper
-	for _, element := range arr.elements {
+func (a JsonArray) Filter(f func(mapper Mapper) bool) JsonArray {
+	var arr = NewArray()
+	for _, element := range a.elements {
 		field := getMapperFromField(element)
 		if f(field) {
-			jsonMappers = append(jsonMappers, field)
+			arr.elements = append(arr.elements, element)
 		}
 	}
-	return jsonMappers
+	return arr
 }
 
 func (a JsonArray) String() string {
@@ -93,11 +78,11 @@ func parseJsonArray(data []byte) (JsonArray, error) {
 
 func convertArray[T JsonType](data []T) JsonArray {
 	var arr JsonArray
-	result := make([]*interface{}, len(data))
+	array := make([]*interface{}, len(data))
 	for i, v := range data {
 		var valAny interface{} = v
-		result[i] = &valAny
+		array[i] = &valAny
 	}
-	arr.elements = result
+	arr.elements = array
 	return arr
 }

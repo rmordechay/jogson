@@ -1,18 +1,13 @@
 package jsonmapper
 
-type Object interface {
-	Keys() []string
-	Values() []Mapper
-	Has(key string) bool
-	Get(key string) Mapper
-	Find(key string) Mapper
-	Elements() map[string]Mapper
-	AddKeyValue(k string, value interface{}) JsonObject
-	String() string
-}
-
 type JsonObject struct {
 	object map[string]*interface{}
+}
+
+func NewObject() JsonObject {
+	var obj JsonObject
+	obj.object = make(map[string]*interface{})
+	return obj
 }
 
 func (o JsonObject) Keys() []string {
@@ -70,63 +65,33 @@ func (o JsonObject) Elements() map[string]Mapper {
 	return jsons
 }
 
-func (o JsonObject) AddKeyValue(k string, value interface{}) JsonObject {
+func (o JsonObject) AddKeyValue(k string, value interface{}) {
 	o.object[k] = &value
-	return o
 }
 
-func CreateEmptyJsonObject() JsonObject {
-	var obj JsonObject
-	obj.object = make(map[string]*interface{})
-	return obj
-}
-
-func ForEachObject(obj JsonObject, f func(key string, mapper Mapper)) {
-	for k, element := range obj.object {
+func (o JsonObject) ForEach(f func(key string, mapper Mapper)) {
+	for k, element := range o.object {
 		f(k, getMapperFromField(element))
 	}
 }
 
-func MapObject[T JsonType](obj JsonObject, f func(key string, mapper Mapper) T) []T {
-	var jsonMappers []T
-	for k, element := range obj.object {
-		field := f(k, getMapperFromField(element))
-		jsonMappers = append(jsonMappers, field)
-	}
-	return jsonMappers
-}
-
-func FilterObject(obj JsonObject, f func(key string, mapper Mapper) bool) []Mapper {
-	var jsonMappers []Mapper
-	for k, element := range obj.object {
+func (o JsonObject) Filter(f func(key string, mapper Mapper) bool) JsonObject {
+	var obj = NewObject()
+	for k, element := range o.object {
 		field := getMapperFromField(element)
 		if f(k, field) {
-			jsonMappers = append(jsonMappers, field)
+			obj.object[k] = element
 		}
 	}
-	return jsonMappers
+	return obj
+}
+
+func (o JsonObject) PrettyString() string {
+	jsonBytes, _ := marshalIndent(o.object)
+	return string(jsonBytes)
 }
 
 func (o JsonObject) String() string {
 	jsonBytes, _ := marshal(o.object)
 	return string(jsonBytes)
-}
-
-func createJsonObject(data interface{}) JsonObject {
-	var obj JsonObject
-	var object = make(map[string]*interface{})
-	for k, v := range data.(map[string]interface{}) {
-		object[k] = &v
-	}
-	obj.object = object
-	return obj
-}
-
-func parseJsonObject(data []byte) (JsonObject, error) {
-	var jo JsonObject
-	err := unmarshal(data, &jo.object)
-	if err != nil {
-		return JsonObject{}, err
-	}
-	return jo, nil
 }

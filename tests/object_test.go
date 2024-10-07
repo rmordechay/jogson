@@ -7,7 +7,7 @@ import (
 )
 
 func TestObjectGetKeys(t *testing.T) {
-	obj, err := jsonmapper.CreateMapperFromString(jsonObjectTest)
+	obj, err := jsonmapper.FromString(jsonObjectTest)
 	assert.NoError(t, err)
 	keys := obj.Object.Keys()
 	assert.Equal(t, 2, len(keys))
@@ -16,7 +16,7 @@ func TestObjectGetKeys(t *testing.T) {
 }
 
 func TestObjectGetValues(t *testing.T) {
-	obj, err := jsonmapper.CreateMapperFromString(jsonObjectTest)
+	obj, err := jsonmapper.FromString(jsonObjectTest)
 	assert.NoError(t, err)
 	values := obj.Object.Values()
 	assert.Equal(t, 2, len(values))

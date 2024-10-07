@@ -1,13 +1,18 @@
 package jsonmapper
 
 import (
+	"encoding/json"
+	"errors"
 	"fmt"
 	jsoniter "github.com/json-iterator/go"
 	"log"
 	"os"
 	"reflect"
 	"time"
+	"unicode"
 )
+
+var jsonIter = jsoniter.ConfigCompatibleWithStandardLibrary
 
 type Mapper struct {
 	IsBool   bool
@@ -28,44 +33,46 @@ type Mapper struct {
 	Err error
 }
 
-func CreateMapperFromStruct[T any](s T) (Mapper, error) {
-	jsonBytes, err := marshal(s)
-	if err != nil {
-		return Mapper{}, err
-	}
-	return CreateMapper(jsonBytes)
-}
-
-func CreateMapperFromFile(path string) (Mapper, error) {
-	file, err := os.ReadFile(path)
-	if err != nil {
-		return Mapper{}, err
-	}
-	return CreateMapper(file)
-}
-
-func CreateMapperFromString(data string) (Mapper, error) {
-	return CreateMapper([]byte(data))
-}
-
-func CreateMapper(data []byte) (Mapper, error) {
+func FromBytes(data []byte) (Mapper, error) {
 	var mapper Mapper
-	if isJsonArray(data) {
+	if isArray(data) {
 		mapper.IsArray = true
 		array, err := parseJsonArray(data)
 		if err != nil {
 			return Mapper{}, err
 		}
 		mapper.Array = array
-	} else {
+	} else if isObject(data) {
 		mapper.IsObject = true
 		object, err := parseJsonObject(data)
 		if err != nil {
 			return Mapper{}, err
 		}
 		mapper.Object = object
+	} else {
+		return Mapper{}, errors.New("could not parse JSON")
 	}
 	return mapper, nil
+}
+
+func FromStruct[T any](s T) (Mapper, error) {
+	jsonBytes, err := marshal(s)
+	if err != nil {
+		return Mapper{}, err
+	}
+	return FromBytes(jsonBytes)
+}
+
+func FromFile(path string) (Mapper, error) {
+	file, err := os.ReadFile(path)
+	if err != nil {
+		return Mapper{}, err
+	}
+	return FromBytes(file)
+}
+
+func FromString(data string) (Mapper, error) {
+	return FromBytes([]byte(data))
 }
 
 func (m Mapper) AsTime() time.Time {
@@ -99,6 +106,35 @@ func (m Mapper) String() string {
 	return ""
 }
 
+func (m Mapper) PrettyString() string {
+	if m.IsBool {
+		return fmt.Sprintf("%v", m.AsBool)
+	} else if m.IsInt {
+		return fmt.Sprintf("%v", m.AsInt)
+	} else if m.IsFloat {
+		return fmt.Sprintf("%v", m.AsFloat)
+	} else if m.IsString {
+		return fmt.Sprintf("%v", m.AsString)
+	} else if m.IsObject {
+		return m.Object.PrettyString()
+	} else if m.IsArray {
+		return fmt.Sprintf("%v", m.Array)
+	}
+	return ""
+}
+
+func createArray(data interface{}) JsonArray {
+	var arr JsonArray
+	switch data.(type) {
+	case []*interface{}:
+		arr.elements = data.([]*interface{})
+	case []interface{}:
+		array := convertToArrayPtr(data)
+		arr.elements = array
+	}
+	return arr
+}
+
 func getMapperFromField(data *interface{}) Mapper {
 	var mapper Mapper
 	value := *data
@@ -120,6 +156,9 @@ func getMapperFromField(data *interface{}) Mapper {
 	case string:
 		mapper.IsString = true
 		mapper.AsString = value.(string)
+	case map[string]interface{}:
+		mapper.IsObject = true
+		mapper.Object = createJsonObject(value)
 	case []float64:
 		mapper.IsArray = true
 		mapper.Array = convertArray(value.([]float64))
@@ -134,10 +173,7 @@ func getMapperFromField(data *interface{}) Mapper {
 		mapper.Array = convertArray(value.([]bool))
 	case []interface{}:
 		mapper.IsArray = true
-		mapper.Array = CreateJsonArray(value)
-	case map[string]interface{}:
-		mapper.IsObject = true
-		mapper.Object = createJsonObject(value)
+		mapper.Array = createArray(value)
 	case nil:
 		mapper.IsNull = true
 	default:
@@ -146,13 +182,68 @@ func getMapperFromField(data *interface{}) Mapper {
 	return mapper
 }
 
-func isJsonArray(data []byte) bool {
-	return data[0] == '['
+func createJsonObject(data interface{}) JsonObject {
+	var obj JsonObject
+	var object = make(map[string]*interface{})
+	for k, v := range data.(map[string]interface{}) {
+		object[k] = &v
+	}
+	obj.object = object
+	return obj
+}
+
+func parseJsonObject(data []byte) (JsonObject, error) {
+	var jo JsonObject
+	err := unmarshal(data, &jo.object)
+	if err != nil {
+		return JsonObject{}, err
+	}
+	return jo, nil
+}
+
+func convertToArrayPtr(data interface{}) []*interface{} {
+	d := data.([]interface{})
+	array := make([]*interface{}, len(d))
+	for i, v := range d {
+		array[i] = &v
+	}
+	return array
+}
+
+func isArray(data []byte) bool {
+	return isObjectOrArray(data, '[')
+}
+
+func isObject(data []byte) bool {
+	return isObjectOrArray(data, '{')
+}
+
+func isObjectOrArray(data []byte, brackOrParen byte) bool {
+	if len(data) == 0 {
+		return false
+	}
+	var firstChar byte
+	for _, d := range data {
+		firstChar = d
+		if unicode.IsSpace(rune(firstChar)) {
+			continue
+		}
+		return firstChar == brackOrParen
+	}
+	return false
 }
 
 func marshal(v interface{}) ([]byte, error) {
-	var json = jsoniter.ConfigCompatibleWithStandardLibrary
-	jsonBytes, err := json.Marshal(v)
+	jsonBytes, err := jsonIter.Marshal(v)
+	if err != nil {
+		return nil, err
+	}
+	return jsonBytes, nil
+}
+
+func marshalIndent(v interface{}) ([]byte, error) {
+	// jsoniter has a bug with indentation
+	jsonBytes, err := json.MarshalIndent(v, "", "  ")
 	if err != nil {
 		return nil, err
 	}
@@ -160,17 +251,5 @@ func marshal(v interface{}) ([]byte, error) {
 }
 
 func unmarshal(data []byte, v interface{}) error {
-	var json = jsoniter.ConfigCompatibleWithStandardLibrary
-	return json.Unmarshal(data, &v)
-}
-
-func iter(data []byte) {
-	var json = jsoniter.ConfigCompatibleWithStandardLibrary
-	iterator := json.BorrowIterator(data)
-	defer json.ReturnIterator(iterator)
-
-	fmt.Printf("%v\n", iterator.WhatIsNext())
-	iterator.ReadArray()
-	fmt.Printf("%v\n", iterator.WhatIsNext())
-	fmt.Printf("%v\n", iterator.ReadObject())
+	return jsonIter.Unmarshal(data, &v)
 }

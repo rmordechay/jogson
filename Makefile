@@ -1,2 +1,2 @@
 run_tests:
-	go test ./tests
+	go test -v ./tests

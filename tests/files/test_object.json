@@ -1,4 +1,19 @@
 {
-  "age": 15,
+  "age": 43,
+  "children": {
+    "Rachel": {
+      "age": 15,
+      "is_funny": false
+    },
+    "Sara": {
+      "age": 19,
+      "is_funny": true
+    }
+  },
+  "features": [
+    "tall",
+    "blue eyes"
+  ],
+  "is_funny": false,
   "name": "Jason"
 }

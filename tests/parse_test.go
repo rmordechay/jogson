@@ -1,7 +1,9 @@
 package tests
 
 import (
+	"fmt"
 	"github.com/rmordechay/jsonmapper"
+	"github.com/rmordechay/jsonmapper/docs"
 	"github.com/stretchr/testify/assert"
 	"os"
 	"strings"
@@ -10,7 +12,7 @@ import (
 )
 
 func TestParseJsonObjectFromString(t *testing.T) {
-	mapper, err := jsonmapper.CreateMapperFromString(jsonObjectTest)
+	mapper, err := jsonmapper.FromString(jsonObjectTest)
 	assert.NoError(t, err)
 
 	actual := removeWhiteSpaces(mapper.Object.String())
@@ -21,7 +23,7 @@ func TestParseJsonObjectFromString(t *testing.T) {
 }
 
 func TestParseJsonArrayFromString(t *testing.T) {
-	mapper, err := jsonmapper.CreateMapperFromString(jsonArrayTest)
+	mapper, err := jsonmapper.FromString(jsonArrayTest)
 	assert.NoError(t, err)
 
 	actual := removeWhiteSpaces(mapper.Array.String())
@@ -33,7 +35,7 @@ func TestParseJsonArrayFromString(t *testing.T) {
 }
 
 func TestParseJsonArrayFromStringWithNulls(t *testing.T) {
-	mapper, err := jsonmapper.CreateMapperFromString(jsonArrayWithNullTest)
+	mapper, err := jsonmapper.FromString(jsonArrayWithNullTest)
 	assert.NoError(t, err)
 
 	actual := removeWhiteSpaces(mapper.Array.String())
@@ -45,7 +47,7 @@ func TestParseJsonArrayFromStringWithNulls(t *testing.T) {
 }
 
 func TestParseJsonObjectFromBytes(t *testing.T) {
-	mapper, err := jsonmapper.CreateMapper([]byte(jsonObjectTest))
+	mapper, err := jsonmapper.FromBytes([]byte(jsonObjectTest))
 	assert.NoError(t, err)
 
 	actual := removeWhiteSpaces(mapper.Object.String())
@@ -56,7 +58,7 @@ func TestParseJsonObjectFromBytes(t *testing.T) {
 }
 
 func TestParseJsonArrayFromBytes(t *testing.T) {
-	mapper, err := jsonmapper.CreateMapper([]byte(jsonArrayTest))
+	mapper, err := jsonmapper.FromBytes([]byte(jsonArrayTest))
 	assert.NoError(t, err)
 
 	actual := removeWhiteSpaces(mapper.Array.String())
@@ -72,7 +74,7 @@ func TestParseJsonArrayFromStruct(t *testing.T) {
 		Name string `json:"name"`
 		Age  int    `json:"age"`
 	}{"John", 15}
-	mapper, err := jsonmapper.CreateMapperFromStruct(testStruct)
+	mapper, err := jsonmapper.FromStruct(testStruct)
 	assert.NoError(t, err)
 	assert.True(t, mapper.IsObject)
 	assert.Equal(t, "John", mapper.Object.Get("name").AsString)
@@ -81,7 +83,7 @@ func TestParseJsonArrayFromStruct(t *testing.T) {
 
 func TestParseJsonObjectFromFile(t *testing.T) {
 	path := "files/test_object.json"
-	mapper, err := jsonmapper.CreateMapperFromFile(path)
+	mapper, err := jsonmapper.FromFile(path)
 	assert.NoError(t, err)
 
 	actual := removeWhiteSpaces(mapper.Object.String())
@@ -95,7 +97,7 @@ func TestParseJsonObjectFromFile(t *testing.T) {
 
 func TestParseJsonArrayFromFile(t *testing.T) {
 	path := "files/test_array.json"
-	mapper, err := jsonmapper.CreateMapperFromFile(path)
+	mapper, err := jsonmapper.FromFile(path)
 	assert.NoError(t, err)
 
 	actual := removeWhiteSpaces(mapper.Array.String())
@@ -109,7 +111,7 @@ func TestParseJsonArrayFromFile(t *testing.T) {
 }
 
 func TestParseTime(t *testing.T) {
-	mapper, err := jsonmapper.CreateMapperFromString(jsonTimeTest)
+	mapper, err := jsonmapper.FromString(jsonTimeTest)
 	assert.NoError(t, err)
 	actualTime1 := mapper.Object.Get("time1").AsTime()
 	actualTime2 := mapper.Object.Get("time2").AsTime()
@@ -123,8 +125,10 @@ func TestParseTime(t *testing.T) {
 }
 
 func TestSandbox(t *testing.T) {
-	_, err := jsonmapper.CreateMapperFromString(jsonArrayTest)
+	mapper, err := jsonmapper.FromString(jsonObjectTest)
 	assert.NoError(t, err)
+	fmt.Printf("%v\n", mapper.PrettyString())
+	docs.RunExample()
 }
 
 func removeWhiteSpaces(data string) string {
