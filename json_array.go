@@ -36,19 +36,6 @@ func (a JsonArray) AddValue(value interface{}) JsonArray {
 	return a
 }
 
-func CreateEmptyJsonArray() JsonArray {
-	var arr JsonArray
-	elements := make([]*interface{}, 0)
-	arr.elements = elements
-	return arr
-}
-
-func CreateJsonArray(data interface{}) JsonArray {
-	var arr JsonArray
-	arr.elements = data.([]*interface{})
-	return arr
-}
-
 func Map[T JsonType](arr JsonArray, f func(mapper Mapper) T) []T {
 	var jsonMappers []T
 	for _, element := range arr.elements {
@@ -93,11 +80,11 @@ func parseJsonArray(data []byte) (JsonArray, error) {
 
 func convertArray[T JsonType](data []T) JsonArray {
 	var arr JsonArray
-	result := make([]*interface{}, len(data))
+	array := make([]*interface{}, len(data))
 	for i, v := range data {
 		var valAny interface{} = v
-		result[i] = &valAny
+		array[i] = &valAny
 	}
-	arr.elements = result
+	arr.elements = array
 	return arr
 }

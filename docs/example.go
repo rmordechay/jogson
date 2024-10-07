@@ -3,24 +3,43 @@ package docs
 import (
 	"fmt"
 	"github.com/rmordechay/jsonmapper"
-	"log"
 )
 
-func main() {
+func RunExample() {
 	jsonString := `
 	{
-	  "name": "Jason",
-	  "age": 43
+		"name": "Jason",
+		"age": 43,
+		"is_funny": false,
+		"features": ["tall", "blue eyes"],
+		"children": {
+			"Rachel": {"age": 15, "is_funny": false}, 
+			"Sara":   {"age": 19, "is_funny": true}
+		}
 	}
 	`
-	mapper, err := jsonmapper.CreateMapperFromString(jsonString)
-	if err != nil {
-		log.Fatal(err)
+	mapper, _ := jsonmapper.FromString(jsonString)
+
+	fmt.Println(mapper.IsObject) // true
+
+	object := mapper.Object
+	var name string = object.Get("name").AsString
+	var age int = object.Get("age").AsInt
+	var isFunny bool = object.Get("is_funny").AsBool
+
+	fmt.Println(name)    // Jason
+	fmt.Println(age)     // 43
+	fmt.Println(isFunny) // false
+
+	array := object.Get("features").Array
+	for _, feature := range array.Elements() {
+		fmt.Println(feature.AsString) // tall, ...
 	}
-	if mapper.IsObject {
-		name := mapper.Object.Get("name").AsString
-		age := mapper.Object.Get("age").AsInt
-		fmt.Println("Name is: ", name)
-		fmt.Println("Name is: ", age)
+
+	children := object.Get("children").Object
+	for key, child := range children.Elements() {
+		fmt.Println("Child name:", key)
+		fmt.Println(child.Object.Get("age").AsInt)       // 15, 19
+		fmt.Println(child.Object.Get("is_funny").AsBool) // false, true
 	}
 }

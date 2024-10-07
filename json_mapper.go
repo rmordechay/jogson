@@ -28,27 +28,7 @@ type Mapper struct {
 	Err error
 }
 
-func CreateMapperFromStruct[T any](s T) (Mapper, error) {
-	jsonBytes, err := marshal(s)
-	if err != nil {
-		return Mapper{}, err
-	}
-	return CreateMapper(jsonBytes)
-}
-
-func CreateMapperFromFile(path string) (Mapper, error) {
-	file, err := os.ReadFile(path)
-	if err != nil {
-		return Mapper{}, err
-	}
-	return CreateMapper(file)
-}
-
-func CreateMapperFromString(data string) (Mapper, error) {
-	return CreateMapper([]byte(data))
-}
-
-func CreateMapper(data []byte) (Mapper, error) {
+func FromBytes(data []byte) (Mapper, error) {
 	var mapper Mapper
 	if isJsonArray(data) {
 		mapper.IsArray = true
@@ -66,6 +46,39 @@ func CreateMapper(data []byte) (Mapper, error) {
 		mapper.Object = object
 	}
 	return mapper, nil
+}
+
+func FromStruct[T any](s T) (Mapper, error) {
+	jsonBytes, err := marshal(s)
+	if err != nil {
+		return Mapper{}, err
+	}
+	return FromBytes(jsonBytes)
+}
+
+func FromFile(path string) (Mapper, error) {
+	file, err := os.ReadFile(path)
+	if err != nil {
+		return Mapper{}, err
+	}
+	return FromBytes(file)
+}
+
+func FromString(data string) (Mapper, error) {
+	return FromBytes([]byte(data))
+}
+
+func EmptyObject() JsonObject {
+	var obj JsonObject
+	obj.object = make(map[string]*interface{})
+	return obj
+}
+
+func EmptyArray() JsonArray {
+	var arr JsonArray
+	elements := make([]*interface{}, 0)
+	arr.elements = elements
+	return arr
 }
 
 func (m Mapper) AsTime() time.Time {
@@ -97,6 +110,18 @@ func (m Mapper) String() string {
 		return fmt.Sprintf("%v", m.Array)
 	}
 	return ""
+}
+
+func createArray(data interface{}) JsonArray {
+	var arr JsonArray
+	switch data.(type) {
+	case []*interface{}:
+		arr.elements = data.([]*interface{})
+	case []interface{}:
+		array := convertToArrayPtr(data)
+		arr.elements = array
+	}
+	return arr
 }
 
 func getMapperFromField(data *interface{}) Mapper {
@@ -134,7 +159,7 @@ func getMapperFromField(data *interface{}) Mapper {
 		mapper.Array = convertArray(value.([]bool))
 	case []interface{}:
 		mapper.IsArray = true
-		mapper.Array = CreateJsonArray(value)
+		mapper.Array = createArray(value)
 	case map[string]interface{}:
 		mapper.IsObject = true
 		mapper.Object = createJsonObject(value)
@@ -146,13 +171,22 @@ func getMapperFromField(data *interface{}) Mapper {
 	return mapper
 }
 
+func convertToArrayPtr(data interface{}) []*interface{} {
+	d := data.([]interface{})
+	array := make([]*interface{}, len(d))
+	for i, v := range d {
+		array[i] = &v
+	}
+	return array
+}
+
 func isJsonArray(data []byte) bool {
 	return data[0] == '['
 }
 
 func marshal(v interface{}) ([]byte, error) {
-	var json = jsoniter.ConfigCompatibleWithStandardLibrary
-	jsonBytes, err := json.Marshal(v)
+	var jsonIter = jsoniter.ConfigCompatibleWithStandardLibrary
+	jsonBytes, err := jsonIter.Marshal(v)
 	if err != nil {
 		return nil, err
 	}
@@ -165,9 +199,9 @@ func unmarshal(data []byte, v interface{}) error {
 }
 
 func iter(data []byte) {
-	var json = jsoniter.ConfigCompatibleWithStandardLibrary
-	iterator := json.BorrowIterator(data)
-	defer json.ReturnIterator(iterator)
+	var jsonIter = jsoniter.ConfigCompatibleWithStandardLibrary
+	iterator := jsonIter.BorrowIterator(data)
+	defer jsonIter.ReturnIterator(iterator)
 
 	fmt.Printf("%v\n", iterator.WhatIsNext())
 	iterator.ReadArray()

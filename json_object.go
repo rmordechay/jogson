@@ -70,15 +70,8 @@ func (o JsonObject) Elements() map[string]Mapper {
 	return jsons
 }
 
-func (o JsonObject) AddKeyValue(k string, value interface{}) JsonObject {
+func (o JsonObject) AddKeyValue(k string, value interface{}) {
 	o.object[k] = &value
-	return o
-}
-
-func CreateEmptyJsonObject() JsonObject {
-	var obj JsonObject
-	obj.object = make(map[string]*interface{})
-	return obj
 }
 
 func ForEachObject(obj JsonObject, f func(key string, mapper Mapper)) {
