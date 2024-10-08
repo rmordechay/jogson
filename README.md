@@ -4,6 +4,20 @@
 
 A simple Go library to simplify working with JSON without the need to define structs.
 
+* [Installation](#Installation)
+* [Creating a mapper](#Creating-a-mapper)
+* [Reading from JSON](#Reading-from-JSON)
+  * [Creating a mapper](#Creating-a-mapper)
+  * [Check Types](#Check-Types)
+  * [Objects](#Objects)
+  * [Get Values](#Get-Values)
+  * [Arrays](#Arrays)
+  * [Find Elements](#Find-Elements)
+  * [Print JSON](#Get-JSON-as-string)
+* [Writing to JSON](#Writing-to-JSON)
+  * [Write elements](#Write-elements)
+
+
 ## Installation
 To install the library, use:
 
@@ -11,7 +25,7 @@ To install the library, use:
 go get github.com/rmordechay/json-mapper
 ```
 
-## Creating a mapper
+### Creating a mapper
 There are multiple ways to create a mapper.
 ```go
 // From bytes
@@ -25,7 +39,7 @@ mapper, err := jsonmapper.FromFile(jsonFilePath)
 ```
 
 ## Reading from JSON
-Once you have the `mapper`, you can read the data easily. Consider the following JSON:
+Once you have the `mapper`, you can read the data easily. Consider the following JSON
 ```go
 jsonString := `{
     "name": "Jason",
@@ -38,7 +52,6 @@ jsonString := `{
         "Sara":   {"age": 19, "is_funny": true}
     }
 }`
-mapper, err := jsonmapper.FromString(jsonString)
 ```
 
 ### Check Types
@@ -54,12 +67,15 @@ fmt.Println(mapper.IsNull)      // false
 
 ### Objects
 ```go
-// Check if a key exists
-keyExists := mapper.Object.Has("children") // true
 // Get a value by key
 element := mapper.Object.Get("age")
+
+// Check if a key exists
+keyExists := mapper.Object.Has("children")
+
 // Get object's keys
 keys := mapper.Object.Keys()
+
 // Get object's values
 values := mapper.Object.Values()
 
@@ -74,10 +90,11 @@ for key, child := range children.Elements() {
 
 ### Get Values
 ```go
-var name string = mapper.Object.Get("name").AsString
-var age int = mapper.Object.Get("age").AsInt
-var isFunny bool = mapper.Object.Get("is_funny").AsBool
-var birthday time.Time = mapper.Object.Get("birthday").AsTime()
+object := mapper.Object
+var name string = object.Get("name").AsString
+var age int = object.Get("age").AsInt
+var isFunny bool = object.Get("is_funny").AsBool
+var birthday time.Time = object.Get("birthday").AsTime()
 
 fmt.Println(name)        // Jason
 fmt.Println(age)         // 43
@@ -87,16 +104,17 @@ fmt.Println(birthday)    // 1981-10-08 00:00:00 +0000 UTC
 
 ### Arrays
 ```go
+// Get array length
+arrayLen := array.Length()
+
+// Get an element of array by index
+element := array.Get(2)
+
 // Iterating over an array
 array := mapper.Object.Get("features").Array
 for _, feature := range array.Elements() {
     fmt.Println(feature.AsString) // tall, ...
 }
-
-// Get array length
-arrayLen := array.Length()
-// Get an element of array by index
-element := array.Get(2)
 ```
 
 ### Find Elements
@@ -107,7 +125,7 @@ fmt.Println(child.IsObject)         // true
 fmt.Println(child.Has("is_funny"))  // true 
 ```
 
-### Print JSON
+### Get JSON as string
 You can get a string from every JSON element which is a valid JSON
 ```go
 fmt.Println(mapper.Object.String())
@@ -115,7 +133,7 @@ fmt.Println(mapper.Object.String())
 fmt.Println(mapper.Object.Get("children").String())
 // output: {"Rachel":{"age":15,"is_funny":false},"Sara":{"age":19,"is_funny":true}}
 ```
-or a pretty string 
+or with pretty string 
 ```go
 fmt.Println(mapper.Object.Get("children").PrettyString())
 // output:
