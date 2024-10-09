@@ -21,8 +21,8 @@ func NewArray() *JsonArray {
 	return &arr
 }
 
-func (a *JsonArray) Elements() []Mapper {
-	jsons := make([]Mapper, 0, len(a.elements))
+func (a *JsonArray) Elements() []*Mapper {
+	jsons := make([]*Mapper, 0, len(a.elements))
 	for _, element := range a.elements {
 		jsons = append(jsons, getMapperFromField(element))
 	}
@@ -156,7 +156,7 @@ func (a *JsonArray) AddValue(value interface{}) {
 
 func (a *JsonArray) ForEach(f func(mapper Mapper)) {
 	for _, element := range a.elements {
-		f(getMapperFromField(element))
+		f(*getMapperFromField(element))
 	}
 }
 
@@ -164,7 +164,7 @@ func (a *JsonArray) Filter(f func(mapper Mapper) bool) JsonArray {
 	var arr = NewArray()
 	for _, element := range a.elements {
 		field := getMapperFromField(element)
-		if f(field) {
+		if f(*field) {
 			arr.elements = append(arr.elements, element)
 		}
 	}

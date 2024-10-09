@@ -87,6 +87,9 @@ for key, child := range children.Elements() {
 ```
 
 ### Primitive Types
+Getting primitive types - `string`, `int`, `float64` or `bool` - is similar both for object and array and only differ
+in the parameter type (objects take `string` as key and arrays take `int` as index)
+#### From Object
 ```go
 object := mapper.Object
 // string 
@@ -98,10 +101,23 @@ var height float64 = object.GetFloat("height") // 1.87
 // bool 
 var isFunny bool = object.GetBool("is_funny") // false
 ```
+#### From Array
+```go
+array := mapper.Array
+// string 
+var s string = array.GetString(0)
+// int 
+var i int = array.GetInt(2)
+// float64 
+var f float64 = array.GetFloat(5)
+// bool 
+var b bool = array.GetBool(7)
+```
+
 
 ### Arrays
 ```go
-	// Get array
+// Get array
 array := mapper.Object.GetArray("features")
 
 // Get array length

@@ -12,6 +12,15 @@ import (
 
 var jsonIter = jsoniter.ConfigCompatibleWithStandardLibrary
 
+type Json interface {
+	AsBool() bool
+	AsInt() int
+	AsFloat() float64
+	AsString() string
+	Object() JsonObject
+	Array() JsonArray
+}
+
 type Mapper struct {
 	IsBool   bool
 	IsInt    bool
@@ -21,105 +30,129 @@ type Mapper struct {
 	IsArray  bool
 	IsNull   bool
 
-	AsBool   bool
-	AsInt    int
-	AsFloat  float64
-	AsString string
-	Object   JsonObject
-	Array    JsonArray
+	asBool   bool
+	asInt    int
+	asFloat  float64
+	asString string
+	object   JsonObject
+	array    JsonArray
 }
 
-func FromBytes(data []byte) (Mapper, error) {
+func (m *Mapper) AsBool() bool {
+	return m.asBool
+}
+
+func (m *Mapper) AsInt() int {
+	return m.asInt
+}
+
+func (m *Mapper) AsFloat() float64 {
+	return m.asFloat
+}
+
+func (m *Mapper) AsString() string {
+	return m.asString
+}
+
+func (m *Mapper) Object() *JsonObject {
+	return &m.object
+}
+
+func (m *Mapper) Array() *JsonArray {
+	return &m.array
+}
+
+func FromBytes(data []byte) (*Mapper, error) {
 	var mapper Mapper
 	if isObjectOrArray(data, '[') {
 		mapper.IsArray = true
 		array, err := parseJsonArray(data)
 		if err != nil {
-			return Mapper{}, err
+			return &Mapper{}, err
 		}
-		mapper.Array = array
+		mapper.array = array
 	} else if isObjectOrArray(data, '{') {
 		mapper.IsObject = true
 		object, err := parseJsonObject(data)
 		if err != nil {
-			return Mapper{}, err
+			return &Mapper{}, err
 		}
-		mapper.Object = object
+		mapper.object = object
 	} else {
-		return Mapper{}, errors.New("could not parse JSON")
+		return &Mapper{}, errors.New("could not parse JSON")
 	}
-	return mapper, nil
+	return &mapper, nil
 }
 
-func FromStruct[T any](s T) (Mapper, error) {
+func FromStruct[T any](s T) (*Mapper, error) {
 	jsonBytes, err := marshal(s)
 	if err != nil {
-		return Mapper{}, err
+		return &Mapper{}, err
 	}
 	return FromBytes(jsonBytes)
 }
 
-func FromFile(path string) (Mapper, error) {
+func FromFile(path string) (*Mapper, error) {
 	file, err := os.ReadFile(path)
 	if err != nil {
-		return Mapper{}, err
+		return &Mapper{}, err
 	}
 	return FromBytes(file)
 }
 
-func FromString(data string) (Mapper, error) {
+func FromString(data string) (*Mapper, error) {
 	return FromBytes([]byte(data))
 }
 
-func (m Mapper) AsTime() (time.Time, error) {
+func (m *Mapper) AsTime() (time.Time, error) {
 	if !m.IsString {
 		return time.Time{}, fmt.Errorf("cannot convert type %v to type time.Time\n", m.getType())
 	}
 	for _, layout := range timeLayouts {
-		parsedTime, err := time.Parse(layout, m.AsString)
+		parsedTime, err := time.Parse(layout, m.asString)
 		if err == nil {
 			return parsedTime, nil
 		}
 	}
-	return time.Time{}, fmt.Errorf("the value '%v' could not be converted to type time.Time", m.AsString)
+	return time.Time{}, fmt.Errorf("the value '%v' could not be converted to type time.Time", m.asString)
 }
 
-func (m Mapper) String() string {
+func (m *Mapper) String() string {
 	switch {
 	case m.IsBool:
-		return fmt.Sprintf("%v", m.AsBool)
+		return fmt.Sprintf("%v", m.asBool)
 	case m.IsInt:
-		return fmt.Sprintf("%v", m.AsInt)
+		return fmt.Sprintf("%v", m.asInt)
 	case m.IsFloat:
-		return fmt.Sprintf("%v", m.AsFloat)
+		return fmt.Sprintf("%v", m.asFloat)
 	case m.IsString:
-		return fmt.Sprintf("%v", m.AsString)
+		return fmt.Sprintf("%v", m.asString)
 	case m.IsObject:
-		return fmt.Sprintf("%v", m.Object)
+		return fmt.Sprintf("%v", m.object)
 	case m.IsArray:
-		return fmt.Sprintf("%v", m.Array)
+		return fmt.Sprintf("%v", m.array)
 	}
 	return ""
 }
 
-func (m Mapper) PrettyString() string {
+func (m *Mapper) PrettyString() string {
 	if m.IsBool {
-		return fmt.Sprintf("%v", m.AsBool)
+		return fmt.Sprintf("%v", m.asBool)
 	} else if m.IsInt {
-		return fmt.Sprintf("%v", m.AsInt)
+		return fmt.Sprintf("%v", m.asInt)
 	} else if m.IsFloat {
-		return fmt.Sprintf("%v", m.AsFloat)
+		return fmt.Sprintf("%v", m.asFloat)
 	} else if m.IsString {
-		return fmt.Sprintf("%v", m.AsString)
+		return fmt.Sprintf("%v", m.asString)
 	} else if m.IsObject {
-		return m.Object.PrettyString()
+		return m.object.PrettyString()
 	} else if m.IsArray {
-		return fmt.Sprintf("%v", m.Array)
+		return fmt.Sprintf("%v", m.array)
 	}
 	return ""
 }
 
-func (m Mapper) getType() JsonType {
+func (m *Mapper) getType() JsonType {
 	switch {
 	case m.IsBool:
 		return Bool
@@ -139,57 +172,57 @@ func (m Mapper) getType() JsonType {
 	return Invalid
 }
 
-func getMapperFromField(data *interface{}) Mapper {
+func getMapperFromField(data *interface{}) *Mapper {
 	var mapper Mapper
 	if data == nil {
-		return Mapper{IsNull: true}
+		return &Mapper{IsNull: true}
 	}
 	value := *data
 	switch value.(type) {
 	case bool:
 		mapper.IsBool = true
-		mapper.AsBool = value.(bool)
+		mapper.asBool = value.(bool)
 	case int:
 		mapper.IsInt = true
-		mapper.AsInt = value.(int)
+		mapper.asInt = value.(int)
 	case float64:
 		if value == float64(int(value.(float64))) {
 			mapper.IsInt = true
-			mapper.AsInt = int(value.(float64))
+			mapper.asInt = int(value.(float64))
 		} else {
 			mapper.IsFloat = true
 		}
-		mapper.AsFloat = value.(float64)
+		mapper.asFloat = value.(float64)
 	case string:
 		mapper.IsString = true
-		mapper.AsString = value.(string)
+		mapper.asString = value.(string)
 	case map[string]interface{}:
 		mapper.IsObject = true
-		mapper.Object = getAsJsonObject(value, nil)
+		mapper.object = getAsJsonObject(value, nil)
 	case []float64:
 		mapper.IsArray = true
-		mapper.Array = getAsJsonArray(value.([]float64))
+		mapper.array = getAsJsonArray(value.([]float64))
 	case []int:
 		mapper.IsArray = true
-		mapper.Array = getAsJsonArray(value.([]int))
+		mapper.array = getAsJsonArray(value.([]int))
 	case []string:
 		mapper.IsArray = true
-		mapper.Array = getAsJsonArray(value.([]string))
+		mapper.array = getAsJsonArray(value.([]string))
 	case []bool:
 		mapper.IsArray = true
-		mapper.Array = getAsJsonArray(value.([]bool))
+		mapper.array = getAsJsonArray(value.([]bool))
 	case []*interface{}:
 		mapper.IsArray = true
-		mapper.Array = JsonArray{elements: value.([]*interface{})}
+		mapper.array = JsonArray{elements: value.([]*interface{})}
 	case []interface{}:
 		mapper.IsArray = true
-		mapper.Array = JsonArray{elements: convertToSlicePtr(value.([]interface{}))}
+		mapper.array = JsonArray{elements: convertToSlicePtr(value.([]interface{}))}
 	case nil:
 		mapper.IsNull = true
 	default:
 		panic(fmt.Errorf("JSON conversion for %v failed. %T not implemented", value, data))
 	}
-	return mapper
+	return &mapper
 }
 
 func parseJsonObject(data []byte) (JsonObject, error) {
@@ -228,7 +261,7 @@ func convertToMapValuesPtr(data map[string]interface{}) map[string]*interface{} 
 	return jsonObject
 }
 
-func getAsJsonObject(data interface{}, j Json) JsonObject {
+func getAsJsonObject(data interface{}, j JsonError) JsonObject {
 	v, ok := data.(map[string]interface{})
 	if !ok {
 		j.SetLastError(fmt.Errorf(TypeConversionErrStr, data, JsonObject{}))

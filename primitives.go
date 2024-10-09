@@ -5,7 +5,7 @@ import (
 	"strconv"
 )
 
-func getAsString(data *interface{}, j Json) string {
+func getAsString(data *interface{}, j JsonError) string {
 	if data == nil {
 		j.SetLastError(fmt.Errorf(NullConversionErrStr, ""))
 		return ""
@@ -25,7 +25,7 @@ func getAsString(data *interface{}, j Json) string {
 	}
 }
 
-func getAsInt(data *interface{}, j Json) int {
+func getAsInt(data *interface{}, j JsonError) int {
 	if data == nil {
 		j.SetLastError(fmt.Errorf(NullConversionErrStr, 0))
 		return 0
@@ -41,7 +41,7 @@ func getAsInt(data *interface{}, j Json) int {
 	}
 }
 
-func getAsFloat(data *interface{}, j Json) float64 {
+func getAsFloat(data *interface{}, j JsonError) float64 {
 	if data == nil {
 		j.SetLastError(fmt.Errorf(NullConversionErrStr, 0.0))
 		return 0
@@ -54,7 +54,7 @@ func getAsFloat(data *interface{}, j Json) float64 {
 	return v
 }
 
-func getAsBool(data *interface{}, j Json) bool {
+func getAsBool(data *interface{}, j JsonError) bool {
 	if data == nil {
 		j.SetLastError(fmt.Errorf(NullConversionErrStr, false))
 		return false

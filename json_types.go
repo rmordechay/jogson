@@ -2,7 +2,7 @@ package jsonmapper
 
 import "time"
 
-type Json interface {
+type JsonError interface {
 	SetLastError(err error)
 }
 
