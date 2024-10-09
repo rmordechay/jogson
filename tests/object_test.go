@@ -12,7 +12,7 @@ func TestObjectGetKeys(t *testing.T) {
 	keys := mapper.Object.Keys()
 	assert.Equal(t, 5, len(keys))
 	assert.Contains(t, keys, "name")
-	assert.Contains(t, keys, "Age")
+	assert.Contains(t, keys, "age")
 	assert.Contains(t, keys, "address")
 }
 
@@ -42,7 +42,7 @@ func TestObjectGetString(t *testing.T) {
 	assert.NoError(t, object.LastError)
 	assert.Equal(t, "Jason", s)
 
-	s = object.GetString("Age")
+	s = object.GetString("age")
 	assert.NoError(t, object.LastError)
 	assert.Equal(t, "15", s)
 
@@ -72,7 +72,7 @@ func TestObjectGetInt(t *testing.T) {
 	mapper, _ := jsonmapper.FromString(jsonObjectTest)
 	object := mapper.Object
 
-	i := object.GetInt("Age")
+	i := object.GetInt("age")
 	assert.NoError(t, object.LastError)
 	assert.Equal(t, 15, i)
 
@@ -102,7 +102,7 @@ func TestObjectGetFloat(t *testing.T) {
 	mapper, _ := jsonmapper.FromString(jsonObjectTest)
 	object := mapper.Object
 
-	f := object.GetFloat("Age")
+	f := object.GetFloat("age")
 	assert.NoError(t, object.LastError)
 	assert.Equal(t, float64(15), f)
 
@@ -145,7 +145,7 @@ func TestObjectGetBoolFails(t *testing.T) {
 	assert.Equal(t, "the requested key 'not found' was not found", object.LastError.Error())
 	assert.Equal(t, false, b)
 
-	b = object.GetBool("Age")
+	b = object.GetBool("age")
 	assert.Equal(t, "the type 'float64' could not be converted to bool", object.LastError.Error())
 	assert.Equal(t, false, b)
 
@@ -203,4 +203,9 @@ func TestObjectGetObjectFails(t *testing.T) {
 	assert.Equal(t, "value is null and could not be converted to jsonmapper.JsonObject", object.LastError.Error())
 	assert.Equal(t, jsonmapper.JsonObject{}, obj)
 
+}
+
+func TestConvertKeysToSnakeCase(t *testing.T) {
+	//mapper, _ := jsonmapper.FromString(jsonObjectTest)
+	//object := mapper.Object
 }

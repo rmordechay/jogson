@@ -16,7 +16,7 @@ func TestParseJsonObjectFromString(t *testing.T) {
 	actual := removeWhiteSpaces(mapper.Object.String())
 
 	assert.True(t, mapper.IsObject)
-	assert.Contains(t, actual, `"Age":15`)
+	assert.Contains(t, actual, `"age":15`)
 	assert.Contains(t, actual, `"name":"Jason"`)
 }
 
@@ -51,7 +51,7 @@ func TestParseJsonObjectFromBytes(t *testing.T) {
 	actual := removeWhiteSpaces(mapper.Object.String())
 
 	assert.True(t, mapper.IsObject)
-	assert.Contains(t, actual, `"Age":15`)
+	assert.Contains(t, actual, `"age":15`)
 	assert.Contains(t, actual, `"name":"Jason"`)
 }
 
