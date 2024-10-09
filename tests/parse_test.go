@@ -1,7 +1,6 @@
 package tests
 
 import (
-	"fmt"
 	"github.com/rmordechay/jsonmapper"
 	"github.com/rmordechay/jsonmapper/docs"
 	"github.com/stretchr/testify/assert"
@@ -113,9 +112,12 @@ func TestParseJsonArrayFromFile(t *testing.T) {
 func TestParseTime(t *testing.T) {
 	mapper, err := jsonmapper.FromString(jsonTimeTest)
 	assert.NoError(t, err)
-	actualTime1 := mapper.Object.Get("time1").AsTime()
-	actualTime2 := mapper.Object.Get("time2").AsTime()
-	actualTime3 := mapper.Object.Get("time3").AsTime()
+	actualTime1, err := mapper.Object.Get("time1").AsTime()
+	assert.NoError(t, err)
+	actualTime2, err := mapper.Object.Get("time2").AsTime()
+	assert.NoError(t, err)
+	actualTime3, err := mapper.Object.Get("time3").AsTime()
+	assert.NoError(t, err)
 	expectedTime1, _ := time.Parse(time.RFC3339, "2024-10-06T17:59:44Z")
 	expectedTime2, _ := time.Parse(time.RFC3339, "2024-10-06T17:59:44+00:00")
 	expectedTime3, _ := time.Parse(time.RFC850, "Sunday, 06-Oct-24 17:59:44 UTC")
@@ -124,10 +126,16 @@ func TestParseTime(t *testing.T) {
 	assert.Equal(t, expectedTime3, actualTime3)
 }
 
-func TestSandbox(t *testing.T) {
-	mapper, err := jsonmapper.FromString(jsonObjectTest)
+func TestParseTimeInvalid(t *testing.T) {
+	mapper, err := jsonmapper.FromString(jsonTimeTestInvalid)
 	assert.NoError(t, err)
-	fmt.Printf("%v\n", mapper.PrettyString())
+	for _, v := range mapper.Object.Elements() {
+		_, err = v.AsTime()
+		assert.Error(t, err)
+	}
+}
+
+func TestExample(t *testing.T) {
 	docs.RunExample()
 }
 

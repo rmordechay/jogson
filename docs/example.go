@@ -21,7 +21,8 @@ func RunExample() {
 	`
 	mapper, _ := jsonmapper.FromString(jsonString)
 	//var birthday time.Time = mapper.Object.Get("birthday").AsTime()
-	fmt.Println(mapper.Object.Get("children").PrettyString())
+	get := mapper.Object.Get("children").PrettyString()
+	fmt.Println(get)
 
 	//var name string = object.Get("name").AsString
 	//var age int = object.Get("age").AsInt

@@ -1,22 +1,23 @@
 package jsonmapper
 
 import (
-	"errors"
 	"fmt"
 )
 
 type JsonArray struct {
 	elements []*interface{}
+
+	Err error
 }
 
-func NewArray() JsonArray {
+func NewArray() *JsonArray {
 	var arr JsonArray
 	elements := make([]*interface{}, 0)
 	arr.elements = elements
-	return arr
+	return &arr
 }
 
-func (a JsonArray) Elements() []Mapper {
+func (a *JsonArray) Elements() []Mapper {
 	jsons := make([]Mapper, 0, len(a.elements))
 	for _, element := range a.elements {
 		jsons = append(jsons, getMapperFromField(element))
@@ -24,32 +25,29 @@ func (a JsonArray) Elements() []Mapper {
 	return jsons
 }
 
-func (a JsonArray) Get(i int) Mapper {
+func (a *JsonArray) Get(i int) Mapper {
 	if i >= a.Length() {
-		indexErr := fmt.Sprintf("index out of range [%v] with length %v", i, a.Length())
-		var mapper Mapper
-		mapper.Err = errors.New(indexErr)
-		return mapper
+		a.Err = fmt.Errorf("index out of range [%v] with length %v", i, a.Length())
+		return Mapper{}
 	}
 	return getMapperFromField((a.elements)[i])
 }
 
-func (a JsonArray) Length() int {
+func (a *JsonArray) Length() int {
 	return len(a.elements)
 }
 
-func (a JsonArray) AddValue(value interface{}) JsonArray {
+func (a *JsonArray) AddValue(value interface{}) {
 	a.elements = append(a.elements, &value)
-	return a
 }
 
-func (a JsonArray) ForEach(f func(mapper Mapper)) {
+func (a *JsonArray) ForEach(f func(mapper Mapper)) {
 	for _, element := range a.elements {
 		f(getMapperFromField(element))
 	}
 }
 
-func (a JsonArray) Filter(f func(mapper Mapper) bool) JsonArray {
+func (a *JsonArray) Filter(f func(mapper Mapper) bool) JsonArray {
 	var arr = NewArray()
 	for _, element := range a.elements {
 		field := getMapperFromField(element)
@@ -57,10 +55,10 @@ func (a JsonArray) Filter(f func(mapper Mapper) bool) JsonArray {
 			arr.elements = append(arr.elements, element)
 		}
 	}
-	return arr
+	return *arr
 }
 
-func (a JsonArray) String() string {
+func (a *JsonArray) String() string {
 	jsonBytes, _ := marshal(a.elements)
 	return string(jsonBytes)
 }
@@ -76,7 +74,7 @@ func parseJsonArray(data []byte) (JsonArray, error) {
 	return ja, nil
 }
 
-func convertArray[T JsonType](data []T) JsonArray {
+func convertArray[T any](data []T) JsonArray {
 	var arr JsonArray
 	array := make([]*interface{}, len(data))
 	for i, v := range data {

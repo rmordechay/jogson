@@ -75,32 +75,52 @@ func FromString(data string) (Mapper, error) {
 	return FromBytes([]byte(data))
 }
 
-func (m Mapper) AsTime() time.Time {
+func (m Mapper) AsTime() (time.Time, error) {
 	if !m.IsString {
-		m.Err = fmt.Errorf("could not convert current type %v to time", m.String())
-		return time.Time{}
+		return time.Time{}, fmt.Errorf("cannot convert type %v to type time.Time\n", m.GetType())
 	}
 	for _, layout := range timeLayouts {
 		parsedTime, err := time.Parse(layout, m.AsString)
 		if err == nil {
-			return parsedTime
+			return parsedTime, nil
 		}
 	}
-	return time.Time{}
+	return time.Time{}, fmt.Errorf("the value '%v' could not be converted to type time.Time", m.AsString)
+}
+
+func (m Mapper) GetType() JsonType {
+	switch {
+	case m.IsBool:
+		return Bool
+	case m.IsInt:
+		return Int
+	case m.IsFloat:
+		return Float
+	case m.IsString:
+		return String
+	case m.IsObject:
+		return Object
+	case m.IsNull:
+		return Null
+	case m.IsArray:
+		return Array
+	}
+	return Invalid
 }
 
 func (m Mapper) String() string {
-	if m.IsBool {
+	switch {
+	case m.IsBool:
 		return fmt.Sprintf("%v", m.AsBool)
-	} else if m.IsInt {
+	case m.IsInt:
 		return fmt.Sprintf("%v", m.AsInt)
-	} else if m.IsFloat {
+	case m.IsFloat:
 		return fmt.Sprintf("%v", m.AsFloat)
-	} else if m.IsString {
+	case m.IsString:
 		return fmt.Sprintf("%v", m.AsString)
-	} else if m.IsObject {
+	case m.IsObject:
 		return fmt.Sprintf("%v", m.Object)
-	} else if m.IsArray {
+	case m.IsArray:
 		return fmt.Sprintf("%v", m.Array)
 	}
 	return ""
@@ -137,6 +157,9 @@ func createArray(data interface{}) JsonArray {
 
 func getMapperFromField(data *interface{}) Mapper {
 	var mapper Mapper
+	if data == nil {
+		return Mapper{IsNull: true}
+	}
 	value := *data
 	switch value.(type) {
 	case bool:

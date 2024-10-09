@@ -2,8 +2,30 @@ package jsonmapper
 
 import "time"
 
-type JsonType interface {
-	int | string | float64 | bool | JsonObject | JsonArray
+type JsonType int
+
+const (
+	Bool JsonType = iota
+	Int
+	Float
+	String
+	Object
+	Array
+	Null
+	Invalid
+)
+
+func (d JsonType) String() string {
+	return [...]string{
+		"bool",
+		"int",
+		"float64",
+		"string",
+		"object",
+		"array",
+		"null",
+		"invalid",
+	}[d]
 }
 
 var timeLayouts = []string{

@@ -1,6 +1,6 @@
 # JSON Mapper Library for Go
 
-[![GoDoc](https://pkg.go.dev/badge/badge)](https://pkg.go.dev/github.com/rmordechay/json-mapper)
+[![GoDoc](https://pkg.go.dev/badge/badge)](https://pkg.go.dev/github.com/rmordechay/jsonmapper)
 
 A simple Go library to simplify working with JSON without the need to define structs.
 
@@ -22,7 +22,7 @@ A simple Go library to simplify working with JSON without the need to define str
 To install the library, use:
 
 ```bash
-go get github.com/rmordechay/json-mapper
+go get github.com/rmordechay/jsonmapper
 ```
 
 ### Creating a mapper
@@ -105,10 +105,10 @@ fmt.Println(birthday)    // 1981-10-08 00:00:00 +0000 UTC
 ### Arrays
 ```go
 // Get array length
-arrayLen := array.Length()
+arrayLen := mapper.Array.Length()
 
 // Get an element of array by index
-element := array.Get(2)
+element := mapper.Array.Get(2)
 
 // Iterating over an array
 array := mapper.Object.Get("features").Array
@@ -121,8 +121,8 @@ for _, feature := range array.Elements() {
 You can search for a nested element. 
 ```go
 element := mapper.Object.Find("Rachel")
-fmt.Println(child.IsObject)         // true 
-fmt.Println(child.Has("is_funny"))  // true 
+fmt.Println(element.IsObject)         // true 
+fmt.Println(element.Has("is_funny"))  // true 
 ```
 
 ### Get JSON as string
@@ -130,6 +130,7 @@ You can get a string from every JSON element which is a valid JSON
 ```go
 fmt.Println(mapper.Object.String())
 // output: {"age":43,"children":{"Rachel":{"age":15,"is_funny":false},"Sara":{"age":19,"is_funny":true}},"features":["tall","blue eyes"],"is_funny":false,"name":"Jason"}
+
 fmt.Println(mapper.Object.Get("children").String())
 // output: {"Rachel":{"age":15,"is_funny":false},"Sara":{"age":19,"is_funny":true}}
 ```
