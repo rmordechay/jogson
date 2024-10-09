@@ -32,8 +32,8 @@ func (o *JsonObject) Keys() []string {
 	return keys
 }
 
-func (o *JsonObject) Values() []*Mapper {
-	values := make([]*Mapper, 0, len(o.object))
+func (o *JsonObject) Values() []Json {
+	values := make([]Json, 0, len(o.object))
 	for _, v := range o.object {
 		values = append(values, getMapperFromField(v))
 	}
@@ -162,21 +162,21 @@ func (o *JsonObject) GetArray(key string) JsonArray {
 	return JsonArray{}
 }
 
-func (o *JsonObject) Find(key string) *Mapper {
+func (o *JsonObject) Find(key string) Json {
 	for k, v := range o.object {
 		field := getMapperFromField(v)
 		if k == key {
 			return field
 		}
-		if field.IsObject {
-			return field.object.Find(key)
+		if field.IsObject() {
+			return field.Object().Find(key)
 		}
 	}
-	return &Mapper{}
+	return &mapper{}
 }
 
-func (o *JsonObject) Elements() map[string]*Mapper {
-	jsons := make(map[string]*Mapper)
+func (o *JsonObject) Elements() map[string]Json {
+	jsons := make(map[string]Json)
 	for k, v := range o.object {
 		jsons[k] = getMapperFromField(v)
 	}
@@ -187,17 +187,16 @@ func (o *JsonObject) AddKeyValue(k string, value interface{}) {
 	o.object[k] = &value
 }
 
-func (o *JsonObject) ForEach(f func(key string, mapper Mapper)) {
+func (o *JsonObject) ForEach(f func(key string, j Json)) {
 	for k, element := range o.object {
-		f(k, *getMapperFromField(element))
+		f(k, getMapperFromField(element))
 	}
 }
 
-func (o *JsonObject) Filter(f func(key string, mapper Mapper) bool) JsonObject {
+func (o *JsonObject) Filter(f func(key string, j Json) bool) JsonObject {
 	var obj = NewObject()
 	for k, element := range o.object {
-		field := getMapperFromField(element)
-		if f(k, *field) {
+		if f(k, getMapperFromField(element)) {
 			obj.object[k] = element
 		}
 	}

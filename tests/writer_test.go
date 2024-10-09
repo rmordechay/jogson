@@ -9,8 +9,7 @@ import (
 func TestWriteStringToObject(t *testing.T) {
 	obj := jsonmapper.NewObject()
 	obj.AddKeyValue("name", "chris")
-	objElements := obj.Elements()
-	assert.Equal(t, "chris", objElements["name"].String())
+	assert.Equal(t, "chris", obj.GetString("name"))
 }
 
 func TestWriteIntToObject(t *testing.T) {
@@ -28,7 +27,7 @@ func TestWriteArrayStringToObject(t *testing.T) {
 	stringArray := objElements["strings"].Array()
 	arrayElements := stringArray.Elements()
 
-	assert.True(t, objElements["strings"].IsArray)
+	assert.True(t, objElements["strings"].IsArray())
 	assert.Equal(t, 3, stringArray.Length())
 	assert.Equal(t, "string1", arrayElements[0].AsString())
 	assert.Equal(t, "string4", arrayElements[2].AsString())
@@ -55,7 +54,7 @@ func TestWriteArrayStringsToObject(t *testing.T) {
 	stringArray := objElements["strings"].Array()
 	arrayElements := stringArray.Elements()
 
-	assert.True(t, objElements["strings"].IsArray)
+	assert.True(t, objElements["strings"].IsArray())
 	assert.Equal(t, 3, stringArray.Length())
 	assert.Equal(t, "string1", arrayElements[0].AsString())
 	assert.Equal(t, "string4", arrayElements[2].AsString())
@@ -69,7 +68,7 @@ func TestWriteObjectArrayInt(t *testing.T) {
 	numberArray := objElements["numbers"].Array()
 	arrayElements := numberArray.Elements()
 
-	assert.True(t, objElements["numbers"].IsArray)
+	assert.True(t, objElements["numbers"].IsArray())
 	assert.Equal(t, 3, numberArray.Length())
 	assert.Equal(t, 1, arrayElements[0].AsInt())
 	assert.Equal(t, 4, arrayElements[2].AsInt())
@@ -83,7 +82,7 @@ func TestWriteArrayFloatToObject(t *testing.T) {
 	numberArray := objElements["numbers"].Array()
 	arrayElements := numberArray.Elements()
 
-	assert.True(t, objElements["numbers"].IsArray)
+	assert.True(t, objElements["numbers"].IsArray())
 	assert.Equal(t, 3, numberArray.Length())
 	assert.Equal(t, 1.5, arrayElements[0].AsFloat())
 	assert.Equal(t, 4.2, arrayElements[2].AsFloat())
