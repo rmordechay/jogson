@@ -64,7 +64,7 @@ func TestGetStringFails(t *testing.T) {
 	assert.Equal(t, "", s)
 
 	s = object.GetString("address")
-	assert.Equal(t, "the value of 'address' is null and could not be converted to string", object.LastError.Error())
+	assert.Equal(t, "value is null and could not be converted to string", object.LastError.Error())
 	assert.Equal(t, "", s)
 }
 
@@ -90,11 +90,11 @@ func TestGetIntFails(t *testing.T) {
 	assert.Equal(t, 0, i)
 
 	i = object.GetInt("name")
-	assert.Equal(t, "the type of key 'name' (string) could not be converted to int", object.LastError.Error())
+	assert.Equal(t, "the type 'string' could not be converted to int", object.LastError.Error())
 	assert.Equal(t, 0, i)
 
 	i = object.GetInt("address")
-	assert.Equal(t, "the value of 'address' is null and could not be converted to int", object.LastError.Error())
+	assert.Equal(t, "value is null and could not be converted to int", object.LastError.Error())
 	assert.Equal(t, 0, i)
 }
 
@@ -120,11 +120,11 @@ func TestGetFloatFails(t *testing.T) {
 	assert.Equal(t, float64(0), f)
 
 	f = object.GetFloat("name")
-	assert.Equal(t, "the type of key 'name' (string) could not be converted to float64", object.LastError.Error())
+	assert.Equal(t, "the type 'string' could not be converted to float64", object.LastError.Error())
 	assert.Equal(t, float64(0), f)
 
 	f = object.GetFloat("address")
-	assert.Equal(t, "the value of 'address' is null and could not be converted to float64", object.LastError.Error())
+	assert.Equal(t, "value is null and could not be converted to float64", object.LastError.Error())
 	assert.Equal(t, float64(0), f)
 }
 
@@ -140,17 +140,16 @@ func TestGetBool(t *testing.T) {
 func TestGetBoolFails(t *testing.T) {
 	mapper, _ := jsonmapper.FromString(jsonObjectTest)
 	object := mapper.Object
-
 	b := object.GetBool("not found")
 	assert.Equal(t, "the requested key 'not found' was not found", object.LastError.Error())
 	assert.Equal(t, false, b)
 
 	b = object.GetBool("age")
-	assert.Equal(t, "the type of key 'age' (float64) could not be converted to bool", object.LastError.Error())
+	assert.Equal(t, "the type 'float64' could not be converted to bool", object.LastError.Error())
 	assert.Equal(t, false, b)
 
 	b = object.GetBool("address")
-	assert.Equal(t, "the value of 'address' is null and could not be converted to bool", object.LastError.Error())
+	assert.Equal(t, "value is null and could not be converted to bool", object.LastError.Error())
 	assert.Equal(t, false, b)
 }
 

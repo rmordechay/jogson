@@ -2,6 +2,10 @@ package jsonmapper
 
 import "time"
 
+type Json interface {
+	SetLastError(err error)
+}
+
 type JsonType int
 
 const (

@@ -111,7 +111,7 @@ arrayLen := array.Length() // 2
 secondElement := array.Get(1)
 
 // Iterating over an array
-array := mapper.Object.Get("features").Array
+array := mapper.Object.GetArray("features")
 for _, feature := range array.Elements() {
     fmt.Println(feature.AsString) // tall, ...
 }

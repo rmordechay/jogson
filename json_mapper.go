@@ -31,14 +31,14 @@ type Mapper struct {
 
 func FromBytes(data []byte) (Mapper, error) {
 	var mapper Mapper
-	if isArray(data) {
+	if isObjectOrArray(data, '[') {
 		mapper.IsArray = true
 		array, err := parseJsonArray(data)
 		if err != nil {
 			return Mapper{}, err
 		}
 		mapper.Array = array
-	} else if isObject(data) {
+	} else if isObjectOrArray(data, '{') {
 		mapper.IsObject = true
 		object, err := parseJsonObject(data)
 		if err != nil {
@@ -73,7 +73,7 @@ func FromString(data string) (Mapper, error) {
 
 func (m Mapper) AsTime() (time.Time, error) {
 	if !m.IsString {
-		return time.Time{}, fmt.Errorf("cannot convert type %v to type time.Time\n", m.GetType())
+		return time.Time{}, fmt.Errorf("cannot convert type %v to type time.Time\n", m.getType())
 	}
 	for _, layout := range timeLayouts {
 		parsedTime, err := time.Parse(layout, m.AsString)
@@ -82,26 +82,6 @@ func (m Mapper) AsTime() (time.Time, error) {
 		}
 	}
 	return time.Time{}, fmt.Errorf("the value '%v' could not be converted to type time.Time", m.AsString)
-}
-
-func (m Mapper) GetType() JsonType {
-	switch {
-	case m.IsBool:
-		return Bool
-	case m.IsInt:
-		return Int
-	case m.IsFloat:
-		return Float
-	case m.IsString:
-		return String
-	case m.IsObject:
-		return Object
-	case m.IsNull:
-		return Null
-	case m.IsArray:
-		return Array
-	}
-	return Invalid
 }
 
 func (m Mapper) String() string {
@@ -139,16 +119,24 @@ func (m Mapper) PrettyString() string {
 	return ""
 }
 
-func createArray(data interface{}) JsonArray {
-	var arr JsonArray
-	switch data.(type) {
-	case []*interface{}:
-		arr.elements = data.([]*interface{})
-	case []interface{}:
-		array := convertToArrayPtr(data.([]interface{}))
-		arr.elements = array
+func (m Mapper) getType() JsonType {
+	switch {
+	case m.IsBool:
+		return Bool
+	case m.IsInt:
+		return Int
+	case m.IsFloat:
+		return Float
+	case m.IsString:
+		return String
+	case m.IsObject:
+		return Object
+	case m.IsNull:
+		return Null
+	case m.IsArray:
+		return Array
 	}
-	return arr
+	return Invalid
 }
 
 func getMapperFromField(data *interface{}) Mapper {
@@ -177,38 +165,31 @@ func getMapperFromField(data *interface{}) Mapper {
 		mapper.AsString = value.(string)
 	case map[string]interface{}:
 		mapper.IsObject = true
-		mapper.Object = createJsonObject(value)
+		mapper.Object = getAsJsonObject(value, nil)
 	case []float64:
 		mapper.IsArray = true
-		mapper.Array = convertArray(value.([]float64))
+		mapper.Array = getAsJsonArray(value.([]float64))
 	case []int:
 		mapper.IsArray = true
-		mapper.Array = convertArray(value.([]int))
+		mapper.Array = getAsJsonArray(value.([]int))
 	case []string:
 		mapper.IsArray = true
-		mapper.Array = convertArray(value.([]string))
+		mapper.Array = getAsJsonArray(value.([]string))
 	case []bool:
 		mapper.IsArray = true
-		mapper.Array = convertArray(value.([]bool))
+		mapper.Array = getAsJsonArray(value.([]bool))
+	case []*interface{}:
+		mapper.IsArray = true
+		mapper.Array = JsonArray{elements: value.([]*interface{})}
 	case []interface{}:
 		mapper.IsArray = true
-		mapper.Array = createArray(value)
+		mapper.Array = JsonArray{elements: convertToSlicePtr(value.([]interface{}))}
 	case nil:
 		mapper.IsNull = true
 	default:
 		panic(fmt.Errorf("JSON conversion for %v failed. %T not implemented", value, data))
 	}
 	return mapper
-}
-
-func createJsonObject(data interface{}) JsonObject {
-	var obj JsonObject
-	var object = make(map[string]*interface{})
-	for k, v := range data.(map[string]interface{}) {
-		object[k] = &v
-	}
-	obj.object = object
-	return obj
 }
 
 func parseJsonObject(data []byte) (JsonObject, error) {
@@ -220,7 +201,18 @@ func parseJsonObject(data []byte) (JsonObject, error) {
 	return jo, nil
 }
 
-func convertToArrayPtr(data []interface{}) []*interface{} {
+func parseJsonArray(data []byte) (JsonArray, error) {
+	var ja JsonArray
+	var arr []*interface{}
+	err := unmarshal(data, &arr)
+	if err != nil {
+		return JsonArray{}, err
+	}
+	ja.elements = arr
+	return ja, nil
+}
+
+func convertToSlicePtr(data []interface{}) []*interface{} {
 	array := make([]*interface{}, len(data))
 	for i, v := range data {
 		array[i] = &v
@@ -236,12 +228,31 @@ func convertToMapValuesPtr(data map[string]interface{}) map[string]*interface{} 
 	return jsonObject
 }
 
-func isArray(data []byte) bool {
-	return isObjectOrArray(data, '[')
+func getAsJsonObject(data interface{}, j Json) JsonObject {
+	v, ok := data.(map[string]interface{})
+	if !ok {
+		j.SetLastError(fmt.Errorf(TypeConversionErrStr, data, JsonObject{}))
+		return JsonObject{}
+	}
+
+	var obj JsonObject
+	var object = make(map[string]*interface{})
+	for key, value := range v {
+		object[key] = &value
+	}
+	obj.object = object
+	return obj
 }
 
-func isObject(data []byte) bool {
-	return isObjectOrArray(data, '{')
+func getAsJsonArray[T any](data []T) JsonArray {
+	var arr JsonArray
+	array := make([]*interface{}, len(data))
+	for i, v := range data {
+		var valAny interface{} = v
+		array[i] = &valAny
+	}
+	arr.elements = array
+	return arr
 }
 
 func isObjectOrArray(data []byte, brackOrParen byte) bool {
