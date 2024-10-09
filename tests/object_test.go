@@ -34,7 +34,7 @@ func TestElementNotFound(t *testing.T) {
 	assert.Equal(t, mapper.Object.LastError.Error(), "the requested key 'not found' was not found")
 }
 
-func TestGetString(t *testing.T) {
+func TestObjectGetString(t *testing.T) {
 	mapper, _ := jsonmapper.FromString(jsonObjectTest)
 	object := mapper.Object
 
@@ -55,7 +55,7 @@ func TestGetString(t *testing.T) {
 	assert.Equal(t, "true", s)
 }
 
-func TestGetStringFails(t *testing.T) {
+func TestObjectGetStringFails(t *testing.T) {
 	mapper, _ := jsonmapper.FromString(jsonObjectTest)
 	object := mapper.Object
 
@@ -68,7 +68,7 @@ func TestGetStringFails(t *testing.T) {
 	assert.Equal(t, "", s)
 }
 
-func TestGetInt(t *testing.T) {
+func TestObjectGetInt(t *testing.T) {
 	mapper, _ := jsonmapper.FromString(jsonObjectTest)
 	object := mapper.Object
 
@@ -81,7 +81,7 @@ func TestGetInt(t *testing.T) {
 	assert.Equal(t, 1, i)
 }
 
-func TestGetIntFails(t *testing.T) {
+func TestObjectGetIntFails(t *testing.T) {
 	mapper, _ := jsonmapper.FromString(jsonObjectTest)
 	object := mapper.Object
 
@@ -98,7 +98,7 @@ func TestGetIntFails(t *testing.T) {
 	assert.Equal(t, 0, i)
 }
 
-func TestGetFloat(t *testing.T) {
+func TestObjectGetFloat(t *testing.T) {
 	mapper, _ := jsonmapper.FromString(jsonObjectTest)
 	object := mapper.Object
 
@@ -111,7 +111,7 @@ func TestGetFloat(t *testing.T) {
 	assert.Equal(t, 1.81, f)
 }
 
-func TestGetFloatFails(t *testing.T) {
+func TestObjectGetFloatFails(t *testing.T) {
 	mapper, _ := jsonmapper.FromString(jsonObjectTest)
 	object := mapper.Object
 
@@ -128,7 +128,7 @@ func TestGetFloatFails(t *testing.T) {
 	assert.Equal(t, float64(0), f)
 }
 
-func TestGetBool(t *testing.T) {
+func TestObjectGetBool(t *testing.T) {
 	mapper, _ := jsonmapper.FromString(jsonObjectTest)
 	object := mapper.Object
 
@@ -137,7 +137,7 @@ func TestGetBool(t *testing.T) {
 	assert.Equal(t, true, b)
 }
 
-func TestGetBoolFails(t *testing.T) {
+func TestObjectGetBoolFails(t *testing.T) {
 	mapper, _ := jsonmapper.FromString(jsonObjectTest)
 	object := mapper.Object
 	b := object.GetBool("not found")
@@ -152,11 +152,3 @@ func TestGetBoolFails(t *testing.T) {
 	assert.Equal(t, "value is null and could not be converted to bool", object.LastError.Error())
 	assert.Equal(t, false, b)
 }
-
-//func TestObjectFilter(t *testing.T) {
-//	panic("not implemented")
-//}
-//
-//func TestObjectForEach(t *testing.T) {
-//	panic("not implemented")
-//}

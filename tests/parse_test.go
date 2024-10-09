@@ -126,7 +126,7 @@ func TestParseTime(t *testing.T) {
 }
 
 func TestParseTimeInvalid(t *testing.T) {
-	mapper, err := jsonmapper.FromString(jsonTimeTestInvalid)
+	mapper, err := jsonmapper.FromString(jsonInvalidTimeTest)
 	assert.NoError(t, err)
 	for _, v := range mapper.Object.Elements() {
 		_, err = v.AsTime()
