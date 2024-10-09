@@ -165,7 +165,7 @@ func getMapperFromField(data *interface{}) Json {
 		mapper.AsString = value.(string)
 	case map[string]interface{}:
 		mapper.IsObject = true
-		mapper.Object = getAsJsonObject(value, nil)
+		mapper.Object = getAsJsonObject(&value, nil)
 	case []float64:
 		mapper.IsArray = true
 		mapper.Array = getAsJsonArray(value.([]float64))
@@ -226,33 +226,6 @@ func convertToMapValuesPtr(data map[string]interface{}) map[string]*interface{} 
 		jsonObject[k] = &v
 	}
 	return jsonObject
-}
-
-func getAsJsonObject(data interface{}, j JsonError) JsonObject {
-	v, ok := data.(map[string]interface{})
-	if !ok {
-		j.SetLastError(fmt.Errorf(TypeConversionErrStr, data, JsonObject{}))
-		return JsonObject{}
-	}
-
-	var obj JsonObject
-	var object = make(map[string]*interface{})
-	for key, value := range v {
-		object[key] = &value
-	}
-	obj.object = object
-	return obj
-}
-
-func getAsJsonArray[T any](data []T) JsonArray {
-	var arr JsonArray
-	array := make([]*interface{}, len(data))
-	for i, v := range data {
-		var valAny interface{} = v
-		array[i] = &valAny
-	}
-	arr.elements = array
-	return arr
 }
 
 func isObjectOrArray(data []byte, brackOrParen byte) bool {

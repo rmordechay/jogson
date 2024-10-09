@@ -211,3 +211,23 @@ func (o *JsonObject) String() string {
 	jsonBytes, _ := marshal(o.object)
 	return string(jsonBytes)
 }
+
+func getAsJsonObject(data *interface{}, j JsonError) JsonObject {
+	if data == nil {
+		j.SetLastError(fmt.Errorf(NullConversionErrStr, ""))
+		return JsonObject{}
+	}
+	v, ok := (*data).(map[string]interface{})
+	if !ok {
+		j.SetLastError(fmt.Errorf(TypeConversionErrStr, data, JsonObject{}))
+		return JsonObject{}
+	}
+
+	var obj JsonObject
+	var object = make(map[string]*interface{})
+	for key, value := range v {
+		object[key] = &value
+	}
+	obj.object = object
+	return obj
+}

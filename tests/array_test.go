@@ -8,7 +8,7 @@ import (
 )
 
 func TestArrayFilter(t *testing.T) {
-	mapper, err := jsonmapper.FromString(jsonArrayTest)
+	mapper, err := jsonmapper.FromString(jsonObjectArrayTest)
 	assert.NoError(t, err)
 	filteredArr := mapper.Array.Filter(func(element jsonmapper.Json) bool {
 		return element.Object.GetString("name") == "Chris"
@@ -18,7 +18,7 @@ func TestArrayFilter(t *testing.T) {
 }
 
 func TestArrayForEach(t *testing.T) {
-	mapper, err := jsonmapper.FromString(jsonArrayTest)
+	mapper, err := jsonmapper.FromString(jsonObjectArrayTest)
 	assert.NoError(t, err)
 	wasVisited := false
 	mapper.Array.ForEach(func(mapper jsonmapper.Json) {
@@ -37,24 +37,36 @@ func TestIndexOutOfBoundError(t *testing.T) {
 	assert.Equal(t, arr.LastError.Error(), "index out of range [3] with length 1")
 }
 
-func TestArrayAs2DArray(t *testing.T) {
-
-}
-
-func TestArrayAsObjectArray(t *testing.T) {
-
-}
-
 func TestArrayAsStringArray(t *testing.T) {
-
+	mapper, _ := jsonmapper.FromString(jsonStringArrayTest)
+	array := mapper.Array
+	assert.ElementsMatch(t, []string{"Jason", "Chris", "Rachel"}, array.AsStringArray())
 }
 
 func TestArrayAsIntArray(t *testing.T) {
-
+	mapper, _ := jsonmapper.FromString(jsonIntArrayTest)
+	array := mapper.Array
+	assert.ElementsMatch(t, []int{0, 15, -54, -346, 9223372036854775807}, array.AsIntArray())
 }
 
 func TestArrayAsFloatArray(t *testing.T) {
+	mapper, _ := jsonmapper.FromString(jsonFloatArrayTest)
+	array := mapper.Array
+	assert.ElementsMatch(t, []float64{15.13, 2, 45.3984, -1.81, 9.223372036854776}, array.AsFloatArray())
+}
 
+func TestArrayAs2DArray(t *testing.T) {
+	mapper, _ := jsonmapper.FromString(json2DArrayTest)
+	array := mapper.Array
+	assert.ElementsMatch(t, []int{1, 2}, array.As2DArray()[0].AsIntArray())
+	assert.ElementsMatch(t, []int{3, 4}, array.As2DArray()[1].AsIntArray())
+}
+
+func TestArrayAsObjectArray(t *testing.T) {
+	mapper, _ := jsonmapper.FromString(jsonObjectArrayTest)
+	array := mapper.Array
+	assert.Equal(t, "Jason", array.AsObjectArray()[0].GetString("name"))
+	assert.Equal(t, "Chris", array.AsObjectArray()[1].GetString("name"))
 }
 
 func TestArrayGetString(t *testing.T) {

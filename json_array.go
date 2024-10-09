@@ -173,3 +173,14 @@ func (a *JsonArray) String() string {
 	jsonBytes, _ := marshal(a.elements)
 	return string(jsonBytes)
 }
+
+func getAsJsonArray[T any](data []T) JsonArray {
+	var arr JsonArray
+	array := make([]*interface{}, len(data))
+	for i, v := range data {
+		var valAny interface{} = v
+		array[i] = &valAny
+	}
+	arr.elements = array
+	return arr
+}

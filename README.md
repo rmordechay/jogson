@@ -57,13 +57,13 @@ jsonString := `{
 
 ### Check Types
 ```go
-fmt.Println(mapper.IsObject())    // true
-fmt.Println(mapper.IsBool())      // false
-fmt.Println(mapper.IsInt())       // false
-fmt.Println(mapper.IsFloat())     // false
-fmt.Println(mapper.IsString())    // false
-fmt.Println(mapper.IsArray())     // false
-fmt.Println(mapper.IsNull())      // false
+fmt.Println(mapper.IsObject)    // true
+fmt.Println(mapper.IsBool)      // false
+fmt.Println(mapper.IsInt)       // false
+fmt.Println(mapper.IsFloat)     // false
+fmt.Println(mapper.IsString)    // false
+fmt.Println(mapper.IsArray)     // false
+fmt.Println(mapper.IsNull)      // false
 ```
 
 ### Objects
