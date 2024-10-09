@@ -29,9 +29,9 @@ func TestObjectGetValues(t *testing.T) {
 func TestElementNotFound(t *testing.T) {
 	mapper, err := jsonmapper.FromString(jsonObjectTest)
 	assert.NoError(t, err)
-	obj := mapper.Object.Get("not found")
-	assert.Error(t, obj.Err)
-	assert.Equal(t, obj.Err.Error(), "could not get JSON element")
+	_ = mapper.Object.GetFloat("not found")
+	assert.Error(t, mapper.Object.LastError)
+	assert.Equal(t, mapper.Object.LastError.Error(), "the requested key 'not found' was not found")
 }
 
 func TestGetString(t *testing.T) {

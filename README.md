@@ -10,7 +10,7 @@ A simple Go library to simplify working with JSON without the need to define str
   * [Creating a mapper](#Creating-a-mapper)
   * [Check Types](#Check-Types)
   * [Objects](#Objects)
-  * [Get Values](#Get-Values)
+  * [Get Values](#get-primitive-values)
   * [Arrays](#Arrays)
   * [Find Elements](#Find-Elements)
   * [Print JSON](#Get-JSON-as-string)
@@ -44,6 +44,7 @@ Once you have the `mapper`, you can read the data easily. Consider the following
 jsonString := `{
     "name": "Jason",
     "age": 43,
+    "height": 1.87,
     "is_funny": false,
     "birthday": "1981-10-08",
     "features": ["tall", "blue eyes"],
@@ -88,18 +89,23 @@ for key, child := range children.Elements() {
 }
 ```
 
-### Get Values
+### Get Primitive Values
+There are two ways to get a primitive value from an object. Either with the underlying Mapper or directly 
+if you already know the type 
 ```go
 object := mapper.Object
-var name string = object.Get("name").AsString
-var age int = object.Get("age").AsInt
-var isFunny bool = object.Get("is_funny").AsBool
-var birthday time.Time = object.Get("birthday").AsTime()
 
-fmt.Println(name)        // Jason
-fmt.Println(age)         // 43
-fmt.Println(isFunny)     // false
-fmt.Println(birthday)    // 1981-10-08 00:00:00 +0000 UTC
+var name1 string = object.Get("name").AsString // Jason
+var name2 string = object.GetString("name") // Jason
+
+var age1 int = object.Get("age").AsInt // 15
+var age2 int = object.GetInt("age") // 15
+
+var height1 float64 = object.Get("height").AsFloat // 1.87
+var height2 float64 = object.GetFloat("height") // 1.87
+
+var isFunny1 bool = object.Get("is_funny").AsBool // false
+var isFunny2 bool = object.GetBool("is_funny") // false
 ```
 
 ### Arrays

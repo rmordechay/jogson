@@ -76,8 +76,8 @@ func TestParseJsonArrayFromStruct(t *testing.T) {
 	mapper, err := jsonmapper.FromStruct(testStruct)
 	assert.NoError(t, err)
 	assert.True(t, mapper.IsObject)
-	assert.Equal(t, "John", mapper.Object.Get("name").AsString)
-	assert.Equal(t, 15, mapper.Object.Get("age").AsInt)
+	assert.Equal(t, "John", mapper.Object.GetString("name"))
+	assert.Equal(t, 15, mapper.Object.GetInt("age"))
 }
 
 func TestParseJsonObjectFromFile(t *testing.T) {
@@ -112,11 +112,11 @@ func TestParseJsonArrayFromFile(t *testing.T) {
 func TestParseTime(t *testing.T) {
 	mapper, err := jsonmapper.FromString(jsonTimeTest)
 	assert.NoError(t, err)
-	actualTime1, err := mapper.Object.Get("time1").AsTime()
+	actualTime1, err := mapper.Object.GetTime("time1")
 	assert.NoError(t, err)
-	actualTime2, err := mapper.Object.Get("time2").AsTime()
+	actualTime2, err := mapper.Object.GetTime("time2")
 	assert.NoError(t, err)
-	actualTime3, err := mapper.Object.Get("time3").AsTime()
+	actualTime3, err := mapper.Object.GetTime("time3")
 	assert.NoError(t, err)
 	expectedTime1, _ := time.Parse(time.RFC3339, "2024-10-06T17:59:44Z")
 	expectedTime2, _ := time.Parse(time.RFC3339, "2024-10-06T17:59:44+00:00")

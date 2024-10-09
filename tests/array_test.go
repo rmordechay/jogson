@@ -10,11 +10,11 @@ func TestArrayFilter(t *testing.T) {
 	mapper, err := jsonmapper.FromString(jsonArrayTest)
 	assert.NoError(t, err)
 	isNameChris := func(element jsonmapper.Mapper) bool {
-		return element.Object.Get("name").AsString == "Chris"
+		return element.Object.GetString("name") == "Chris"
 	}
 	filteredArr := mapper.Array.Filter(isNameChris)
 	assert.Equal(t, 1, filteredArr.Length())
-	assert.Equal(t, "Chris", filteredArr.Elements()[0].Object.Get("name").AsString)
+	assert.Equal(t, "Chris", filteredArr.Elements()[0].Object.GetString("name"))
 }
 
 func TestArrayForEach(t *testing.T) {

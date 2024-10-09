@@ -5,9 +5,7 @@ import (
 	"errors"
 	"fmt"
 	jsoniter "github.com/json-iterator/go"
-	"log"
 	"os"
-	"reflect"
 	"time"
 	"unicode"
 )
@@ -29,8 +27,6 @@ type Mapper struct {
 	AsString string
 	Object   JsonObject
 	Array    JsonArray
-
-	Err error
 }
 
 func FromBytes(data []byte) (Mapper, error) {
@@ -200,7 +196,7 @@ func getMapperFromField(data *interface{}) Mapper {
 	case nil:
 		mapper.IsNull = true
 	default:
-		log.Fatalf("JSON conversion for %v failed. %v not implemented.", value, reflect.TypeOf(data))
+		panic(fmt.Errorf("JSON conversion for %v failed. %T not implemented", value, data))
 	}
 	return mapper
 }
