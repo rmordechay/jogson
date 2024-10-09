@@ -140,6 +140,7 @@ func TestObjectGetBool(t *testing.T) {
 func TestObjectGetBoolFails(t *testing.T) {
 	mapper, _ := jsonmapper.FromString(jsonObjectTest)
 	object := mapper.Object
+
 	b := object.GetBool("not found")
 	assert.Equal(t, "the requested key 'not found' was not found", object.LastError.Error())
 	assert.Equal(t, false, b)
@@ -154,17 +155,52 @@ func TestObjectGetBoolFails(t *testing.T) {
 }
 
 func TestObjectGetArray(t *testing.T) {
+	mapper, _ := jsonmapper.FromString(jsonObjectWithArrayTest)
+	object := mapper.Object
 
+	array := object.GetArray("names")
+	assert.ElementsMatch(t, []string{"Jason", "Chris", "Rachel"}, array.AsStringArray())
 }
 
 func TestObjectGetArrayFails(t *testing.T) {
+	mapper, _ := jsonmapper.FromString(jsonObjectWithArrayTest)
+	object := mapper.Object
 
+	arr := object.GetArray("not found")
+	assert.Equal(t, "the requested key 'not found' was not found", object.LastError.Error())
+	assert.Equal(t, &jsonmapper.JsonArray{}, arr)
+
+	arr = object.GetArray("name")
+	assert.Equal(t, "the type 'string' could not be converted to jsonmapper.JsonArray", object.LastError.Error())
+	assert.Equal(t, &jsonmapper.JsonArray{}, arr)
+
+	arr = object.GetArray("address")
+	assert.Equal(t, "value is null and could not be converted to jsonmapper.JsonArray", object.LastError.Error())
+	assert.Equal(t, &jsonmapper.JsonArray{}, arr)
 }
 
 func TestObjectGetObject(t *testing.T) {
+	mapper, _ := jsonmapper.FromString(jsonObjectNestedArrayTest)
+	object := mapper.Object
 
+	obj := object.GetObject("person")
+	assert.Equal(t, "Jason", obj.GetString("name"))
 }
 
 func TestObjectGetObjectFails(t *testing.T) {
+	mapper, _ := jsonmapper.FromString(jsonObjectTest)
+	object := mapper.Object
+
+	obj := object.GetObject("not found")
+	assert.Equal(t, "the requested key 'not found' was not found", object.LastError.Error())
+	assert.Equal(t, jsonmapper.JsonObject{}, obj)
+
+	obj = object.GetObject("name")
+	assert.Equal(t, "the type 'string' could not be converted to jsonmapper.JsonObject", object.LastError.Error())
+	assert.Equal(t, jsonmapper.JsonObject{}, obj)
+
+	obj = object.GetObject("address")
+	assert.Equal(t, "value is null and could not be converted to jsonmapper.JsonObject", object.LastError.Error())
+	assert.Equal(t, jsonmapper.JsonObject{}, obj)
 
 }

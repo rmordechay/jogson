@@ -138,24 +138,24 @@ func (o *JsonObject) GetObject(key string) JsonObject {
 	return JsonObject{}
 }
 
-func (o *JsonObject) GetArray(key string) JsonArray {
+func (o *JsonObject) GetArray(key string) *JsonArray {
 	for k, v := range o.object {
 		if k != key {
 			continue
 		}
 		if v == nil {
-			o.LastError = fmt.Errorf(nullConversionErrStr, false)
-			return JsonArray{}
+			o.LastError = fmt.Errorf(nullConversionErrStr, JsonArray{})
+			return &JsonArray{}
 		}
 		jsonArray, ok := (*v).([]interface{})
 		if !ok {
-			o.LastError = fmt.Errorf(typeConversionErrStr, *v, false)
-			return JsonArray{}
+			o.LastError = fmt.Errorf(typeConversionErrStr, *v, JsonArray{})
+			return &JsonArray{}
 		}
-		return JsonArray{elements: convertToSlicePtr(jsonArray)}
+		return &JsonArray{elements: convertToSlicePtr(jsonArray)}
 	}
 	o.LastError = fmt.Errorf(keyNotFoundErrStr, key)
-	return JsonArray{}
+	return &JsonArray{}
 }
 
 func (o *JsonObject) Find(key string) Json {

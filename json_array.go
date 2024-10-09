@@ -118,10 +118,14 @@ func (a *JsonArray) GetObject(i int) JsonObject {
 		a.SetLastError(fmt.Errorf(indexOutOfRangeErrStr, i, a.Length()))
 		return JsonObject{}
 	}
-	element := *a.elements[i]
-	v, ok := element.(map[string]interface{})
+	element := a.elements[i]
+	if element == nil {
+		a.SetLastError(fmt.Errorf(nullConversionErrStr, JsonObject{}))
+		return JsonObject{}
+	}
+	v, ok := (*element).(map[string]interface{})
 	if !ok {
-		a.SetLastError(fmt.Errorf(typeConversionErrStr, element, JsonObject{}))
+		a.SetLastError(fmt.Errorf(typeConversionErrStr, *element, JsonObject{}))
 		return JsonObject{}
 	}
 	return JsonObject{object: convertToMapValuesPtr(v)}
@@ -132,10 +136,14 @@ func (a *JsonArray) GetArray(i int) JsonArray {
 		a.SetLastError(fmt.Errorf(indexOutOfRangeErrStr, i, a.Length()))
 		return JsonArray{}
 	}
-	element := *a.elements[i]
-	v, ok := element.([]interface{})
+	element := a.elements[i]
+	if element == nil {
+		a.SetLastError(fmt.Errorf(nullConversionErrStr, JsonArray{}))
+		return JsonArray{}
+	}
+	v, ok := (*element).([]interface{})
 	if !ok {
-		a.SetLastError(fmt.Errorf(typeConversionErrStr, element, JsonArray{}))
+		a.SetLastError(fmt.Errorf(typeConversionErrStr, *element, JsonArray{}))
 		return JsonArray{}
 	}
 	return JsonArray{elements: convertToSlicePtr(v)}
@@ -163,6 +171,40 @@ func (a *JsonArray) Filter(f func(j Json) bool) JsonArray {
 		}
 	}
 	return *arr
+}
+
+func (a *JsonArray) FilterNull() JsonArray {
+	var arr = NewArray()
+	for _, element := range a.elements {
+		field := getMapperFromField(element)
+		if !field.IsNull {
+			arr.elements = append(arr.elements, element)
+		}
+	}
+	return *arr
+}
+
+func (a *JsonArray) All() bool {
+	for _, element := range a.elements {
+		field := getMapperFromField(element)
+		if field.IsNull {
+			return false
+		}
+	}
+	return true
+}
+
+func (a *JsonArray) Any() bool {
+	if len(a.elements) == 0 {
+		return true
+	}
+	for _, element := range a.elements {
+		field := getMapperFromField(element)
+		if !field.IsNull {
+			return true
+		}
+	}
+	return false
 }
 
 func (a *JsonArray) SetLastError(err error) {
