@@ -68,53 +68,47 @@ fmt.Println(mapper.IsNull)      // false
 
 ### Objects
 ```go
-// Get a value by key
-element := mapper.Object.Get("age")
-
 // Check if a key exists
-keyExists := mapper.Object.Has("children")
+var keyExists bool = mapper.Object.Has("children")
 
 // Get object's keys
-keys := mapper.Object.Keys()
+var keys []string = mapper.Object.Keys()
 
 // Get object's values
-values := mapper.Object.Values()
+var values []jsonmapper.Mapper = mapper.Object.Values()
 
 // Iterating over an object with key, value pair
-children := mapper.Object.Get("children").Object
+children := mapper.Object.GetObject("children")
 for key, child := range children.Elements() {
-    fmt.Println("Child name:", key)                  // Rachel, Sara
-    fmt.Println(child.Object.Get("age").AsInt)       // 15, 19
-    fmt.Println(child.Object.Get("is_funny").AsBool) // false, true
+    fmt.Println("Child name:", key)               // Rachel, Sara
+    fmt.Println(child.Object.GetInt("age"))       // 15, 19
+    fmt.Println(child.Object.GetBool("is_funny")) // false, true
 }
 ```
 
-### Get Primitive Values
-There are two ways to get a primitive value from an object. Either with the underlying Mapper or directly 
-if you already know the type 
+### Primitive Types
 ```go
 object := mapper.Object
-
-var name1 string = object.Get("name").AsString // Jason
-var name2 string = object.GetString("name") // Jason
-
-var age1 int = object.Get("age").AsInt // 15
-var age2 int = object.GetInt("age") // 15
-
-var height1 float64 = object.Get("height").AsFloat // 1.87
-var height2 float64 = object.GetFloat("height") // 1.87
-
-var isFunny1 bool = object.Get("is_funny").AsBool // false
-var isFunny2 bool = object.GetBool("is_funny") // false
+// string 
+var name string = object.GetString("name") // Jason
+// int 
+var age int = object.GetInt("age") // 15
+// float64 
+var height float64 = object.GetFloat("height") // 1.87
+// bool 
+var isFunny bool = object.GetBool("is_funny") // false
 ```
 
 ### Arrays
 ```go
+	// Get array
+array := mapper.Object.GetArray("features")
+
 // Get array length
-arrayLen := mapper.Array.Length()
+arrayLen := array.Length() // 2
 
 // Get an element of array by index
-element := mapper.Array.Get(2)
+secondElement := array.Get(1)
 
 // Iterating over an array
 array := mapper.Object.Get("features").Array

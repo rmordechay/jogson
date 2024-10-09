@@ -145,7 +145,7 @@ func createArray(data interface{}) JsonArray {
 	case []*interface{}:
 		arr.elements = data.([]*interface{})
 	case []interface{}:
-		array := convertToArrayPtr(data)
+		array := convertToArrayPtr(data.([]interface{}))
 		arr.elements = array
 	}
 	return arr
@@ -220,13 +220,20 @@ func parseJsonObject(data []byte) (JsonObject, error) {
 	return jo, nil
 }
 
-func convertToArrayPtr(data interface{}) []*interface{} {
-	d := data.([]interface{})
-	array := make([]*interface{}, len(d))
-	for i, v := range d {
+func convertToArrayPtr(data []interface{}) []*interface{} {
+	array := make([]*interface{}, len(data))
+	for i, v := range data {
 		array[i] = &v
 	}
 	return array
+}
+
+func convertToMapValuesPtr(data map[string]interface{}) map[string]*interface{} {
+	jsonObject := make(map[string]*interface{}, len(data))
+	for k, v := range data {
+		jsonObject[k] = &v
+	}
+	return jsonObject
 }
 
 func isArray(data []byte) bool {

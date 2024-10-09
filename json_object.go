@@ -48,16 +48,6 @@ func (o *JsonObject) Has(key string) bool {
 	return false
 }
 
-func (o *JsonObject) Get(key string) Mapper {
-	for k, v := range o.object {
-		if k == key {
-			return getMapperFromField(v)
-		}
-	}
-	o.LastError = fmt.Errorf(KeyNotFoundErrStr, key)
-	return Mapper{}
-}
-
 func (o *JsonObject) GetTime(key string) (time.Time, error) {
 	for k, v := range o.object {
 		if k == key {
@@ -68,23 +58,6 @@ func (o *JsonObject) GetTime(key string) (time.Time, error) {
 		}
 	}
 	return time.Time{}, fmt.Errorf(KeyNotFoundErrStr, key)
-}
-
-func parseTime(k string, t *interface{}) (time.Time, error) {
-	if t == nil {
-		return time.Time{}, fmt.Errorf(NullConversionErrStr, k, "")
-	}
-	timeAsString, ok := (*t).(string)
-	if !ok {
-		return time.Time{}, fmt.Errorf("cannot convert type %T to type time.Time\n", t)
-	}
-	for _, layout := range timeLayouts {
-		parsedTime, err := time.Parse(layout, timeAsString)
-		if err == nil {
-			return parsedTime, nil
-		}
-	}
-	return time.Time{}, fmt.Errorf("the value '%v' could not be converted to type time.Time", timeAsString)
 }
 
 func (o *JsonObject) GetString(key string) string {
@@ -167,19 +140,38 @@ func (o *JsonObject) GetObject(key string) JsonObject {
 	for k, v := range o.object {
 		if k == key {
 			if v == nil {
-				o.LastError = fmt.Errorf(NullConversionErrStr, k, false)
+				o.LastError = fmt.Errorf(NullConversionErrStr, k, JsonObject{})
 				return JsonObject{}
 			}
-			jsonObject, ok := (*v).(JsonObject)
+			jsonObject, ok := (*v).(map[string]interface{})
 			if !ok {
-				o.LastError = fmt.Errorf(TypeConversionErrStr, k, *v, false)
+				o.LastError = fmt.Errorf(TypeConversionErrStr, k, *v, JsonObject{})
 				return JsonObject{}
 			}
-			return jsonObject
+			return JsonObject{object: convertToMapValuesPtr(jsonObject)}
 		}
 	}
 	o.LastError = fmt.Errorf(KeyNotFoundErrStr, key)
 	return JsonObject{}
+}
+
+func (o *JsonObject) GetArray(key string) JsonArray {
+	for k, v := range o.object {
+		if k == key {
+			if v == nil {
+				o.LastError = fmt.Errorf(NullConversionErrStr, k, false)
+				return JsonArray{}
+			}
+			jsonArray, ok := (*v).([]interface{})
+			if !ok {
+				o.LastError = fmt.Errorf(TypeConversionErrStr, k, *v, false)
+				return JsonArray{}
+			}
+			return JsonArray{elements: convertToArrayPtr(jsonArray)}
+		}
+	}
+	o.LastError = fmt.Errorf(KeyNotFoundErrStr, key)
+	return JsonArray{}
 }
 
 func (o *JsonObject) Find(key string) Mapper {
@@ -232,4 +224,21 @@ func (o *JsonObject) PrettyString() string {
 func (o *JsonObject) String() string {
 	jsonBytes, _ := marshal(o.object)
 	return string(jsonBytes)
+}
+
+func parseTime(k string, t *interface{}) (time.Time, error) {
+	if t == nil {
+		return time.Time{}, fmt.Errorf(NullConversionErrStr, k, "")
+	}
+	timeAsString, ok := (*t).(string)
+	if !ok {
+		return time.Time{}, fmt.Errorf("cannot convert type %T to type time.Time\n", t)
+	}
+	for _, layout := range timeLayouts {
+		parsedTime, err := time.Parse(layout, timeAsString)
+		if err == nil {
+			return parsedTime, nil
+		}
+	}
+	return time.Time{}, fmt.Errorf("the value '%v' could not be converted to type time.Time", timeAsString)
 }
