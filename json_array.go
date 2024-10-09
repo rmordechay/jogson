@@ -5,13 +5,8 @@ import (
 )
 
 type JsonArray struct {
-	elements []*interface{}
-
+	elements  []*interface{}
 	LastError error
-}
-
-func (a *JsonArray) SetLastError(err error) {
-	a.LastError = err
 }
 
 func NewArray() *JsonArray {
@@ -29,7 +24,7 @@ func (a *JsonArray) Elements() []Json {
 	return jsons
 }
 
-func (a *JsonArray) AsNestedArray() []JsonArray {
+func (a *JsonArray) As2DArray() []JsonArray {
 	arr := make([]JsonArray, 0, len(a.elements))
 	a.LastError = nil
 	for _, element := range a.elements {
@@ -168,6 +163,10 @@ func (a *JsonArray) Filter(f func(j Json) bool) JsonArray {
 		}
 	}
 	return *arr
+}
+
+func (a *JsonArray) SetLastError(err error) {
+	a.LastError = err
 }
 
 func (a *JsonArray) String() string {

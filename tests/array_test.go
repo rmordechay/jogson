@@ -8,22 +8,22 @@ import (
 )
 
 func TestArrayFilter(t *testing.T) {
-	jsonMapper, err := jsonmapper.FromString(jsonArrayTest)
+	mapper, err := jsonmapper.FromString(jsonArrayTest)
 	assert.NoError(t, err)
-	filteredArr := jsonMapper.Array().Filter(func(element jsonmapper.Json) bool {
-		return element.Object().GetString("name") == "Chris"
+	filteredArr := mapper.Array.Filter(func(element jsonmapper.Json) bool {
+		return element.Object.GetString("name") == "Chris"
 	})
 	assert.Equal(t, 1, filteredArr.Length())
-	//assert.Equal(t, "Chris", filteredArr.Elements()[0].object.GetString("name"))
+	assert.Equal(t, "Chris", filteredArr.Elements()[0].Object.GetString("name"))
 }
 
 func TestArrayForEach(t *testing.T) {
-	jsonMapper, err := jsonmapper.FromString(jsonArrayTest)
+	mapper, err := jsonmapper.FromString(jsonArrayTest)
 	assert.NoError(t, err)
 	wasVisited := false
-	jsonMapper.Array().ForEach(func(jsonMapper jsonmapper.Json) {
+	mapper.Array.ForEach(func(mapper jsonmapper.Json) {
 		wasVisited = true
-		assert.NotNil(t, jsonMapper)
+		assert.NotNil(t, mapper)
 	})
 	assert.True(t, wasVisited)
 }
@@ -37,9 +37,29 @@ func TestIndexOutOfBoundError(t *testing.T) {
 	assert.Equal(t, arr.LastError.Error(), "index out of range [3] with length 1")
 }
 
+func TestArrayAs2DArray(t *testing.T) {
+
+}
+
+func TestArrayAsObjectArray(t *testing.T) {
+
+}
+
+func TestArrayAsStringArray(t *testing.T) {
+
+}
+
+func TestArrayAsIntArray(t *testing.T) {
+
+}
+
+func TestArrayAsFloatArray(t *testing.T) {
+
+}
+
 func TestArrayGetString(t *testing.T) {
-	jsonMapper, _ := jsonmapper.FromString(jsonAnyArrayTest)
-	array := jsonMapper.Array()
+	mapper, _ := jsonmapper.FromString(jsonAnyArrayTest)
+	array := mapper.Array
 
 	s := array.GetString(0)
 	assert.NoError(t, array.LastError)
@@ -67,8 +87,8 @@ func TestArrayGetString(t *testing.T) {
 }
 
 func TestArrayGetStringFails(t *testing.T) {
-	jsonMapper, _ := jsonmapper.FromString(jsonAnyArrayTest)
-	array := jsonMapper.Array()
+	mapper, _ := jsonmapper.FromString(jsonAnyArrayTest)
+	array := mapper.Array
 
 	s := array.GetString(10)
 	assert.Equal(t, "index out of range [10] with length 5", array.LastError.Error())
@@ -80,8 +100,8 @@ func TestArrayGetStringFails(t *testing.T) {
 }
 
 func TestArrayGetInt(t *testing.T) {
-	jsonMapper, _ := jsonmapper.FromString(jsonIntArrayTest)
-	array := jsonMapper.Array()
+	mapper, _ := jsonmapper.FromString(jsonIntArrayTest)
+	array := mapper.Array
 
 	i := array.GetInt(0)
 	assert.NoError(t, array.LastError)
@@ -101,8 +121,8 @@ func TestArrayGetInt(t *testing.T) {
 }
 
 func TestArrayGetIntFails(t *testing.T) {
-	jsonMapper, _ := jsonmapper.FromString(jsonAnyArrayTest)
-	array := jsonMapper.Array()
+	mapper, _ := jsonmapper.FromString(jsonAnyArrayTest)
+	array := mapper.Array
 
 	i := array.GetInt(10)
 	assert.Equal(t, "index out of range [10] with length 5", array.LastError.Error())
@@ -118,8 +138,8 @@ func TestArrayGetIntFails(t *testing.T) {
 }
 
 func TestArrayGetFloat(t *testing.T) {
-	jsonMapper, _ := jsonmapper.FromString(jsonFloatArrayTest)
-	array := jsonMapper.Array()
+	mapper, _ := jsonmapper.FromString(jsonFloatArrayTest)
+	array := mapper.Array
 
 	f := array.GetFloat(0)
 	assert.NoError(t, array.LastError)
@@ -143,8 +163,8 @@ func TestArrayGetFloat(t *testing.T) {
 }
 
 func TestArrayGetFloatFails(t *testing.T) {
-	jsonMapper, _ := jsonmapper.FromString(jsonAnyArrayTest)
-	array := jsonMapper.Array()
+	mapper, _ := jsonmapper.FromString(jsonAnyArrayTest)
+	array := mapper.Array
 
 	f := array.GetFloat(10)
 	assert.Equal(t, "index out of range [10] with length 5", array.LastError.Error())
@@ -157,4 +177,20 @@ func TestArrayGetFloatFails(t *testing.T) {
 	f = array.GetFloat(2)
 	assert.Equal(t, "value is null and could not be converted to float64", array.LastError.Error())
 	assert.Equal(t, float64(0), f)
+}
+
+func TestArrayGetArray(t *testing.T) {
+
+}
+
+func TestArrayGetArrayFails(t *testing.T) {
+
+}
+
+func TestArrayGetObject(t *testing.T) {
+
+}
+
+func TestArrayGetObjectFails(t *testing.T) {
+
 }

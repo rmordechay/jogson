@@ -5,12 +5,12 @@
 A simple Go library to simplify working with JSON without the need to define structs.
 
 * [Installation](#Installation)
-* [Creating a mapper](#Creating-a-mapper)
+* [Creating a mapper](#creating-a-mapper)
 * [Reading from JSON](#Reading-from-JSON)
-  * [Creating a mapper](#Creating-a-mapper)
+  * [Creating a mapper](#creating-a-mapper)
   * [Check Types](#Check-Types)
   * [Objects](#Objects)
-  * [Get Values](#get-primitive-values)
+  * [Get Values](#Primitive-Types)
   * [Arrays](#Arrays)
   * [Find Elements](#Find-Elements)
   * [Print JSON](#Get-JSON-as-string)
@@ -25,7 +25,7 @@ To install the library, use:
 go get github.com/rmordechay/jsonmapper
 ```
 
-### Creating a mapper
+### Creating a Mapper
 There are multiple ways to create a mapper.
 ```go
 // From bytes
@@ -58,12 +58,12 @@ jsonString := `{
 ### Check Types
 ```go
 fmt.Println(mapper.IsObject())    // true
-fmt.Println(mapper.IsBool)      // false
-fmt.Println(mapper.IsInt)       // false
-fmt.Println(mapper.IsFloat)     // false
-fmt.Println(mapper.IsString)    // false
+fmt.Println(mapper.IsBool())      // false
+fmt.Println(mapper.IsInt())       // false
+fmt.Println(mapper.IsFloat())     // false
+fmt.Println(mapper.IsString())    // false
 fmt.Println(mapper.IsArray())     // false
-fmt.Println(mapper.IsNull)      // false
+fmt.Println(mapper.IsNull())      // false
 ```
 
 ### Objects
@@ -75,7 +75,7 @@ var keyExists bool = mapper.Object.Has("children")
 var keys []string = mapper.Object.Keys()
 
 // Get object's values
-var values []jsonmapper.Mapper = mapper.Object.Values()
+values := mapper.Object.Values()
 
 // Iterating over an object with key, value pair
 children := mapper.Object.GetObject("children")

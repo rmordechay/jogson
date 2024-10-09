@@ -13,8 +13,7 @@ var (
 )
 
 type JsonObject struct {
-	object map[string]*interface{}
-
+	object    map[string]*interface{}
 	LastError error
 }
 
@@ -40,6 +39,14 @@ func (o *JsonObject) Values() []Json {
 	return values
 }
 
+func (o *JsonObject) Elements() map[string]Json {
+	jsons := make(map[string]Json)
+	for k, v := range o.object {
+		jsons[k] = getMapperFromField(v)
+	}
+	return jsons
+}
+
 func (o *JsonObject) Has(key string) bool {
 	for k := range o.object {
 		if k == key {
@@ -57,7 +64,7 @@ func (o *JsonObject) GetTime(key string) (time.Time, error) {
 		if v == nil {
 			return time.Time{}, fmt.Errorf(NullConversionErrStr, time.Time{})
 		}
-		return parseTime(k, v)
+		return parseTime(v)
 	}
 	return time.Time{}, fmt.Errorf(KeyNotFoundErrStr, key)
 }
@@ -71,10 +78,6 @@ func (o *JsonObject) GetString(key string) string {
 	}
 	o.LastError = fmt.Errorf(KeyNotFoundErrStr, key)
 	return ""
-}
-
-func (o *JsonObject) SetLastError(err error) {
-	o.LastError = err
 }
 
 func (o *JsonObject) GetInt(key string) int {
@@ -168,19 +171,11 @@ func (o *JsonObject) Find(key string) Json {
 		if k == key {
 			return field
 		}
-		if field.IsObject() {
-			return field.Object().Find(key)
+		if field.IsObject {
+			return field.Object.Find(key)
 		}
 	}
-	return &mapper{}
-}
-
-func (o *JsonObject) Elements() map[string]Json {
-	jsons := make(map[string]Json)
-	for k, v := range o.object {
-		jsons[k] = getMapperFromField(v)
-	}
-	return jsons
+	return Json{}
 }
 
 func (o *JsonObject) AddKeyValue(k string, value interface{}) {
@@ -203,6 +198,10 @@ func (o *JsonObject) Filter(f func(key string, j Json) bool) JsonObject {
 	return obj
 }
 
+func (o *JsonObject) SetLastError(err error) {
+	o.LastError = err
+}
+
 func (o *JsonObject) PrettyString() string {
 	jsonBytes, _ := marshalIndent(o.object)
 	return string(jsonBytes)
@@ -211,21 +210,4 @@ func (o *JsonObject) PrettyString() string {
 func (o *JsonObject) String() string {
 	jsonBytes, _ := marshal(o.object)
 	return string(jsonBytes)
-}
-
-func parseTime(k string, t *interface{}) (time.Time, error) {
-	if t == nil {
-		return time.Time{}, fmt.Errorf(NullConversionErrStr, "")
-	}
-	timeAsString, ok := (*t).(string)
-	if !ok {
-		return time.Time{}, fmt.Errorf("cannot convert type %T to type time.Time\n", t)
-	}
-	for _, layout := range timeLayouts {
-		parsedTime, err := time.Parse(layout, timeAsString)
-		if err == nil {
-			return parsedTime, nil
-		}
-	}
-	return time.Time{}, fmt.Errorf("the value '%v' could not be converted to type time.Time", timeAsString)
 }
