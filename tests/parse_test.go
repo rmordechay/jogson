@@ -16,7 +16,7 @@ func TestParseJsonObjectFromString(t *testing.T) {
 	actual := removeWhiteSpaces(mapper.Object.String())
 
 	assert.True(t, mapper.IsObject)
-	assert.Contains(t, actual, `"age":15`)
+	assert.Contains(t, actual, `"Age":15`)
 	assert.Contains(t, actual, `"name":"Jason"`)
 }
 
@@ -51,7 +51,7 @@ func TestParseJsonObjectFromBytes(t *testing.T) {
 	actual := removeWhiteSpaces(mapper.Object.String())
 
 	assert.True(t, mapper.IsObject)
-	assert.Contains(t, actual, `"age":15`)
+	assert.Contains(t, actual, `"Age":15`)
 	assert.Contains(t, actual, `"name":"Jason"`)
 }
 
@@ -70,13 +70,55 @@ func TestParseJsonArrayFromBytes(t *testing.T) {
 func TestParseJsonArrayFromStruct(t *testing.T) {
 	testStruct := struct {
 		Name string `json:"name"`
-		Age  int    `json:"age"`
+		Age  int    `json:"Age"`
 	}{"John", 15}
 	mapper, err := jsonmapper.FromStruct(testStruct)
 	assert.NoError(t, err)
 	assert.True(t, mapper.IsObject)
 	assert.Equal(t, "John", mapper.Object.GetString("name"))
-	assert.Equal(t, 15, mapper.Object.GetInt("age"))
+	assert.Equal(t, 15, mapper.Object.GetInt("Age"))
+}
+
+func TestParseJsonArrayFromStruct2(t *testing.T) {
+	type childTest struct {
+		Age     int
+		IsFunny bool
+	}
+
+	type personTest struct {
+		Name     string
+		Age      int
+		Height   float64
+		IsFunny  bool
+		Birthday time.Time
+		Features []string
+		Children map[string]childTest
+	}
+	child1 := childTest{Age: 17, IsFunny: false}
+	child2 := childTest{Age: 23, IsFunny: true}
+	children := make(map[string]childTest)
+	children["Rachel"] = child1
+	children["Sara"] = child2
+	birthday, _ := time.Parse(time.DateOnly, "1981-05-30")
+	person := personTest{
+		Name:     "Chris",
+		Age:      45,
+		Height:   1.85,
+		IsFunny:  true,
+		Birthday: birthday,
+		Features: []string{"tall", "blue eyes"},
+		Children: children,
+	}
+	mapper, err := jsonmapper.FromStruct(person)
+	assert.NoError(t, err)
+	assert.NotNil(t, mapper)
+	assert.Equal(t, 45, mapper.Object.GetInt("Age"))
+	assert.Equal(t, "1981-05-30T00:00:00Z", mapper.Object.GetString("Birthday"))
+	getTime, err := mapper.Object.GetTime("Birthday")
+	assert.NoError(t, err)
+	assert.Equal(t, birthday, getTime)
+	assert.Equal(t, 1.85, mapper.Object.GetFloat("Height"))
+	assert.Equal(t, true, mapper.Object.GetBool("IsFunny"))
 }
 
 func TestParseJsonObjectFromFile(t *testing.T) {
