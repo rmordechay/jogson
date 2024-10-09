@@ -2,6 +2,7 @@ package jsonmapper
 
 import (
 	"fmt"
+	"strconv"
 	"time"
 )
 
@@ -67,12 +68,19 @@ func (o *JsonObject) GetString(key string) string {
 				o.LastError = fmt.Errorf(NullConversionErrStr, k, "")
 				return ""
 			}
-			s, ok := (*v).(string)
-			if !ok {
+			switch (*v).(type) {
+			case string:
+				return (*v).(string)
+			case float64:
+				return strconv.FormatFloat((*v).(float64), 'f', -1, 64)
+			case int:
+				return strconv.Itoa((*v).(int))
+			case bool:
+				return strconv.FormatBool((*v).(bool))
+			default:
 				o.LastError = fmt.Errorf(TypeConversionErrStr, k, *v, "")
 				return ""
 			}
-			return s
 		}
 	}
 	o.LastError = fmt.Errorf(KeyNotFoundErrStr, key)
