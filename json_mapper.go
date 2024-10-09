@@ -245,7 +245,7 @@ func isObjectOrArray(data []byte, brackOrParen byte) bool {
 
 func parseTime(t *interface{}) (time.Time, error) {
 	if t == nil {
-		return time.Time{}, fmt.Errorf(NullConversionErrStr, "")
+		return time.Time{}, fmt.Errorf(nullConversionErrStr, "")
 	}
 	timeAsString, ok := (*t).(string)
 	if !ok {

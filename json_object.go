@@ -5,13 +5,6 @@ import (
 	"time"
 )
 
-var (
-	NullConversionErrStr = "value is null and could not be converted to %T"
-	TypeConversionErrStr = "the type '%T' could not be converted to %T"
-	KeyNotFoundErrStr    = "the requested key '%v' was not found"
-	IndexOutOfRange      = "index out of range [%v] with length %v"
-)
-
 type JsonObject struct {
 	object    map[string]*interface{}
 	LastError error
@@ -62,11 +55,11 @@ func (o *JsonObject) GetTime(key string) (time.Time, error) {
 			continue
 		}
 		if v == nil {
-			return time.Time{}, fmt.Errorf(NullConversionErrStr, time.Time{})
+			return time.Time{}, fmt.Errorf(nullConversionErrStr, time.Time{})
 		}
 		return parseTime(v)
 	}
-	return time.Time{}, fmt.Errorf(KeyNotFoundErrStr, key)
+	return time.Time{}, fmt.Errorf(keyNotFoundErrStr, key)
 }
 
 func (o *JsonObject) GetString(key string) string {
@@ -76,7 +69,7 @@ func (o *JsonObject) GetString(key string) string {
 		}
 		return getAsString(v, o)
 	}
-	o.LastError = fmt.Errorf(KeyNotFoundErrStr, key)
+	o.LastError = fmt.Errorf(keyNotFoundErrStr, key)
 	return ""
 }
 
@@ -86,12 +79,12 @@ func (o *JsonObject) GetInt(key string) int {
 			continue
 		}
 		if v == nil {
-			o.LastError = fmt.Errorf(NullConversionErrStr, 0)
+			o.LastError = fmt.Errorf(nullConversionErrStr, 0)
 			return 0
 		}
 		return getAsInt(v, o)
 	}
-	o.LastError = fmt.Errorf(KeyNotFoundErrStr, key)
+	o.LastError = fmt.Errorf(keyNotFoundErrStr, key)
 	return 0
 }
 
@@ -101,12 +94,12 @@ func (o *JsonObject) GetFloat(key string) float64 {
 			continue
 		}
 		if v == nil {
-			o.LastError = fmt.Errorf(NullConversionErrStr, 0.0)
+			o.LastError = fmt.Errorf(nullConversionErrStr, 0.0)
 			return 0
 		}
 		return getAsFloat(v, o)
 	}
-	o.LastError = fmt.Errorf(KeyNotFoundErrStr, key)
+	o.LastError = fmt.Errorf(keyNotFoundErrStr, key)
 	return 0
 }
 
@@ -116,12 +109,12 @@ func (o *JsonObject) GetBool(key string) bool {
 			continue
 		}
 		if v == nil {
-			o.LastError = fmt.Errorf(NullConversionErrStr, false)
+			o.LastError = fmt.Errorf(nullConversionErrStr, false)
 			return false
 		}
 		return getAsBool(v, o)
 	}
-	o.LastError = fmt.Errorf(KeyNotFoundErrStr, key)
+	o.LastError = fmt.Errorf(keyNotFoundErrStr, key)
 	return false
 }
 
@@ -131,17 +124,17 @@ func (o *JsonObject) GetObject(key string) JsonObject {
 			continue
 		}
 		if v == nil {
-			o.LastError = fmt.Errorf(NullConversionErrStr, JsonObject{})
+			o.LastError = fmt.Errorf(nullConversionErrStr, JsonObject{})
 			return JsonObject{}
 		}
 		jsonObject, ok := (*v).(map[string]interface{})
 		if !ok {
-			o.LastError = fmt.Errorf(TypeConversionErrStr, *v, JsonObject{})
+			o.LastError = fmt.Errorf(typeConversionErrStr, *v, JsonObject{})
 			return JsonObject{}
 		}
 		return JsonObject{object: convertToMapValuesPtr(jsonObject)}
 	}
-	o.LastError = fmt.Errorf(KeyNotFoundErrStr, key)
+	o.LastError = fmt.Errorf(keyNotFoundErrStr, key)
 	return JsonObject{}
 }
 
@@ -151,17 +144,17 @@ func (o *JsonObject) GetArray(key string) JsonArray {
 			continue
 		}
 		if v == nil {
-			o.LastError = fmt.Errorf(NullConversionErrStr, false)
+			o.LastError = fmt.Errorf(nullConversionErrStr, false)
 			return JsonArray{}
 		}
 		jsonArray, ok := (*v).([]interface{})
 		if !ok {
-			o.LastError = fmt.Errorf(TypeConversionErrStr, *v, false)
+			o.LastError = fmt.Errorf(typeConversionErrStr, *v, false)
 			return JsonArray{}
 		}
 		return JsonArray{elements: convertToSlicePtr(jsonArray)}
 	}
-	o.LastError = fmt.Errorf(KeyNotFoundErrStr, key)
+	o.LastError = fmt.Errorf(keyNotFoundErrStr, key)
 	return JsonArray{}
 }
 
@@ -214,12 +207,12 @@ func (o *JsonObject) String() string {
 
 func getAsJsonObject(data *interface{}, j JsonError) JsonObject {
 	if data == nil {
-		j.SetLastError(fmt.Errorf(NullConversionErrStr, ""))
+		j.SetLastError(fmt.Errorf(nullConversionErrStr, ""))
 		return JsonObject{}
 	}
 	v, ok := (*data).(map[string]interface{})
 	if !ok {
-		j.SetLastError(fmt.Errorf(TypeConversionErrStr, data, JsonObject{}))
+		j.SetLastError(fmt.Errorf(typeConversionErrStr, data, JsonObject{}))
 		return JsonObject{}
 	}
 

@@ -32,6 +32,13 @@ func (d JsonType) String() string {
 	}[d]
 }
 
+var (
+	nullConversionErrStr  = "value is null and could not be converted to %T"
+	typeConversionErrStr  = "the type '%T' could not be converted to %T"
+	keyNotFoundErrStr     = "the requested key '%v' was not found"
+	indexOutOfRangeErrStr = "index out of range [%v] with length %v"
+)
+
 var timeLayouts = []string{
 	time.RFC3339,
 	time.RFC850,

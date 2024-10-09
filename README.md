@@ -68,17 +68,19 @@ fmt.Println(mapper.IsNull)      // false
 
 ### Objects
 ```go
+object := mapper.Object
+
 // Check if a key exists
-var keyExists bool = mapper.Object.Has("children")
+var keyExists bool = object.Has("children")
 
 // Get object's keys
-var keys []string = mapper.Object.Keys()
+var keys []string = object.Keys()
 
 // Get object's values
-values := mapper.Object.Values()
+values := object.Values()
 
 // Iterating over an object with key, value pair
-children := mapper.Object.GetObject("children")
+children := object.GetObject("children")
 for key, child := range children.Elements() {
     fmt.Println("Child name:", key)               // Rachel, Sara
     fmt.Println(child.Object.GetInt("age"))       // 15, 19

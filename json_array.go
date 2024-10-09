@@ -83,7 +83,7 @@ func (a *JsonArray) AsFloatArray() []float64 {
 
 func (a *JsonArray) GetString(i int) string {
 	if i >= a.Length() {
-		a.SetLastError(fmt.Errorf(IndexOutOfRange, i, a.Length()))
+		a.SetLastError(fmt.Errorf(indexOutOfRangeErrStr, i, a.Length()))
 		return ""
 	}
 	return getAsString(a.elements[i], a)
@@ -91,7 +91,7 @@ func (a *JsonArray) GetString(i int) string {
 
 func (a *JsonArray) GetInt(i int) int {
 	if i >= a.Length() {
-		a.SetLastError(fmt.Errorf(IndexOutOfRange, i, a.Length()))
+		a.SetLastError(fmt.Errorf(indexOutOfRangeErrStr, i, a.Length()))
 		return 0
 	}
 	return getAsInt(a.elements[i], a)
@@ -99,7 +99,7 @@ func (a *JsonArray) GetInt(i int) int {
 
 func (a *JsonArray) GetFloat(i int) float64 {
 	if i >= a.Length() {
-		a.SetLastError(fmt.Errorf(IndexOutOfRange, i, a.Length()))
+		a.SetLastError(fmt.Errorf(indexOutOfRangeErrStr, i, a.Length()))
 		return 0
 	}
 	return getAsFloat(a.elements[i], a)
@@ -107,7 +107,7 @@ func (a *JsonArray) GetFloat(i int) float64 {
 
 func (a *JsonArray) GetBool(i int) bool {
 	if i >= a.Length() {
-		a.SetLastError(fmt.Errorf(IndexOutOfRange, i, a.Length()))
+		a.SetLastError(fmt.Errorf(indexOutOfRangeErrStr, i, a.Length()))
 		return false
 	}
 	return getAsBool(a.elements[i], a)
@@ -115,13 +115,13 @@ func (a *JsonArray) GetBool(i int) bool {
 
 func (a *JsonArray) GetObject(i int) JsonObject {
 	if i >= a.Length() {
-		a.SetLastError(fmt.Errorf(IndexOutOfRange, i, a.Length()))
+		a.SetLastError(fmt.Errorf(indexOutOfRangeErrStr, i, a.Length()))
 		return JsonObject{}
 	}
 	element := *a.elements[i]
 	v, ok := element.(map[string]interface{})
 	if !ok {
-		a.SetLastError(fmt.Errorf(TypeConversionErrStr, element, JsonObject{}))
+		a.SetLastError(fmt.Errorf(typeConversionErrStr, element, JsonObject{}))
 		return JsonObject{}
 	}
 	return JsonObject{object: convertToMapValuesPtr(v)}
@@ -129,13 +129,13 @@ func (a *JsonArray) GetObject(i int) JsonObject {
 
 func (a *JsonArray) GetArray(i int) JsonArray {
 	if i >= a.Length() {
-		a.SetLastError(fmt.Errorf(IndexOutOfRange, i, a.Length()))
+		a.SetLastError(fmt.Errorf(indexOutOfRangeErrStr, i, a.Length()))
 		return JsonArray{}
 	}
 	element := *a.elements[i]
 	v, ok := element.([]interface{})
 	if !ok {
-		a.SetLastError(fmt.Errorf(TypeConversionErrStr, element, JsonArray{}))
+		a.SetLastError(fmt.Errorf(typeConversionErrStr, element, JsonArray{}))
 		return JsonArray{}
 	}
 	return JsonArray{elements: convertToSlicePtr(v)}
