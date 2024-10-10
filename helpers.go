@@ -65,3 +65,34 @@ func getAsBool(data *any, j jsonEntity) bool {
 	}
 	return v
 }
+
+func getAsJsonObject(data *any, j jsonEntity) JsonObject {
+	if data == nil {
+		j.SetLastError(NewNullConversionErr("string"))
+		return JsonObject{}
+	}
+	v, ok := (*data).(map[string]any)
+	if !ok {
+		j.SetLastError(NewTypeConversionErr(data, "JsonObject"))
+		return JsonObject{}
+	}
+
+	var obj JsonObject
+	var object = make(map[string]*any)
+	for key, value := range v {
+		object[key] = &value
+	}
+	obj.object = object
+	return obj
+}
+
+func getAsJsonArray[T any](data []T) JsonArray {
+	var arr JsonArray
+	array := make([]*any, len(data))
+	for i, v := range data {
+		var valAny any = v
+		array[i] = &valAny
+	}
+	arr.elements = array
+	return arr
+}

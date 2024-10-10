@@ -81,7 +81,7 @@ func (o *JsonObject) GetInt(key string) int {
 			continue
 		}
 		if v == nil {
-			o.LastError = NewNullConversionErr("int")
+			o.SetLastError(NewNullConversionErr("int"))
 			return 0
 		}
 		return getAsInt(v, o)
@@ -98,7 +98,7 @@ func (o *JsonObject) GetFloat(key string) float64 {
 			continue
 		}
 		if v == nil {
-			o.LastError = NewNullConversionErr("float64")
+			o.SetLastError(NewNullConversionErr("float64"))
 			return 0
 		}
 		return getAsFloat(v, o)
@@ -115,7 +115,7 @@ func (o *JsonObject) GetBool(key string) bool {
 			continue
 		}
 		if v == nil {
-			o.LastError = NewNullConversionErr("bool")
+			o.SetLastError(NewNullConversionErr("bool"))
 			return false
 		}
 		return getAsBool(v, o)
@@ -147,7 +147,7 @@ func (o *JsonObject) GetObject(key string) *JsonObject {
 			continue
 		}
 		if v == nil {
-			o.LastError = NewNullConversionErr("JsonObject")
+			o.SetLastError(NewNullConversionErr("JsonObject"))
 			return &JsonObject{}
 		}
 		switch (*v).(type) {
@@ -174,7 +174,7 @@ func (o *JsonObject) GetArray(key string) *JsonArray {
 			continue
 		}
 		if v == nil {
-			o.LastError = NewNullConversionErr("JsonArray")
+			o.SetLastError(NewNullConversionErr("JsonArray"))
 			return &JsonArray{}
 		}
 		switch (*v).(type) {
@@ -224,7 +224,7 @@ func (o *JsonObject) AddKeyValue(k string, value any) {
 	case nil, string, int, float64, bool, []string, []int, []float64, []bool:
 		o.object[k] = &value
 	default:
-		o.LastError = fmt.Errorf("could not add value of type %T", value)
+		o.SetLastError(fmt.Errorf("could not add value of type %T", value))
 	}
 }
 
@@ -246,14 +246,14 @@ func (o *JsonObject) Filter(f func(key string, j JsonMapper) bool) JsonObject {
 	return obj
 }
 
-// SetLastError sets the LastError field of the JsonObject to the provided error.
-func (o *JsonObject) SetLastError(err error) {
-	o.LastError = err
-}
-
 // TransformObjectKeys returns a new JsonObject with transformed keys, where keys are converted to snake_case.
 func (o *JsonObject) TransformObjectKeys() JsonObject {
 	return JsonObject{object: transformKeys(o.object)}
+}
+
+// SetLastError sets the LastError field of the JsonObject to the provided error.
+func (o *JsonObject) SetLastError(err error) {
+	o.LastError = err
 }
 
 // PrettyString returns a pretty-printed string representation of the JsonObject.
@@ -267,26 +267,6 @@ func (o *JsonObject) PrettyString() string {
 func (o *JsonObject) String() string {
 	jsonBytes, _ := marshal(o.object)
 	return string(jsonBytes)
-}
-
-func getAsJsonObject(data *any, j jsonEntity) JsonObject {
-	if data == nil {
-		j.SetLastError(NewNullConversionErr("string"))
-		return JsonObject{}
-	}
-	v, ok := (*data).(map[string]any)
-	if !ok {
-		j.SetLastError(NewTypeConversionErr(data, "JsonObject"))
-		return JsonObject{}
-	}
-
-	var obj JsonObject
-	var object = make(map[string]*any)
-	for key, value := range v {
-		object[key] = &value
-	}
-	obj.object = object
-	return obj
 }
 
 func transformKeys(m map[string]*any) map[string]*any {

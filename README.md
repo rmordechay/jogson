@@ -7,18 +7,18 @@ A simple Go library to simplify working with JSON without the need to define str
 * [Installation](#Installation)
 * [Create a Mapper](#Create-a-mapper)
 * [Read from JSON](#Read-from-JSON)
-  * [Check Types](#Check-Types)
-  * [Objects](#Objects)
-  * [Get Values](#Primitive-Types)
-  * [Arrays](#Arrays)
-  * [Find Elements](#Find-Elements)
-  * [Print JSON](#Get-JSON-as-string)
+    * [Check Types](#Check-Types)
+    * [Objects](#Objects)
+    * [Get Values](#Primitive-Types)
+    * [Arrays](#Arrays)
+    * [Find Elements](#Find-Elements)
+    * [Print JSON](#get-as-json-string)
 * [Write to JSON](#Write-to-JSON)
-  * [Write Object](#Write-object)
-  * [Write Array](#Write-array)
-
+    * [Write Object](#Write-object)
+    * [Write Array](#Write-array)
 
 ## Installation
+
 To install the library, use:
 
 ```bash
@@ -26,7 +26,9 @@ go get github.com/rmordechay/jsonmapper
 ```
 
 ### Create a Mapper
+
 There are multiple ways to create a mapper.
+
 ```go
 // From bytes
 mapper, err := jsonmapper.FromBytes([]byte(jsonBytes))
@@ -39,7 +41,9 @@ mapper, err := jsonmapper.FromFile(jsonFilePath)
 ```
 
 ## Read from JSON
+
 Once you have the `mapper`, you can read the data easily. Consider the following JSON
+
 ```go
 jsonString := `{
     "name": "Jason",
@@ -56,17 +60,19 @@ jsonString := `{
 ```
 
 ### Check Types
+
 ```go
-fmt.Println(mapper.IsObject)    // true
-fmt.Println(mapper.IsBool)      // false
-fmt.Println(mapper.IsInt)       // false
-fmt.Println(mapper.IsFloat)     // false
-fmt.Println(mapper.IsString)    // false
-fmt.Println(mapper.IsArray)     // false
-fmt.Println(mapper.IsNull)      // false
+fmt.Println(mapper.IsObject) // true
+fmt.Println(mapper.IsBool) // false
+fmt.Println(mapper.IsInt) // false
+fmt.Println(mapper.IsFloat) // false
+fmt.Println(mapper.IsString) // false
+fmt.Println(mapper.IsArray) // false
+fmt.Println(mapper.IsNull) // false
 ```
 
 ### Objects
+
 ```go
 object := mapper.Object
 
@@ -85,16 +91,52 @@ values := object.Values()
 // Iterating over an object with key, value pair
 children := object.GetObject("children")
 for key, child := range children.Elements() {
-    fmt.Println("Child name:", key)               // Rachel, Sara
-    fmt.Println(child.Object.GetInt("age"))       // 15, 19
-    fmt.Println(child.Object.GetBool("is_funny")) // false, true
+fmt.Println("Child name:", key) // Rachel, Sara
+fmt.Println(child.Object.GetInt("age")) // 15, 19
+fmt.Println(child.Object.GetBool("is_funny")) // false, true
 }
 ```
 
+### Arrays
+
+```go
+// Get array
+array := mapper.Object.GetArray("features")
+
+// Get array length
+arrayLen := array.Length() // 2
+
+// Get an element of array by index
+secondElement := array.Get(1)
+
+// Iterating over an array
+for _, feature := range array.Elements() {
+fmt.Println(feature.AsString) // tall, ...
+}
+
+// Get as a slice of string
+var stringArray []string = array.AsStringArray()
+
+// Get as a slice of int
+var intArray []int = array.AsIntArray()
+
+// Get as a slice of float
+var floatArray []float = array.AsFloatArray()
+
+// Get as a slice of JsonArray
+var nestedArray []JsonArray = array.As2DArray()
+
+// Get as a slice of JsonObject
+var objectArray []JsonObject = array.AsObjectArray()
+```
+
 ### Primitive Types
+
 Getting primitive types - `string`, `int`, `float64` or `bool` - is similar both for object and array and only differ
 in the parameter type (objects take `string` as key and arrays take `int` as index)
+
 #### From Object
+
 ```go
 object := mapper.Object
 // string 
@@ -106,7 +148,9 @@ var height float64 = object.GetFloat("height") // 1.87
 // bool 
 var isFunny bool = object.GetBool("is_funny") // false
 ```
+
 #### From Array
+
 ```go
 array := mapper.Array
 // string 
@@ -120,39 +164,50 @@ var b bool = array.GetBool(7)
 ```
 
 #### Time
+
+To get a string as `time.Time`
+
 ```go
 var birthday time.Time = array.GetTime(0)
 var birthday string = object.GetTime("birthday".Format(time.RFC3339)) // 1981-10-08T00:00:00Z
 ```
 
-### Arrays
-```go
-// Get array
-array := mapper.Object.GetArray("features")
+The following formats are supported:
 
-// Get array length
-arrayLen := array.Length() // 2
-
-// Get an element of array by index
-secondElement := array.Get(1)
-
-// Iterating over an array
-array := mapper.Object.GetArray("features")
-for _, feature := range array.Elements() {
-    fmt.Println(feature.AsString) // tall, ...
-}
-```
+* `time.RFC3339`
+* `time.RFC850`
+* `time.RFC822`
+* `time.RFC822Z`
+* `time.RFC1123`
+* `time.RFC1123Z`
+* `time.RFC3339Nano`
+* `time.ANSIC`
+* `time.UnixDate`
+* `time.RubyDate`
+* `time.Layout`
+* `time.Kitchen`
+* `time.Stamp`
+* `time.StampMilli`
+* `time.StampMicro`
+* `time.StampNano`
+* `time.DateTime`
+* `time.DateOnly`
+* `time.TimeOnly`
 
 ### Find Elements
-You can search for a nested element. 
+
+You can search for a nested element.
+
 ```go
 element := mapper.Object.Find("Rachel")
-fmt.Println(element.IsObject)         // true 
-fmt.Println(element.Has("is_funny"))  // true 
+fmt.Println(element.IsObject) // true 
+fmt.Println(element.Has("is_funny")) // true 
 ```
 
-### Get JSON as string
+### Get as JSON String
+
 You can get a string from every JSON element which is a valid JSON
+
 ```go
 fmt.Println(mapper.Object.String())
 // output: {"age":43,"children":{"Rachel":{"age":15,"is_funny":false},"Sara":{"age":19,"is_funny":true}},"features":["tall","blue eyes"],"is_funny":false,"name":"Jason"}
@@ -160,7 +215,9 @@ fmt.Println(mapper.Object.String())
 fmt.Println(mapper.Object.Get("children").String())
 // output: {"Rachel":{"age":15,"is_funny":false},"Sara":{"age":19,"is_funny":true}}
 ```
-or with pretty string 
+
+or with pretty string
+
 ```go
 fmt.Println(mapper.Object.Get("children").PrettyString())
 // output:
@@ -177,8 +234,11 @@ fmt.Println(mapper.Object.Get("children").PrettyString())
 ```
 
 ## Write to JSON
+
 To write a JSON object or array is as simple as reading from it.
+
 ### Write Object
+
 ```go
 // Create a new object
 obj := jsonmapper.NewObject()
@@ -187,6 +247,7 @@ fmt.Println(obj.String()) // {"name":"Chris"}
 ```
 
 ### Write Array
+
 ```go
 // Create a new array
 arr := jsonmapper.NewArray()

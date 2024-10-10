@@ -1,6 +1,7 @@
 package jsonmapper
 
 import (
+	"fmt"
 	"time"
 )
 
@@ -32,44 +33,11 @@ func (a *JsonArray) Elements() []JsonMapper {
 	return jsons
 }
 
-// As2DArray converts the elements of the JsonArray into a two-dimensional array, returning
-// a slice of JsonArray objects.
-func (a *JsonArray) As2DArray() []JsonArray {
-	arr := make([]JsonArray, 0, len(a.elements))
-	a.LastError = nil
-	for _, element := range a.elements {
-		asJsonObject := getAsJsonArray((*element).([]any))
-		if a.LastError != nil {
-			break
-		}
-		arr = append(arr, asJsonObject)
-	}
-	return arr
-}
-
-// AsObjectArray converts the elements of the JsonArray into a slice of JsonObject objects.
-func (a *JsonArray) AsObjectArray() []JsonObject {
-	arr := make([]JsonObject, 0, len(a.elements))
-	a.LastError = nil
-	for _, element := range a.elements {
-		asJsonObject := getAsJsonObject(element, a)
-		if a.LastError != nil {
-			break
-		}
-		arr = append(arr, asJsonObject)
-	}
-	return arr
-}
-
 // AsStringArray converts the elements of the JsonArray into a slice of strings.
 func (a *JsonArray) AsStringArray() []string {
 	arr := make([]string, 0, len(a.elements))
-	a.LastError = nil
 	for _, element := range a.elements {
 		asString := getAsString(element, a)
-		if a.LastError != nil {
-			break
-		}
 		arr = append(arr, asString)
 	}
 	return arr
@@ -91,6 +59,27 @@ func (a *JsonArray) AsFloatArray() []float64 {
 	for _, element := range a.elements {
 		asFloat := getAsFloat(element, a)
 		arr = append(arr, asFloat)
+	}
+	return arr
+}
+
+// As2DArray converts the elements of the JsonArray into a two-dimensional array, returning
+// a slice of JsonArray objects.
+func (a *JsonArray) As2DArray() []JsonArray {
+	arr := make([]JsonArray, 0, len(a.elements))
+	for _, element := range a.elements {
+		asJsonObject := getAsJsonArray((*element).([]any))
+		arr = append(arr, asJsonObject)
+	}
+	return arr
+}
+
+// AsObjectArray converts the elements of the JsonArray into a slice of JsonObject objects.
+func (a *JsonArray) AsObjectArray() []JsonObject {
+	arr := make([]JsonObject, 0, len(a.elements))
+	for _, element := range a.elements {
+		asJsonObject := getAsJsonObject(element, a)
+		arr = append(arr, asJsonObject)
 	}
 	return arr
 }
@@ -188,7 +177,24 @@ func (a *JsonArray) GetArray(i int) JsonArray {
 
 // AddElement appends a new element to the JsonArray.
 func (a *JsonArray) AddElement(value any) {
-	a.elements = append(a.elements, &value)
+	switch value.(type) {
+	case JsonObject:
+		var object any = value.(JsonObject).object
+		a.elements = append(a.elements, &object)
+	case *JsonObject:
+		var object any = value.(JsonObject).object
+		a.elements = append(a.elements, &object)
+	case JsonArray:
+		var valueElements any = value.(JsonArray).elements
+		a.elements = append(a.elements, &valueElements)
+	case *JsonArray:
+		var valueElements any = value.(*JsonArray).elements
+		a.elements = append(a.elements, &valueElements)
+	case nil, string, int, float64, bool, []string, []int, []float64, []bool:
+		a.elements = append(a.elements, &value)
+	default:
+		a.SetLastError(fmt.Errorf("could not add value of type %T", value))
+	}
 }
 
 // ForEach applies the given function to each element in the JsonArray.
@@ -255,15 +261,4 @@ func (a *JsonArray) SetLastError(err error) {
 func (a *JsonArray) String() string {
 	jsonBytes, _ := marshal(a.elements)
 	return string(jsonBytes)
-}
-
-func getAsJsonArray[T any](data []T) JsonArray {
-	var arr JsonArray
-	array := make([]*any, len(data))
-	for i, v := range data {
-		var valAny any = v
-		array[i] = &valAny
-	}
-	arr.elements = array
-	return arr
 }
