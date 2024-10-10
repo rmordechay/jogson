@@ -215,6 +215,7 @@ func parseJsonArray(data []byte) (JsonArray, error) {
 func convertToSlicePtr(data []any) []*any {
 	array := make([]*any, len(data))
 	for i, v := range data {
+		v := v
 		array[i] = &v
 	}
 	return array
@@ -223,6 +224,7 @@ func convertToSlicePtr(data []any) []*any {
 func convertToMapValuesPtr(data map[string]any) map[string]*any {
 	jsonObject := make(map[string]*any, len(data))
 	for k, v := range data {
+		v := v
 		jsonObject[k] = &v
 	}
 	return jsonObject

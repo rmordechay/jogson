@@ -171,11 +171,11 @@ func TestObjectGetArrayFails(t *testing.T) {
 	assert.Equal(t, &jsonmapper.JsonArray{}, arr)
 
 	arr = object.GetArray("name")
-	assert.Equal(t, "the type 'string' could not be converted to jsonmapper.JsonArray", object.LastError.Error())
+	assert.Equal(t, "the type 'string' could not be converted to []*any", object.LastError.Error())
 	assert.Equal(t, &jsonmapper.JsonArray{}, arr)
 
 	arr = object.GetArray("address")
-	assert.Equal(t, "value is null and could not be converted to jsonmapper.JsonArray", object.LastError.Error())
+	assert.Equal(t, "value is null and could not be converted to JsonArray", object.LastError.Error())
 	assert.Equal(t, &jsonmapper.JsonArray{}, arr)
 }
 
@@ -196,11 +196,11 @@ func TestObjectGetObjectFails(t *testing.T) {
 	assert.Equal(t, &jsonmapper.JsonObject{}, obj)
 
 	obj = object.GetObject("name")
-	assert.Equal(t, "the type 'string' could not be converted to jsonmapper.JsonObject", object.LastError.Error())
+	assert.Equal(t, "the type 'string' could not be converted to JsonObject", object.LastError.Error())
 	assert.Equal(t, &jsonmapper.JsonObject{}, obj)
 
 	obj = object.GetObject("address")
-	assert.Equal(t, "value is null and could not be converted to jsonmapper.JsonObject", object.LastError.Error())
+	assert.Equal(t, "value is null and could not be converted to JsonObject", object.LastError.Error())
 	assert.Equal(t, &jsonmapper.JsonObject{}, obj)
 
 }

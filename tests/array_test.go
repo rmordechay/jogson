@@ -219,11 +219,11 @@ func TestArrayGetArrayFails(t *testing.T) {
 	assert.Equal(t, jsonmapper.JsonArray{}, innerArr)
 
 	innerArr = arr.GetArray(2)
-	assert.Equal(t, "the type 'float64' could not be converted to jsonmapper.JsonArray", arr.LastError.Error())
+	assert.Equal(t, "the type 'float64' could not be converted to JsonArray", arr.LastError.Error())
 	assert.Equal(t, jsonmapper.JsonArray{}, innerArr)
 
 	innerArr = arr.GetArray(3)
-	assert.Equal(t, "value is null and could not be converted to jsonmapper.JsonArray", arr.LastError.Error())
+	assert.Equal(t, "value is null and could not be converted to JsonArray", arr.LastError.Error())
 	assert.Equal(t, jsonmapper.JsonArray{}, innerArr)
 }
 
@@ -244,10 +244,10 @@ func TestArrayGetObjectFails(t *testing.T) {
 	assert.Equal(t, &jsonmapper.JsonObject{}, obj)
 
 	obj = array.GetObject(2)
-	assert.Equal(t, "the type 'string' could not be converted to jsonmapper.JsonObject", array.LastError.Error())
+	assert.Equal(t, "the type 'string' could not be converted to JsonObject", array.LastError.Error())
 	assert.Equal(t, &jsonmapper.JsonObject{}, obj)
 
 	obj = array.GetObject(3)
-	assert.Equal(t, "value is null and could not be converted to jsonmapper.JsonObject", array.LastError.Error())
+	assert.Equal(t, "value is null and could not be converted to JsonObject", array.LastError.Error())
 	assert.Equal(t, &jsonmapper.JsonObject{}, obj)
 }
