@@ -175,10 +175,9 @@ fmt.Println(mapper.Object.Get("children").PrettyString())
 
 ## Writing to JSON
 To write a JSON object or array is as simple as reading from it.
-To create an object or array from scratch, you can use
-
 ### Write Object
 ```go
+// Create a new object
 obj := jsonmapper.NewObject()
 obj.AddKeyValue("name", "Chris")
 fmt.Println(obj.String()) // {"name":"Chris"}
@@ -186,6 +185,7 @@ fmt.Println(obj.String()) // {"name":"Chris"}
 
 ### Write Array
 ```go
+// Create a new array
 arr := jsonmapper.NewArray()
 arr.AddElement(15)
 arr.AddElement(19)
