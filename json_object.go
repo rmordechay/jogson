@@ -207,7 +207,7 @@ func (o *JsonObject) GetArray(key string) *JsonArray {
 		}
 		if v == nil {
 			o.SetLastError(NewNullConversionErr("JsonArray"))
-			return &JsonArray{}
+			return EmptyArray()
 		}
 		switch (*v).(type) {
 		case []any:
@@ -216,11 +216,11 @@ func (o *JsonObject) GetArray(key string) *JsonArray {
 			return NewArray((*v).([]*any))
 		default:
 			o.SetLastError(NewTypeConversionErr(*v, "[]*any"))
-			return &JsonArray{}
+			return EmptyArray()
 		}
 	}
 	o.SetLastError(NewKeyNotFoundErr(key))
-	return &JsonArray{}
+	return EmptyArray()
 }
 
 // Find searches for a key in the JsonObject and its nested objects.

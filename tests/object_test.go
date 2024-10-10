@@ -168,15 +168,15 @@ func TestObjectGetArrayFails(t *testing.T) {
 
 	arr := object.GetArray("not found")
 	assert.ErrorIs(t, object.LastError, jsonmapper.KeyNotFoundErr)
-	assert.Equal(t, &jsonmapper.JsonArray{}, arr)
+	assert.Equal(t, jsonmapper.EmptyArray(), arr)
 
 	arr = object.GetArray("name")
 	assert.ErrorIs(t, object.LastError, jsonmapper.TypeConversionErr)
-	assert.Equal(t, &jsonmapper.JsonArray{}, arr)
+	assert.Equal(t, jsonmapper.EmptyArray(), arr)
 
 	arr = object.GetArray("address")
 	assert.ErrorIs(t, object.LastError, jsonmapper.NullConversionErr)
-	assert.Equal(t, &jsonmapper.JsonArray{}, arr)
+	assert.Equal(t, jsonmapper.EmptyArray(), arr)
 }
 
 func TestObjectGetObject(t *testing.T) {
@@ -193,15 +193,15 @@ func TestObjectGetObjectFails(t *testing.T) {
 
 	obj := object.GetObject("not found")
 	assert.ErrorIs(t, object.LastError, jsonmapper.KeyNotFoundErr)
-	assert.Equal(t, &jsonmapper.JsonObject{}, obj)
+	assert.Equal(t, jsonmapper.EmptyObject(), obj)
 
 	obj = object.GetObject("name")
 	assert.ErrorIs(t, object.LastError, jsonmapper.TypeConversionErr)
-	assert.Equal(t, &jsonmapper.JsonObject{}, obj)
+	assert.Equal(t, jsonmapper.EmptyObject(), obj)
 
 	obj = object.GetObject("address")
 	assert.ErrorIs(t, object.LastError, jsonmapper.NullConversionErr)
-	assert.Equal(t, &jsonmapper.JsonObject{}, obj)
+	assert.Equal(t, jsonmapper.EmptyObject(), obj)
 }
 
 func TestConvertKeysToSnakeCase(t *testing.T) {

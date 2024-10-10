@@ -217,15 +217,15 @@ func TestArrayGetArrayFails(t *testing.T) {
 
 	innerArr := array.GetArray(5)
 	assert.ErrorIs(t, array.LastError, jsonmapper.IndexOutOfRangeErr)
-	assert.Equal(t, jsonmapper.JsonArray{}, innerArr)
+	assert.Equal(t, jsonmapper.EmptyArray(), innerArr)
 
 	innerArr = array.GetArray(2)
 	assert.ErrorIs(t, array.LastError, jsonmapper.TypeConversionErr)
-	assert.Equal(t, jsonmapper.JsonArray{}, innerArr)
+	assert.Equal(t, jsonmapper.EmptyArray(), innerArr)
 
 	innerArr = array.GetArray(3)
 	assert.ErrorIs(t, array.LastError, jsonmapper.NullConversionErr)
-	assert.Equal(t, jsonmapper.JsonArray{}, innerArr)
+	assert.Equal(t, jsonmapper.EmptyArray(), innerArr)
 }
 
 func TestArrayGetObject(t *testing.T) {
@@ -242,13 +242,13 @@ func TestArrayGetObjectFails(t *testing.T) {
 
 	obj := array.GetObject(10)
 	assert.ErrorIs(t, array.LastError, jsonmapper.IndexOutOfRangeErr)
-	assert.Equal(t, &jsonmapper.JsonObject{}, obj)
+	assert.Equal(t, jsonmapper.EmptyObject(), obj)
 
 	obj = array.GetObject(2)
 	assert.ErrorIs(t, array.LastError, jsonmapper.TypeConversionErr)
-	assert.Equal(t, &jsonmapper.JsonObject{}, obj)
+	assert.Equal(t, jsonmapper.EmptyObject(), obj)
 
 	obj = array.GetObject(3)
 	assert.ErrorIs(t, array.LastError, jsonmapper.NullConversionErr)
-	assert.Equal(t, &jsonmapper.JsonObject{}, obj)
+	assert.Equal(t, jsonmapper.EmptyObject(), obj)
 }

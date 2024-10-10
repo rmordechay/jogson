@@ -121,12 +121,12 @@ func (a *JsonArray) GetTime(i int) (time.Time, error) {
 func (a *JsonArray) GetObject(i int) *JsonObject {
 	if i >= a.Length() {
 		a.SetLastError(NewIndexOutOfRangeErr(i, a.Length()))
-		return &JsonObject{}
+		return EmptyObject()
 	}
 	element := a.elements[i]
 	if element == nil {
 		a.SetLastError(NewNullConversionErr("JsonObject"))
-		return &JsonObject{}
+		return EmptyObject()
 	}
 	switch (*element).(type) {
 	case map[string]*any:
@@ -137,27 +137,27 @@ func (a *JsonArray) GetObject(i int) *JsonObject {
 		return NewObject(data)
 	default:
 		a.SetLastError(NewTypeConversionErr(*element, "JsonObject"))
-		return &JsonObject{}
+		return EmptyObject()
 	}
 }
 
 // GetArray retrieves the JsonArray from the element at the specified index.
-func (a *JsonArray) GetArray(i int) JsonArray {
+func (a *JsonArray) GetArray(i int) *JsonArray {
 	if i >= a.Length() {
 		a.SetLastError(NewIndexOutOfRangeErr(i, a.Length()))
-		return JsonArray{}
+		return EmptyArray()
 	}
 	element := a.elements[i]
 	if element == nil {
 		a.SetLastError(NewNullConversionErr("JsonArray"))
-		return JsonArray{}
+		return EmptyArray()
 	}
 	v, ok := (*element).([]any)
 	if !ok {
 		a.SetLastError(NewTypeConversionErr(*element, "JsonArray"))
-		return JsonArray{}
+		return EmptyArray()
 	}
-	return *NewArray(convertToSlicePtr(v))
+	return NewArray(convertToSlicePtr(v))
 }
 
 // AddElement appends a new element to the JsonArray.

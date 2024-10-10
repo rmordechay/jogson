@@ -28,79 +28,6 @@ func (m *JsonMapper) getType() JsonType {
 	return Invalid
 }
 
-func getMapperFromField(data *any) JsonMapper {
-	var mapper JsonMapper
-	if data == nil {
-		return JsonMapper{IsNull: true}
-	}
-	value := *data
-	switch value.(type) {
-	case bool:
-		mapper.IsBool = true
-		mapper.AsBool = value.(bool)
-	case int:
-		mapper.IsInt = true
-		mapper.AsInt = value.(int)
-	case float64:
-		if value == float64(int(value.(float64))) {
-			mapper.IsInt = true
-			mapper.AsInt = int(value.(float64))
-		} else {
-			mapper.IsFloat = true
-		}
-		mapper.AsFloat = value.(float64)
-	case string:
-		mapper.IsString = true
-		mapper.AsString = value.(string)
-	case map[string]any:
-		mapper.IsObject = true
-		mapper.AsObject = convertAnyToObject(&value, nil)
-	case []float64:
-		mapper.IsArray = true
-		mapper.AsArray = convertSliceToJsonArray(value.([]float64))
-	case []int:
-		mapper.IsArray = true
-		mapper.AsArray = convertSliceToJsonArray(value.([]int))
-	case []string:
-		mapper.IsArray = true
-		mapper.AsArray = convertSliceToJsonArray(value.([]string))
-	case []bool:
-		mapper.IsArray = true
-		mapper.AsArray = convertSliceToJsonArray(value.([]bool))
-	case []*any:
-		mapper.IsArray = true
-		mapper.AsArray = *NewArray(value.([]*any))
-	case []any:
-		mapper.IsArray = true
-		mapper.AsArray = *NewArray(convertToSlicePtr(value.([]any)))
-	case nil:
-		mapper.IsNull = true
-	default:
-		panic(fmt.Errorf("JSON conversion for %v failed. %T not implemented", value, data))
-	}
-	return mapper
-}
-
-func parseJsonObject(data []byte) (JsonObject, error) {
-	var jo JsonObject
-	err := unmarshal(data, &jo.object)
-	if err != nil {
-		return JsonObject{}, err
-	}
-	return jo, nil
-}
-
-func parseJsonArray(data []byte) (JsonArray, error) {
-	var ja JsonArray
-	var arr []*any
-	err := unmarshal(data, &arr)
-	if err != nil {
-		return JsonArray{}, err
-	}
-	ja.elements = arr
-	return ja, nil
-}
-
 func convertToSlicePtr(data []any) []*any {
 	array := make([]*any, len(data))
 	for i, v := range data {
@@ -117,28 +44,6 @@ func convertToMapValuesPtr(data map[string]any) map[string]*any {
 		jsonObject[k] = &v
 	}
 	return jsonObject
-}
-
-func newJsonArray(data []byte) (JsonMapper, error) {
-	var mapper JsonMapper
-	mapper.IsArray = true
-	array, err := parseJsonArray(data)
-	if err != nil {
-		return JsonMapper{}, err
-	}
-	mapper.AsArray = array
-	return mapper, nil
-}
-
-func newJsonObject(data []byte) (JsonMapper, error) {
-	var mapper JsonMapper
-	mapper.IsObject = true
-	object, err := parseJsonObject(data)
-	if err != nil {
-		return JsonMapper{}, err
-	}
-	mapper.AsObject = object
-	return mapper, nil
 }
 
 func isObjectOrArray(data []byte, brackOrParen byte) bool {
@@ -209,9 +114,9 @@ func toSnakeCase(str string) string {
 	return string(result)
 }
 
-type F[T any] func(data *any, j jsonEntity) T
+type toT[T any] func(data *any, j jsonEntity) T
 
-func asGenericMap[T any](f F[T], o JsonObject) map[string]T {
+func asGenericMap[T any](f toT[T], o JsonObject) map[string]T {
 	genericMap := make(map[string]T)
 	for k, v := range o.object {
 		genericMap[k] = f(v, &o)
@@ -219,7 +124,7 @@ func asGenericMap[T any](f F[T], o JsonObject) map[string]T {
 	return genericMap
 }
 
-func asGenericArray[T any](f F[T], o JsonArray) []T {
+func asGenericArray[T any](f toT[T], o JsonArray) []T {
 	arr := make([]T, 0, len(o.elements))
 	for _, element := range o.elements {
 		arr = append(arr, f(element, &o))
@@ -292,32 +197,32 @@ func convertAnyToBool(data *any, j jsonEntity) bool {
 func convertAnyToObject(data *any, j jsonEntity) JsonObject {
 	if data == nil {
 		j.SetLastError(NewNullConversionErr("JsonObject"))
-		return JsonObject{}
+		return *EmptyObject()
 	}
 	v, ok := (*data).(map[string]any)
 	if !ok {
 		j.SetLastError(NewTypeConversionErr(data, "JsonObject"))
-		return JsonObject{}
+		return *EmptyObject()
 	}
 
-	var obj JsonObject
+	obj := EmptyObject()
 	var object = make(map[string]*any)
 	for key, value := range v {
 		object[key] = &value
 	}
 	obj.object = object
-	return obj
+	return *obj
 }
 
 func convertAnyToArray(data *any, j jsonEntity) JsonArray {
 	if data == nil {
 		j.SetLastError(NewNullConversionErr("JsonArray"))
-		return JsonArray{}
+		return *EmptyArray()
 	}
 	v, ok := (*data).([]any)
 	if !ok {
 		j.SetLastError(NewTypeConversionErr(data, "JsonArray"))
-		return JsonArray{}
+		return *EmptyArray()
 	}
 
 	var array JsonArray

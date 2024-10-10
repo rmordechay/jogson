@@ -11,6 +11,8 @@ import (
 	"time"
 )
 
+const bufferSize = 4096
+
 var jsonIter = jsoniter.ConfigCompatibleWithStandardLibrary
 
 // JsonMapper represents a generic JSON type. It contains fields for all supported JSON
@@ -74,7 +76,7 @@ func FromString(data string) (JsonMapper, error) {
 func FromBuffer(reader io.Reader) (JsonMapper, error) {
 	var m JsonMapper
 	m.reader = reader
-	m.buffer = make([]byte, 4096)
+	m.buffer = make([]byte, bufferSize)
 	return m, nil
 }
 
@@ -94,6 +96,12 @@ func (m *JsonMapper) AsTime() (time.Time, error) {
 }
 
 func (m *JsonMapper) ProcessJsonList(numberOfWorkers int, f func(o JsonObject)) {
+	if m.reader == nil {
+		panic("reader is not set")
+	}
+	if m.buffer == nil {
+		m.buffer = make([]byte, bufferSize)
+	}
 	dec := json.NewDecoder(m.reader)
 	_, err := dec.Token()
 	if err != nil {
@@ -131,8 +139,8 @@ func (m *JsonMapper) ProcessJsonList(numberOfWorkers int, f func(o JsonObject)) 
 func (m *JsonMapper) Read(p []byte) (n int, err error) {
 	m.lastRead = 0
 	if len(m.buffer) <= m.offset {
-		// Buffer is empty, reset to recover space.
-		m.reset()
+		// Buffer is empty, resetBuffer to recover space.
+		m.resetBuffer()
 		if len(p) == 0 {
 			return 0, nil
 		}
@@ -183,7 +191,84 @@ func (m *JsonMapper) String() string {
 	return ""
 }
 
-func (m *JsonMapper) reset() {
+func getMapperFromField(data *any) JsonMapper {
+	var mapper JsonMapper
+	if data == nil {
+		return JsonMapper{IsNull: true}
+	}
+	value := *data
+	switch value.(type) {
+	case bool:
+		mapper.IsBool = true
+		mapper.AsBool = value.(bool)
+	case int:
+		mapper.IsInt = true
+		mapper.AsInt = value.(int)
+	case float64:
+		if value == float64(int(value.(float64))) {
+			mapper.IsInt = true
+			mapper.AsInt = int(value.(float64))
+		} else {
+			mapper.IsFloat = true
+		}
+		mapper.AsFloat = value.(float64)
+	case string:
+		mapper.IsString = true
+		mapper.AsString = value.(string)
+	case map[string]any:
+		mapper.IsObject = true
+		mapper.AsObject = convertAnyToObject(&value, nil)
+	case []float64:
+		mapper.IsArray = true
+		mapper.AsArray = convertSliceToJsonArray(value.([]float64))
+	case []int:
+		mapper.IsArray = true
+		mapper.AsArray = convertSliceToJsonArray(value.([]int))
+	case []string:
+		mapper.IsArray = true
+		mapper.AsArray = convertSliceToJsonArray(value.([]string))
+	case []bool:
+		mapper.IsArray = true
+		mapper.AsArray = convertSliceToJsonArray(value.([]bool))
+	case []*any:
+		mapper.IsArray = true
+		mapper.AsArray = *NewArray(value.([]*any))
+	case []any:
+		mapper.IsArray = true
+		mapper.AsArray = *NewArray(convertToSlicePtr(value.([]any)))
+	case nil:
+		mapper.IsNull = true
+	default:
+		panic(fmt.Errorf("JSON conversion for %v failed. %T not implemented", value, data))
+	}
+	return mapper
+}
+
+func newJsonObject(data []byte) (JsonMapper, error) {
+	jsonObject := EmptyObject()
+	err := unmarshal(data, &jsonObject.object)
+	if err != nil {
+		return JsonMapper{}, err
+	}
+	var mapper JsonMapper
+	mapper.IsObject = true
+	mapper.AsObject = *jsonObject
+	return mapper, nil
+}
+
+func newJsonArray(data []byte) (JsonMapper, error) {
+	jsonArray := EmptyArray()
+	err := unmarshal(data, &jsonArray.elements)
+	if err != nil {
+		return JsonMapper{}, err
+	}
+	var mapper JsonMapper
+	mapper.IsArray = true
+	mapper.AsArray = *jsonArray
+	return mapper, nil
+}
+
+func (m *JsonMapper) resetBuffer() {
 	m.buffer = m.buffer[:0]
 	m.offset = 0
 	m.lastRead = 0
