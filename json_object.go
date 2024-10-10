@@ -89,8 +89,8 @@ func (o *JsonObject) AsFloatMap() map[string]float64 {
 	return getGenericMap(convertAnyToFloat, *o)
 }
 
-// As2DMap returns the object as map of (string, JsonArray)
-func (o *JsonObject) As2DMap() map[string]JsonArray {
+// AsArrayMap returns the object as map of (string, JsonArray)
+func (o *JsonObject) AsArrayMap() map[string]JsonArray {
 	return getGenericMap(convertAnyToArray, *o)
 }
 

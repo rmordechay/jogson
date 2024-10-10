@@ -3,10 +3,13 @@ package jsonmapper
 import (
 	"encoding/json"
 	"fmt"
+	jsoniter "github.com/json-iterator/go"
 	"strconv"
 	"time"
 	"unicode"
 )
+
+var jsonIter = jsoniter.ConfigCompatibleWithStandardLibrary
 
 func (m *JsonMapper) getType() JsonType {
 	switch {

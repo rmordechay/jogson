@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	jsoniter "github.com/json-iterator/go"
 	"io"
 	"os"
 	"sync"
@@ -12,8 +11,6 @@ import (
 )
 
 const bufferSize = 4096
-
-var jsonIter = jsoniter.ConfigCompatibleWithStandardLibrary
 
 // JsonMapper represents a generic JSON type. It contains fields for all supported JSON
 // types like bool, int, float, string, object, and array, as well as Go supported types.
@@ -238,8 +235,6 @@ func getMapperFromField(data *any) JsonMapper {
 		mapper.AsArray = *NewArray(convertToSlicePtr(value))
 	case nil:
 		mapper.IsNull = true
-	default:
-		panic(fmt.Errorf("JSON conversion for %v failed. %T not implemented", value, data))
 	}
 	return mapper
 }
