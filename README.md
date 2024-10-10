@@ -116,6 +116,11 @@ var f float64 = array.GetFloat(5)
 var b bool = array.GetBool(7)
 ```
 
+#### Time
+```go
+var birthday time.Time = array.GetTime(0)
+var birthday string = object.GetTime("birthday".Format(time.RFC3339)) // 1981-10-08T00:00:00Z
+```
 
 ### Arrays
 ```go
@@ -171,11 +176,18 @@ fmt.Println(mapper.Object.Get("children").PrettyString())
 ## Writing to JSON
 To write a JSON object or array is as simple as reading from it.
 To create an object or array from scratch, you can use
+
+### Write Object
 ```go
-// Object
-obj := jsonmapper.CreateEmptyObject()
-// Array
-array := jsonmapper.CreateEmptyArray()
+obj := jsonmapper.NewObject()
+obj.AddKeyValue("name", "Chris")
+fmt.Println(obj.String()) // {"name":"Chris"}
 ```
 
-### Write elements
+### Write Array
+```go
+arr := jsonmapper.NewArray()
+arr.AddElement(15)
+arr.AddElement(19)
+fmt.Println(arr.String()) // [15,19]
+```

@@ -49,19 +49,6 @@ func (o *JsonObject) Has(key string) bool {
 	return false
 }
 
-func (o *JsonObject) GetTime(key string) (time.Time, error) {
-	for k, v := range o.object {
-		if k != key {
-			continue
-		}
-		if v == nil {
-			return time.Time{}, fmt.Errorf(nullConversionErrStr, time.Time{})
-		}
-		return parseTime(v)
-	}
-	return time.Time{}, fmt.Errorf(keyNotFoundErrStr, key)
-}
-
 func (o *JsonObject) GetString(key string) string {
 	for k, v := range o.object {
 		if k != key {
@@ -118,24 +105,40 @@ func (o *JsonObject) GetBool(key string) bool {
 	return false
 }
 
-func (o *JsonObject) GetObject(key string) JsonObject {
+func (o *JsonObject) GetTime(key string) (time.Time, error) {
+	for k, v := range o.object {
+		if k != key {
+			continue
+		}
+		if v == nil {
+			return time.Time{}, fmt.Errorf(nullConversionErrStr, time.Time{})
+		}
+		return parseTime(v)
+	}
+	return time.Time{}, fmt.Errorf(keyNotFoundErrStr, key)
+}
+
+func (o *JsonObject) GetObject(key string) *JsonObject {
 	for k, v := range o.object {
 		if k != key {
 			continue
 		}
 		if v == nil {
 			o.LastError = fmt.Errorf(nullConversionErrStr, JsonObject{})
-			return JsonObject{}
+			return &JsonObject{}
 		}
-		jsonObject, ok := (*v).(map[string]interface{})
-		if !ok {
+		switch (*v).(type) {
+		case map[string]*interface{}:
+			return &JsonObject{object: (*v).(map[string]*interface{})}
+		case map[string]interface{}:
+			return &JsonObject{object: convertToMapValuesPtr((*v).(map[string]interface{}))}
+		default:
 			o.LastError = fmt.Errorf(typeConversionErrStr, *v, JsonObject{})
-			return JsonObject{}
+			return &JsonObject{}
 		}
-		return JsonObject{object: convertToMapValuesPtr(jsonObject)}
 	}
 	o.LastError = fmt.Errorf(keyNotFoundErrStr, key)
-	return JsonObject{}
+	return &JsonObject{}
 }
 
 func (o *JsonObject) GetArray(key string) *JsonArray {
@@ -195,6 +198,10 @@ func (o *JsonObject) SetLastError(err error) {
 	o.LastError = err
 }
 
+func (o *JsonObject) TransformObjectKeys() JsonObject {
+	return JsonObject{object: transformKeys(o.object)}
+}
+
 func (o *JsonObject) PrettyString() string {
 	jsonBytes, _ := marshalIndent(o.object)
 	return string(jsonBytes)
@@ -223,4 +230,24 @@ func getAsJsonObject(data *interface{}, j JsonError) JsonObject {
 	}
 	obj.object = object
 	return obj
+}
+
+func transformKeys(m map[string]*interface{}) map[string]*interface{} {
+	newMap := make(map[string]*interface{})
+	for key, value := range m {
+		newKey := toSnakeCase(key)
+		if value == nil {
+			newMap[newKey] = value
+			continue
+		}
+		nestedMap, ok := (*value).(map[string]interface{})
+		if ok {
+			nestedResult := transformKeys(convertToMapValuesPtr(nestedMap))
+			var nestedInterface interface{} = nestedResult
+			newMap[newKey] = &nestedInterface
+		} else {
+			newMap[newKey] = value
+		}
+	}
+	return newMap
 }

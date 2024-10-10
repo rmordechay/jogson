@@ -41,7 +41,7 @@ func TestArrayForEach(t *testing.T) {
 
 func TestIndexOutOfBoundError(t *testing.T) {
 	arr := jsonmapper.NewArray()
-	arr.AddValue(1)
+	arr.AddElement(1)
 	assert.Equal(t, 1, arr.Length())
 	assert.Equal(t, 0, arr.GetInt(3))
 	assert.Error(t, arr.LastError)
@@ -241,13 +241,13 @@ func TestArrayGetObjectFails(t *testing.T) {
 
 	obj := array.GetObject(10)
 	assert.Equal(t, "index out of range [10] with length 4", array.LastError.Error())
-	assert.Equal(t, jsonmapper.JsonObject{}, obj)
+	assert.Equal(t, &jsonmapper.JsonObject{}, obj)
 
 	obj = array.GetObject(2)
 	assert.Equal(t, "the type 'string' could not be converted to jsonmapper.JsonObject", array.LastError.Error())
-	assert.Equal(t, jsonmapper.JsonObject{}, obj)
+	assert.Equal(t, &jsonmapper.JsonObject{}, obj)
 
 	obj = array.GetObject(3)
 	assert.Equal(t, "value is null and could not be converted to jsonmapper.JsonObject", array.LastError.Error())
-	assert.Equal(t, jsonmapper.JsonObject{}, obj)
+	assert.Equal(t, &jsonmapper.JsonObject{}, obj)
 }

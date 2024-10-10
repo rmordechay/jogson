@@ -2,6 +2,7 @@ package jsonmapper
 
 import (
 	"fmt"
+	"time"
 )
 
 type JsonArray struct {
@@ -113,22 +114,38 @@ func (a *JsonArray) GetBool(i int) bool {
 	return getAsBool(a.elements[i], a)
 }
 
-func (a *JsonArray) GetObject(i int) JsonObject {
+func (a *JsonArray) GetTime(key int) (time.Time, error) {
+	for k, v := range a.elements {
+		if k != key {
+			continue
+		}
+		if v == nil {
+			return time.Time{}, fmt.Errorf(nullConversionErrStr, time.Time{})
+		}
+		return parseTime(v)
+	}
+	return time.Time{}, fmt.Errorf(keyNotFoundErrStr, key)
+}
+
+func (a *JsonArray) GetObject(i int) *JsonObject {
 	if i >= a.Length() {
 		a.SetLastError(fmt.Errorf(indexOutOfRangeErrStr, i, a.Length()))
-		return JsonObject{}
+		return &JsonObject{}
 	}
 	element := a.elements[i]
 	if element == nil {
 		a.SetLastError(fmt.Errorf(nullConversionErrStr, JsonObject{}))
-		return JsonObject{}
+		return &JsonObject{}
 	}
-	v, ok := (*element).(map[string]interface{})
-	if !ok {
+	switch (*element).(type) {
+	case map[string]*interface{}:
+		return &JsonObject{object: (*element).(map[string]*interface{})}
+	case map[string]interface{}:
+		return &JsonObject{object: convertToMapValuesPtr((*element).(map[string]interface{}))}
+	default:
 		a.SetLastError(fmt.Errorf(typeConversionErrStr, *element, JsonObject{}))
-		return JsonObject{}
+		return &JsonObject{}
 	}
-	return JsonObject{object: convertToMapValuesPtr(v)}
 }
 
 func (a *JsonArray) GetArray(i int) JsonArray {
@@ -153,7 +170,7 @@ func (a *JsonArray) Length() int {
 	return len(a.elements)
 }
 
-func (a *JsonArray) AddValue(value interface{}) {
+func (a *JsonArray) AddElement(value interface{}) {
 	a.elements = append(a.elements, &value)
 }
 

@@ -2,6 +2,7 @@ package tests
 
 import (
 	"github.com/rmordechay/jsonmapper"
+	"github.com/rmordechay/jsonmapper/docs"
 	"github.com/stretchr/testify/assert"
 	"os"
 	"strings"
@@ -177,7 +178,7 @@ func TestParseTimeInvalid(t *testing.T) {
 }
 
 func TestExample(t *testing.T) {
-	//docs.RunExample()
+	docs.RunExample()
 }
 
 func removeWhiteSpaces(data string) string {

@@ -90,9 +90,9 @@ func TestWriteArrayFloatToObject(t *testing.T) {
 
 func TestWriteFloatsArray(t *testing.T) {
 	arr := jsonmapper.NewArray()
-	arr.AddValue(1)
-	arr.AddValue(4)
-	arr.AddValue(6)
+	arr.AddElement(1)
+	arr.AddElement(4)
+	arr.AddElement(6)
 	assert.Equal(t, 3, arr.Length())
 	assert.Equal(t, 1, arr.GetInt(0))
 	assert.Equal(t, 4, arr.GetInt(1))

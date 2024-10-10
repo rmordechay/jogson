@@ -193,19 +193,31 @@ func TestObjectGetObjectFails(t *testing.T) {
 
 	obj := object.GetObject("not found")
 	assert.Equal(t, "the requested key 'not found' was not found", object.LastError.Error())
-	assert.Equal(t, jsonmapper.JsonObject{}, obj)
+	assert.Equal(t, &jsonmapper.JsonObject{}, obj)
 
 	obj = object.GetObject("name")
 	assert.Equal(t, "the type 'string' could not be converted to jsonmapper.JsonObject", object.LastError.Error())
-	assert.Equal(t, jsonmapper.JsonObject{}, obj)
+	assert.Equal(t, &jsonmapper.JsonObject{}, obj)
 
 	obj = object.GetObject("address")
 	assert.Equal(t, "value is null and could not be converted to jsonmapper.JsonObject", object.LastError.Error())
-	assert.Equal(t, jsonmapper.JsonObject{}, obj)
+	assert.Equal(t, &jsonmapper.JsonObject{}, obj)
 
 }
 
 func TestConvertKeysToSnakeCase(t *testing.T) {
-	//mapper, _ := jsonmapper.FromString(jsonObjectTest)
-	//object := mapper.Object
+	mapper, err := jsonmapper.FromString(jsonObjectKeysPascalCaseTest)
+	assert.NoError(t, err)
+	object := mapper.Object
+	snakeCase := object.TransformObjectKeys()
+	assert.NoError(t, object.LastError)
+	assert.ElementsMatch(t, []string{"children", "name", "age", "address", "second_address", "is_funny"}, snakeCase.Keys())
+	children := snakeCase.GetObject("children")
+	assert.NoError(t, snakeCase.LastError)
+	rachel := children.GetObject("rachel")
+	assert.NoError(t, children.LastError)
+	age := rachel.GetInt("age")
+	isFunny := rachel.GetBool("is_funny")
+	assert.Equal(t, 15, age)
+	assert.True(t, isFunny)
 }
