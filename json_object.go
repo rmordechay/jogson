@@ -92,7 +92,7 @@ func (o *JsonObject) Has(key string) bool {
 	return false
 }
 
-func getObjScalarGeneric[T any](o *JsonObject, f bla[T], key string, typeString string) T {
+func getObjScalarGeneric[T any](o *JsonObject, f jc[T], key string, typeString string) T {
 	var zero T
 	for k, v := range o.object {
 		if k != key {
@@ -111,27 +111,25 @@ func getObjScalarGeneric[T any](o *JsonObject, f bla[T], key string, typeString 
 // GetString retrieves the string value associated with the specified key.
 // If the key does not exist or the value is not a string, it sets LastError.
 func (o *JsonObject) GetString(key string) string {
-	return getObjScalarGeneric(o, convertAnyToString, key, "string")
+	return getObjScalarGeneric(o, convertAnyToString, key, stringTypeStr)
 }
-
-type bla[T any] func(data *any, j jsonEntity) T
 
 // GetInt retrieves the int value associated with the specified key.
 // If the key does not exist or the value is not an int, it sets LastError.
 func (o *JsonObject) GetInt(key string) int {
-	return getObjScalarGeneric(o, convertAnyToInt, key, "int")
+	return getObjScalarGeneric(o, convertAnyToInt, key, intTypeStr)
 }
 
 // GetFloat retrieves the float64 value associated with the specified key.
 // If the key does not exist or the value is not a float, it sets LastError.
 func (o *JsonObject) GetFloat(key string) float64 {
-	return getObjScalarGeneric(o, convertAnyToFloat, key, "float64")
+	return getObjScalarGeneric(o, convertAnyToFloat, key, floatTypeStr)
 }
 
 // GetBool retrieves the bool value associated with the specified key.
 // If the key does not exist or the value is not a bool, it sets LastError.
 func (o *JsonObject) GetBool(key string) bool {
-	return getObjScalarGeneric(o, convertAnyToBool, key, "bool")
+	return getObjScalarGeneric(o, convertAnyToBool, key, boolTypeStr)
 }
 
 // GetTime retrieves the time.Time value associated with the specified key.
@@ -142,7 +140,7 @@ func (o *JsonObject) GetTime(key string) time.Time {
 			continue
 		}
 		if v == nil {
-			o.SetLastError(createNullConversionErr("time.Time"))
+			o.SetLastError(createNullConversionErr(timeTypeStr))
 			return time.Time{}
 		}
 		t, err := parseTime(v)
@@ -161,7 +159,7 @@ func (o *JsonObject) GetObject(key string) *JsonObject {
 			continue
 		}
 		if v == nil {
-			o.SetLastError(createNullConversionErr("JsonObject"))
+			o.SetLastError(createNullConversionErr(objectTypeStr))
 			return EmptyObject()
 		}
 		switch (*v).(type) {
@@ -172,7 +170,7 @@ func (o *JsonObject) GetObject(key string) *JsonObject {
 			dataPtr := convertToMapValuesPtr((*v).(map[string]any))
 			return NewObject(dataPtr)
 		default:
-			o.SetLastError(createTypeConversionErr(*v, "JsonObject"))
+			o.SetLastError(createTypeConversionErr(*v, objectTypeStr))
 			return EmptyObject()
 		}
 	}
@@ -188,7 +186,7 @@ func (o *JsonObject) GetArray(key string) *JsonArray {
 			continue
 		}
 		if v == nil {
-			o.SetLastError(createNullConversionErr("JsonArray"))
+			o.SetLastError(createNullConversionErr(arrayTypeStr))
 			return EmptyArray()
 		}
 		switch (*v).(type) {
@@ -197,7 +195,7 @@ func (o *JsonObject) GetArray(key string) *JsonArray {
 		case []*any:
 			return NewArray((*v).([]*any))
 		default:
-			o.SetLastError(createTypeConversionErr(*v, "JsonArray"))
+			o.SetLastError(createTypeConversionErr(*v, arrayTypeStr))
 			return EmptyArray()
 		}
 	}

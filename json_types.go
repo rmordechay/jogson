@@ -23,14 +23,24 @@ const (
 	Invalid
 )
 
+const (
+	boolTypeStr   = "bool"
+	intTypeStr    = "int"
+	floatTypeStr  = "float64"
+	stringTypeStr = "string"
+	objectTypeStr = "JsonObject"
+	arrayTypeStr  = "JsonArray"
+	timeTypeStr   = "time.Time"
+)
+
 func (d JsonType) String() string {
 	return [...]string{
-		"bool",
-		"int",
-		"float64",
-		"string",
-		"object",
-		"array",
+		boolTypeStr,
+		intTypeStr,
+		floatTypeStr,
+		stringTypeStr,
+		objectTypeStr,
+		arrayTypeStr,
 		"null",
 		"invalid",
 	}[d]

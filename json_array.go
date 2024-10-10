@@ -67,48 +67,38 @@ func (a *JsonArray) AsObjectArray() []JsonObject {
 	return asGenericArray(convertAnyToObject, *a)
 }
 
-func getArrayScalarGeneric(a *JsonArray, i int) string {
+func getArrayScalarGeneric[T any](a *JsonArray, f jc[T], i int, typeString string) T {
+	var zero T
 	if i >= a.Length() {
 		a.SetLastError(createIndexOutOfRangeErr(i, a.Length()))
-		return ""
+		return zero
 	}
-	return convertAnyToString(a.elements[i], a)
+	data := a.elements[i]
+	if data == nil {
+		a.SetLastError(createNullConversionErr(typeString))
+		return zero
+	}
+	return f(data, a)
 }
 
 // GetString retrieves the string value from the element at the specified index.
 func (a *JsonArray) GetString(i int) string {
-	if i >= a.Length() {
-		a.SetLastError(createIndexOutOfRangeErr(i, a.Length()))
-		return ""
-	}
-	return convertAnyToString(a.elements[i], a)
+	return getArrayScalarGeneric(a, convertAnyToString, i, stringTypeStr)
 }
 
 // GetInt retrieves the integer value from the element at the specified index.
 func (a *JsonArray) GetInt(i int) int {
-	if i >= a.Length() {
-		a.SetLastError(createIndexOutOfRangeErr(i, a.Length()))
-		return 0
-	}
-	return convertAnyToInt(a.elements[i], a)
+	return getArrayScalarGeneric(a, convertAnyToInt, i, intTypeStr)
 }
 
 // GetFloat retrieves the float value from the element at the specified index.
 func (a *JsonArray) GetFloat(i int) float64 {
-	if i >= a.Length() {
-		a.SetLastError(createIndexOutOfRangeErr(i, a.Length()))
-		return 0
-	}
-	return convertAnyToFloat(a.elements[i], a)
+	return getArrayScalarGeneric(a, convertAnyToFloat, i, floatTypeStr)
 }
 
 // GetBool retrieves the boolean value from the element at the specified index.
 func (a *JsonArray) GetBool(i int) bool {
-	if i >= a.Length() {
-		a.SetLastError(createIndexOutOfRangeErr(i, a.Length()))
-		return false
-	}
-	return convertAnyToBool(a.elements[i], a)
+	return getArrayScalarGeneric(a, convertAnyToBool, i, boolTypeStr)
 }
 
 // GetTime retrieves the time value from the element at the specified index, returning an error if conversion fails.
@@ -118,7 +108,7 @@ func (a *JsonArray) GetTime(i int) (time.Time, error) {
 			continue
 		}
 		if v == nil {
-			return time.Time{}, createNullConversionErr("time.Time")
+			return time.Time{}, createNullConversionErr(timeTypeStr)
 		}
 		return parseTime(v)
 	}
@@ -133,7 +123,7 @@ func (a *JsonArray) GetObject(i int) *JsonObject {
 	}
 	element := a.elements[i]
 	if element == nil {
-		a.SetLastError(createNullConversionErr("JsonObject"))
+		a.SetLastError(createNullConversionErr(objectTypeStr))
 		return EmptyObject()
 	}
 	switch (*element).(type) {
@@ -144,7 +134,7 @@ func (a *JsonArray) GetObject(i int) *JsonObject {
 		data := convertToMapValuesPtr((*element).(map[string]any))
 		return NewObject(data)
 	default:
-		a.SetLastError(createTypeConversionErr(*element, "JsonObject"))
+		a.SetLastError(createTypeConversionErr(*element, objectTypeStr))
 		return EmptyObject()
 	}
 }
@@ -157,12 +147,12 @@ func (a *JsonArray) GetArray(i int) *JsonArray {
 	}
 	element := a.elements[i]
 	if element == nil {
-		a.SetLastError(createNullConversionErr("JsonArray"))
+		a.SetLastError(createNullConversionErr(arrayTypeStr))
 		return EmptyArray()
 	}
 	v, ok := (*element).([]any)
 	if !ok {
-		a.SetLastError(createTypeConversionErr(*element, "JsonArray"))
+		a.SetLastError(createTypeConversionErr(*element, arrayTypeStr))
 		return EmptyArray()
 	}
 	return NewArray(convertToSlicePtr(v))
