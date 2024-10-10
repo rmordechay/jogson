@@ -11,8 +11,15 @@ type JsonArray struct {
 	LastError error
 }
 
-// NewArray initializes and returns a new instance of JsonArray with an empty list of elements.
-func NewArray() *JsonArray {
+// NewArray initializes and returns a new instance of JsonArray.
+func NewArray(data []*any) *JsonArray {
+	var arr JsonArray
+	arr.elements = data
+	return &arr
+}
+
+// EmptyArray initializes and returns an empty new instance of JsonArray.
+func EmptyArray() *JsonArray {
 	var arr JsonArray
 	elements := make([]*any, 0)
 	arr.elements = elements
@@ -123,9 +130,11 @@ func (a *JsonArray) GetObject(i int) *JsonObject {
 	}
 	switch (*element).(type) {
 	case map[string]*any:
-		return &JsonObject{object: (*element).(map[string]*any)}
+		data := (*element).(map[string]*any)
+		return NewObject(data)
 	case map[string]any:
-		return &JsonObject{object: convertToMapValuesPtr((*element).(map[string]any))}
+		data := convertToMapValuesPtr((*element).(map[string]any))
+		return NewObject(data)
 	default:
 		a.SetLastError(NewTypeConversionErr(*element, "JsonObject"))
 		return &JsonObject{}
@@ -148,7 +157,7 @@ func (a *JsonArray) GetArray(i int) JsonArray {
 		a.SetLastError(NewTypeConversionErr(*element, "JsonArray"))
 		return JsonArray{}
 	}
-	return JsonArray{elements: convertToSlicePtr(v)}
+	return *NewArray(convertToSlicePtr(v))
 }
 
 // AddElement appends a new element to the JsonArray.
@@ -182,7 +191,7 @@ func (a *JsonArray) ForEach(f func(j JsonMapper)) {
 
 // Filter returns a new JsonArray containing only the elements that satisfy the given filter function.
 func (a *JsonArray) Filter(f func(j JsonMapper) bool) JsonArray {
-	var arr = NewArray()
+	var arr = EmptyArray()
 	for _, element := range a.elements {
 		if f(getMapperFromField(element)) {
 			arr.elements = append(arr.elements, element)
@@ -193,7 +202,7 @@ func (a *JsonArray) Filter(f func(j JsonMapper) bool) JsonArray {
 
 // FilterNull returns a new JsonArray excluding any elements that are null.
 func (a *JsonArray) FilterNull() JsonArray {
-	var arr = NewArray()
+	var arr = EmptyArray()
 	for _, element := range a.elements {
 		field := getMapperFromField(element)
 		if !field.IsNull {

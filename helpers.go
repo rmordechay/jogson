@@ -69,10 +69,10 @@ func getMapperFromField(data *any) JsonMapper {
 		mapper.AsArray = convertSliceToJsonArray(value.([]bool))
 	case []*any:
 		mapper.IsArray = true
-		mapper.AsArray = JsonArray{elements: value.([]*any)}
+		mapper.AsArray = *NewArray(value.([]*any))
 	case []any:
 		mapper.IsArray = true
-		mapper.AsArray = JsonArray{elements: convertToSlicePtr(value.([]any))}
+		mapper.AsArray = *NewArray(convertToSlicePtr(value.([]any)))
 	case nil:
 		mapper.IsNull = true
 	default:

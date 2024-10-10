@@ -1,10 +1,13 @@
 package jsonmapper
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	jsoniter "github.com/json-iterator/go"
+	"io"
 	"os"
+	"sync"
 	"time"
 )
 
@@ -27,6 +30,11 @@ type JsonMapper struct {
 	AsString string
 	AsObject JsonObject
 	AsArray  JsonArray
+
+	buffer   []byte
+	offset   int
+	lastRead int
+	reader   io.Reader
 }
 
 // FromBytes parses JSON data from a byte slice.
@@ -63,6 +71,13 @@ func FromString(data string) (JsonMapper, error) {
 	return FromBytes([]byte(data))
 }
 
+func FromBuffer(reader io.Reader) (JsonMapper, error) {
+	var m JsonMapper
+	m.reader = reader
+	m.buffer = make([]byte, 4096)
+	return m, nil
+}
+
 // AsTime attempts to convert the JSON value to a time.Time object.
 // Only works if the JSON value is a string and can be parsed as a valid time.
 func (m *JsonMapper) AsTime() (time.Time, error) {
@@ -76,6 +91,59 @@ func (m *JsonMapper) AsTime() (time.Time, error) {
 		}
 	}
 	return time.Time{}, NewInvalidTimeErr(m.AsString)
+}
+
+func (m *JsonMapper) ProcessJsonList(numberOfWorkers int, f func(o JsonObject)) {
+	dec := json.NewDecoder(m.reader)
+	_, err := dec.Token()
+	if err != nil {
+		return
+	}
+
+	var wg sync.WaitGroup
+	sem := make(chan struct{}, numberOfWorkers)
+
+	for dec.More() {
+		var data map[string]*interface{}
+		err = dec.Decode(&data)
+		if err == io.EOF {
+			break
+		} else if err != nil {
+			return
+		}
+		obj := NewObject(data)
+		wg.Add(1)
+		sem <- struct{}{}
+		go func(o JsonObject) {
+			defer func() { <-sem }()
+			f(o)
+			wg.Done()
+		}(*obj)
+	}
+
+	_, err = dec.Token()
+	if err != nil {
+		return
+	}
+	wg.Wait()
+}
+
+func (m *JsonMapper) Read(p []byte) (n int, err error) {
+	m.lastRead = 0
+	if len(m.buffer) <= m.offset {
+		// Buffer is empty, reset to recover space.
+		m.reset()
+		if len(p) == 0 {
+			return 0, nil
+		}
+		return 0, io.EOF
+	}
+	n = copy(p, m.buffer[m.offset:])
+	m.offset += n
+	if n > 0 {
+		m.lastRead = -1
+	}
+	return n, nil
 }
 
 // PrettyString returns a formatted, human-readable string representation of the JsonMapper value.
@@ -113,4 +181,10 @@ func (m *JsonMapper) String() string {
 		return fmt.Sprintf("%v", m.AsArray)
 	}
 	return ""
+}
+
+func (m *JsonMapper) reset() {
+	m.buffer = m.buffer[:0]
+	m.offset = 0
+	m.lastRead = 0
 }

@@ -11,11 +11,18 @@ type JsonObject struct {
 	LastError error
 }
 
-// NewObject creates and returns a new JsonObject.
-func NewObject() JsonObject {
+// NewObject initializes and returns a new instance of JsonObject.
+func NewObject(data map[string]*any) *JsonObject {
+	var obj JsonObject
+	obj.object = data
+	return &obj
+}
+
+// EmptyObject initializes and returns an empty new instance of JsonObject.
+func EmptyObject() *JsonObject {
 	var obj JsonObject
 	obj.object = make(map[string]*any)
-	return obj
+	return &obj
 }
 
 // Length returns the number of elements in the JsonObject.
@@ -173,22 +180,22 @@ func (o *JsonObject) GetObject(key string) *JsonObject {
 		}
 		if v == nil {
 			o.SetLastError(NewNullConversionErr("JsonObject"))
-			return &JsonObject{}
+			return EmptyObject()
 		}
 		switch (*v).(type) {
 		case map[string]*any:
-			object := (*v).(map[string]*any)
-			return &JsonObject{object: object}
+			data := (*v).(map[string]*any)
+			return NewObject(data)
 		case map[string]any:
 			dataPtr := convertToMapValuesPtr((*v).(map[string]any))
-			return &JsonObject{object: dataPtr}
+			return NewObject(dataPtr)
 		default:
 			o.SetLastError(NewTypeConversionErr(*v, "JsonObject"))
-			return &JsonObject{}
+			return EmptyObject()
 		}
 	}
 	o.SetLastError(NewKeyNotFoundErr(key))
-	return &JsonObject{}
+	return EmptyObject()
 }
 
 // GetArray retrieves an array of JsonArray associated with the specified key.
@@ -204,9 +211,9 @@ func (o *JsonObject) GetArray(key string) *JsonArray {
 		}
 		switch (*v).(type) {
 		case []any:
-			return &JsonArray{elements: convertToSlicePtr((*v).([]any))}
+			return NewArray(convertToSlicePtr((*v).([]any)))
 		case []*any:
-			return &JsonArray{elements: (*v).([]*any)}
+			return NewArray((*v).([]*any))
 		default:
 			o.SetLastError(NewTypeConversionErr(*v, "[]*any"))
 			return &JsonArray{}
@@ -262,18 +269,18 @@ func (o *JsonObject) ForEach(f func(key string, j JsonMapper)) {
 
 // Filter returns a new JsonObject containing only the key-value pairs for which the provided function returns true.
 func (o *JsonObject) Filter(f func(key string, j JsonMapper) bool) JsonObject {
-	var obj = NewObject()
+	var obj = EmptyObject()
 	for k, element := range o.object {
 		if f(k, getMapperFromField(element)) {
 			obj.object[k] = element
 		}
 	}
-	return obj
+	return *obj
 }
 
 // TransformObjectKeys returns a new JsonObject with transformed keys, where keys are converted to snake_case.
 func (o *JsonObject) TransformObjectKeys() JsonObject {
-	return JsonObject{object: transformKeys(o.object)}
+	return *NewObject(transformKeys(o.object))
 }
 
 // SetLastError sets the LastError field of the JsonObject to the provided error.
