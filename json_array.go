@@ -67,7 +67,7 @@ func (a *JsonArray) AsObjectArray() []JsonObject {
 	return asGenericArray(convertAnyToObject, *a)
 }
 
-func getArrayScalarGeneric[T any](a *JsonArray, f jc[T], i int, typeString string) T {
+func getArrayScalar[T any](a *JsonArray, f jc[T], i int, typeString string) T {
 	var zero T
 	if i >= a.Length() {
 		a.SetLastError(createIndexOutOfRangeErr(i, a.Length()))
@@ -83,36 +83,27 @@ func getArrayScalarGeneric[T any](a *JsonArray, f jc[T], i int, typeString strin
 
 // GetString retrieves the string value from the element at the specified index.
 func (a *JsonArray) GetString(i int) string {
-	return getArrayScalarGeneric(a, convertAnyToString, i, stringTypeStr)
+	return getArrayScalar(a, convertAnyToString, i, stringTypeStr)
 }
 
 // GetInt retrieves the integer value from the element at the specified index.
 func (a *JsonArray) GetInt(i int) int {
-	return getArrayScalarGeneric(a, convertAnyToInt, i, intTypeStr)
+	return getArrayScalar(a, convertAnyToInt, i, intTypeStr)
 }
 
 // GetFloat retrieves the float value from the element at the specified index.
 func (a *JsonArray) GetFloat(i int) float64 {
-	return getArrayScalarGeneric(a, convertAnyToFloat, i, floatTypeStr)
+	return getArrayScalar(a, convertAnyToFloat, i, floatTypeStr)
 }
 
 // GetBool retrieves the boolean value from the element at the specified index.
 func (a *JsonArray) GetBool(i int) bool {
-	return getArrayScalarGeneric(a, convertAnyToBool, i, boolTypeStr)
+	return getArrayScalar(a, convertAnyToBool, i, boolTypeStr)
 }
 
 // GetTime retrieves the time value from the element at the specified index, returning an error if conversion fails.
-func (a *JsonArray) GetTime(i int) (time.Time, error) {
-	for k, v := range a.elements {
-		if k != i {
-			continue
-		}
-		if v == nil {
-			return time.Time{}, createNullConversionErr(timeTypeStr)
-		}
-		return parseTime(v)
-	}
-	return time.Time{}, createIndexOutOfRangeErr(i, a.Length())
+func (a *JsonArray) GetTime(i int) time.Time {
+	return getArrayScalar(a, parseTime, i, timeTypeStr)
 }
 
 // GetObject retrieves the JsonObject from the element at the specified index.

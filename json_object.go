@@ -92,7 +92,7 @@ func (o *JsonObject) Has(key string) bool {
 	return false
 }
 
-func getObjScalarGeneric[T any](o *JsonObject, f jc[T], key string, typeString string) T {
+func getObjScalar[T any](o *JsonObject, f jc[T], key string, typeString string) T {
 	var zero T
 	for k, v := range o.object {
 		if k != key {
@@ -111,44 +111,31 @@ func getObjScalarGeneric[T any](o *JsonObject, f jc[T], key string, typeString s
 // GetString retrieves the string value associated with the specified key.
 // If the key does not exist or the value is not a string, it sets LastError.
 func (o *JsonObject) GetString(key string) string {
-	return getObjScalarGeneric(o, convertAnyToString, key, stringTypeStr)
+	return getObjScalar(o, convertAnyToString, key, stringTypeStr)
 }
 
 // GetInt retrieves the int value associated with the specified key.
 // If the key does not exist or the value is not an int, it sets LastError.
 func (o *JsonObject) GetInt(key string) int {
-	return getObjScalarGeneric(o, convertAnyToInt, key, intTypeStr)
+	return getObjScalar(o, convertAnyToInt, key, intTypeStr)
 }
 
 // GetFloat retrieves the float64 value associated with the specified key.
 // If the key does not exist or the value is not a float, it sets LastError.
 func (o *JsonObject) GetFloat(key string) float64 {
-	return getObjScalarGeneric(o, convertAnyToFloat, key, floatTypeStr)
+	return getObjScalar(o, convertAnyToFloat, key, floatTypeStr)
 }
 
 // GetBool retrieves the bool value associated with the specified key.
 // If the key does not exist or the value is not a bool, it sets LastError.
 func (o *JsonObject) GetBool(key string) bool {
-	return getObjScalarGeneric(o, convertAnyToBool, key, boolTypeStr)
+	return getObjScalar(o, convertAnyToBool, key, boolTypeStr)
 }
 
 // GetTime retrieves the time.Time value associated with the specified key.
 // If the key does not exist or the value is not a valid time, it returns an error.
 func (o *JsonObject) GetTime(key string) time.Time {
-	for k, v := range o.object {
-		if k != key {
-			continue
-		}
-		if v == nil {
-			o.SetLastError(createNullConversionErr(timeTypeStr))
-			return time.Time{}
-		}
-		t, err := parseTime(v)
-		o.SetLastError(err)
-		return t
-	}
-	o.SetLastError(createKeyNotFoundErr(key))
-	return time.Time{}
+	return getObjScalar(o, parseTime, key, timeTypeStr)
 }
 
 // GetObject retrieves a nested JsonObject associated with the specified key.

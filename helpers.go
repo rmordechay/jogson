@@ -61,21 +61,24 @@ func isObjectOrArray(data []byte, brackOrParen byte) bool {
 	return false
 }
 
-func parseTime(t *any) (time.Time, error) {
+func parseTime(t *any, j jsonEntity) time.Time {
 	if t == nil {
-		return time.Time{}, createNullConversionErr(stringTypeStr)
+		j.SetLastError(createNullConversionErr(stringTypeStr))
+		return time.Time{}
 	}
 	timeAsString, ok := (*t).(string)
 	if !ok {
-		return time.Time{}, fmt.Errorf("cannot convert type %T to type time.Time\n", t)
+		j.SetLastError(fmt.Errorf("cannot convert type %T to type time.Time\n", t))
+		return time.Time{}
 	}
 	for _, layout := range timeLayouts {
 		parsedTime, err := time.Parse(layout, timeAsString)
 		if err == nil {
-			return parsedTime, nil
+			return parsedTime
 		}
 	}
-	return time.Time{}, fmt.Errorf("the value '%v' could not be converted to type time.Time", timeAsString)
+	j.SetLastError(fmt.Errorf("the value '%v' could not be converted to type time.Time", timeAsString))
+	return time.Time{}
 }
 
 func marshal(v any) ([]byte, error) {
