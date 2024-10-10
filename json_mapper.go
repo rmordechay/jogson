@@ -12,9 +12,8 @@ import (
 
 var jsonIter = jsoniter.ConfigCompatibleWithStandardLibrary
 
-// Json represents a generic JSON type.
-// It contains fields for all supported JSON types like bool, int, float, string, object, and array,
-// as well as Go supported types.
+// Json represents a generic JSON type. It contains fields for all supported JSON
+// types like bool, int, float, string, object, and array, as well as Go supported types.
 type Json struct {
 	IsBool   bool
 	IsInt    bool
@@ -33,7 +32,6 @@ type Json struct {
 }
 
 // FromBytes parses JSON data from a byte slice.
-// It automatically determines whether the input is a JSON object or array.
 func FromBytes(data []byte) (Json, error) {
 	if isObjectOrArray(data, '[') {
 		return newJsonArray(data)
