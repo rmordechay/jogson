@@ -32,9 +32,9 @@ func (o *JsonObject) Keys() []string {
 	return keys
 }
 
-// Values returns a slice of all values in the JsonObject as Json types.
-func (o *JsonObject) Values() []Json {
-	values := make([]Json, 0, len(o.object))
+// Values returns a slice of all values in the JsonObject as JsonMapper types.
+func (o *JsonObject) Values() []JsonMapper {
+	values := make([]JsonMapper, 0, len(o.object))
 	for _, v := range o.object {
 		values = append(values, getMapperFromField(v))
 	}
@@ -42,8 +42,8 @@ func (o *JsonObject) Values() []Json {
 }
 
 // Elements returns a map of all elements in the JsonObject with their keys.
-func (o *JsonObject) Elements() map[string]Json {
-	jsons := make(map[string]Json)
+func (o *JsonObject) Elements() map[string]JsonMapper {
+	jsons := make(map[string]JsonMapper)
 	for k, v := range o.object {
 		jsons[k] = getMapperFromField(v)
 	}
@@ -69,7 +69,7 @@ func (o *JsonObject) GetString(key string) string {
 		}
 		return getAsString(v, o)
 	}
-	o.LastError = fmt.Errorf(keyNotFoundErrStr, key)
+	o.SetLastError(NewKeyNotFoundErr(key))
 	return ""
 }
 
@@ -81,12 +81,12 @@ func (o *JsonObject) GetInt(key string) int {
 			continue
 		}
 		if v == nil {
-			o.LastError = fmt.Errorf(nullConversionErrStr, "int")
+			o.LastError = NewNullConversionErr("int")
 			return 0
 		}
 		return getAsInt(v, o)
 	}
-	o.LastError = fmt.Errorf(keyNotFoundErrStr, key)
+	o.SetLastError(NewKeyNotFoundErr(key))
 	return 0
 }
 
@@ -98,12 +98,12 @@ func (o *JsonObject) GetFloat(key string) float64 {
 			continue
 		}
 		if v == nil {
-			o.LastError = fmt.Errorf(nullConversionErrStr, "float64")
+			o.LastError = NewNullConversionErr("float64")
 			return 0
 		}
 		return getAsFloat(v, o)
 	}
-	o.LastError = fmt.Errorf(keyNotFoundErrStr, key)
+	o.SetLastError(NewKeyNotFoundErr(key))
 	return 0
 }
 
@@ -115,12 +115,12 @@ func (o *JsonObject) GetBool(key string) bool {
 			continue
 		}
 		if v == nil {
-			o.LastError = fmt.Errorf(nullConversionErrStr, "bool")
+			o.LastError = NewNullConversionErr("bool")
 			return false
 		}
 		return getAsBool(v, o)
 	}
-	o.LastError = fmt.Errorf(keyNotFoundErrStr, key)
+	o.SetLastError(NewKeyNotFoundErr(key))
 	return false
 }
 
@@ -132,11 +132,11 @@ func (o *JsonObject) GetTime(key string) (time.Time, error) {
 			continue
 		}
 		if v == nil {
-			return time.Time{}, fmt.Errorf(nullConversionErrStr, "time.Time")
+			return time.Time{}, NewNullConversionErr("time.Time")
 		}
 		return parseTime(v)
 	}
-	return time.Time{}, fmt.Errorf(keyNotFoundErrStr, key)
+	return time.Time{}, NewKeyNotFoundErr(key)
 }
 
 // GetObject retrieves a nested JsonObject associated with the specified key.
@@ -147,7 +147,7 @@ func (o *JsonObject) GetObject(key string) *JsonObject {
 			continue
 		}
 		if v == nil {
-			o.LastError = fmt.Errorf(nullConversionErrStr, "JsonObject")
+			o.LastError = NewNullConversionErr("JsonObject")
 			return &JsonObject{}
 		}
 		switch (*v).(type) {
@@ -158,11 +158,11 @@ func (o *JsonObject) GetObject(key string) *JsonObject {
 			dataPtr := convertToMapValuesPtr((*v).(map[string]any))
 			return &JsonObject{object: dataPtr}
 		default:
-			o.SetLastError(fmt.Errorf(typeConversionErrStr, *v, "JsonObject"))
+			o.SetLastError(NewTypeConversionErr(*v, "JsonObject"))
 			return &JsonObject{}
 		}
 	}
-	o.LastError = fmt.Errorf(keyNotFoundErrStr, key)
+	o.SetLastError(NewKeyNotFoundErr(key))
 	return &JsonObject{}
 }
 
@@ -174,7 +174,7 @@ func (o *JsonObject) GetArray(key string) *JsonArray {
 			continue
 		}
 		if v == nil {
-			o.LastError = fmt.Errorf(nullConversionErrStr, "JsonArray")
+			o.LastError = NewNullConversionErr("JsonArray")
 			return &JsonArray{}
 		}
 		switch (*v).(type) {
@@ -183,17 +183,17 @@ func (o *JsonObject) GetArray(key string) *JsonArray {
 		case []*any:
 			return &JsonArray{elements: (*v).([]*any)}
 		default:
-			o.SetLastError(fmt.Errorf(typeConversionErrStr, *v, "[]*any"))
+			o.SetLastError(NewTypeConversionErr(*v, "[]*any"))
 			return &JsonArray{}
 		}
 	}
-	o.LastError = fmt.Errorf(keyNotFoundErrStr, key)
+	o.SetLastError(NewKeyNotFoundErr(key))
 	return &JsonArray{}
 }
 
 // Find searches for a key in the JsonObject and its nested objects.
-// Returns the Json associated with the key if found; otherwise, returns an empty Json.
-func (o *JsonObject) Find(key string) Json {
+// Returns the JsonMapper associated with the key if found; otherwise, returns an empty JsonMapper.
+func (o *JsonObject) Find(key string) JsonMapper {
 	for k, v := range o.object {
 		field := getMapperFromField(v)
 		if k == key {
@@ -203,7 +203,7 @@ func (o *JsonObject) Find(key string) Json {
 			return field.Object.Find(key)
 		}
 	}
-	return Json{}
+	return JsonMapper{}
 }
 
 // AddKeyValue adds a key-value pair to the JsonObject.
@@ -229,14 +229,14 @@ func (o *JsonObject) AddKeyValue(k string, value any) {
 }
 
 // ForEach applies the provided function to each key-value pair in the JsonObject.
-func (o *JsonObject) ForEach(f func(key string, j Json)) {
+func (o *JsonObject) ForEach(f func(key string, j JsonMapper)) {
 	for k, element := range o.object {
 		f(k, getMapperFromField(element))
 	}
 }
 
 // Filter returns a new JsonObject containing only the key-value pairs for which the provided function returns true.
-func (o *JsonObject) Filter(f func(key string, j Json) bool) JsonObject {
+func (o *JsonObject) Filter(f func(key string, j JsonMapper) bool) JsonObject {
 	var obj = NewObject()
 	for k, element := range o.object {
 		if f(k, getMapperFromField(element)) {
@@ -269,14 +269,14 @@ func (o *JsonObject) String() string {
 	return string(jsonBytes)
 }
 
-func getAsJsonObject(data *any, j JsonError) JsonObject {
+func getAsJsonObject(data *any, j jsonEntity) JsonObject {
 	if data == nil {
-		j.SetLastError(fmt.Errorf(nullConversionErrStr, "string"))
+		j.SetLastError(NewNullConversionErr("string"))
 		return JsonObject{}
 	}
 	v, ok := (*data).(map[string]any)
 	if !ok {
-		j.SetLastError(fmt.Errorf(typeConversionErrStr, data, "JsonObject"))
+		j.SetLastError(NewTypeConversionErr(data, "JsonObject"))
 		return JsonObject{}
 	}
 

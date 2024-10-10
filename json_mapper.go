@@ -12,9 +12,9 @@ import (
 
 var jsonIter = jsoniter.ConfigCompatibleWithStandardLibrary
 
-// Json represents a generic JSON type. It contains fields for all supported JSON
+// JsonMapper represents a generic JSON type. It contains fields for all supported JSON
 // types like bool, int, float, string, object, and array, as well as Go supported types.
-type Json struct {
+type JsonMapper struct {
 	IsBool   bool
 	IsInt    bool
 	IsFloat  bool
@@ -32,44 +32,44 @@ type Json struct {
 }
 
 // FromBytes parses JSON data from a byte slice.
-func FromBytes(data []byte) (Json, error) {
+func FromBytes(data []byte) (JsonMapper, error) {
 	if isObjectOrArray(data, '[') {
 		return newJsonArray(data)
 	} else if isObjectOrArray(data, '{') {
 		return newJsonObject(data)
 	} else {
-		return Json{}, errors.New("could not parse JSON")
+		return JsonMapper{}, errors.New("could not parse JSON")
 	}
 }
 
-// FromStruct serializes a Go struct into JSON and parses it into a Json object.
-func FromStruct[T any](s T) (Json, error) {
+// FromStruct serializes a Go struct into JSON and parses it into a JsonMapper object.
+func FromStruct[T any](s T) (JsonMapper, error) {
 	jsonBytes, err := marshal(s)
 	if err != nil {
-		return Json{}, err
+		return JsonMapper{}, err
 	}
 	return FromBytes(jsonBytes)
 }
 
-// FromFile reads a JSON file from the given path and parses it into a Json object.
-func FromFile(path string) (Json, error) {
+// FromFile reads a JSON file from the given path and parses it into a JsonMapper object.
+func FromFile(path string) (JsonMapper, error) {
 	file, err := os.ReadFile(path)
 	if err != nil {
-		return Json{}, err
+		return JsonMapper{}, err
 	}
 	return FromBytes(file)
 }
 
-// FromString parses JSON from a string into a Json object.
-func FromString(data string) (Json, error) {
+// FromString parses JSON from a string into a JsonMapper object.
+func FromString(data string) (JsonMapper, error) {
 	return FromBytes([]byte(data))
 }
 
 // AsTime attempts to convert the JSON value to a time.Time object.
 // Only works if the JSON value is a string and can be parsed as a valid time.
-func (m *Json) AsTime() (time.Time, error) {
+func (m *JsonMapper) AsTime() (time.Time, error) {
 	if !m.IsString {
-		return time.Time{}, fmt.Errorf("cannot convert type %v to type time.Time\n", m.getType())
+		return time.Time{}, NewTimeTypeConversionErr(m.getType())
 	}
 	for _, layout := range timeLayouts {
 		parsedTime, err := time.Parse(layout, m.AsString)
@@ -77,11 +77,11 @@ func (m *Json) AsTime() (time.Time, error) {
 			return parsedTime, nil
 		}
 	}
-	return time.Time{}, fmt.Errorf("the value '%v' could not be converted to type time.Time", m.AsString)
+	return time.Time{}, NewInvalidTimeErr(m.AsString)
 }
 
-// PrettyString returns a formatted, human-readable string representation of the Json value.
-func (m *Json) PrettyString() string {
+// PrettyString returns a formatted, human-readable string representation of the JsonMapper value.
+func (m *JsonMapper) PrettyString() string {
 	if m.IsBool {
 		return fmt.Sprintf("%v", m.AsBool)
 	} else if m.IsInt {
@@ -98,8 +98,8 @@ func (m *Json) PrettyString() string {
 	return ""
 }
 
-// String returns a string representation Json type in JSON format.
-func (m *Json) String() string {
+// String returns a string representation JsonMapper type in JSON format.
+func (m *JsonMapper) String() string {
 	switch {
 	case m.IsBool:
 		return fmt.Sprintf("%v", m.AsBool)
@@ -117,7 +117,7 @@ func (m *Json) String() string {
 	return ""
 }
 
-func (m *Json) getType() JsonType {
+func (m *JsonMapper) getType() JsonType {
 	switch {
 	case m.IsBool:
 		return Bool
@@ -137,10 +137,10 @@ func (m *Json) getType() JsonType {
 	return Invalid
 }
 
-func getMapperFromField(data *any) Json {
-	var mapper Json
+func getMapperFromField(data *any) JsonMapper {
+	var mapper JsonMapper
 	if data == nil {
-		return Json{IsNull: true}
+		return JsonMapper{IsNull: true}
 	}
 	value := *data
 	switch value.(type) {
@@ -228,23 +228,23 @@ func convertToMapValuesPtr(data map[string]any) map[string]*any {
 	return jsonObject
 }
 
-func newJsonArray(data []byte) (Json, error) {
-	var mapper Json
+func newJsonArray(data []byte) (JsonMapper, error) {
+	var mapper JsonMapper
 	mapper.IsArray = true
 	array, err := parseJsonArray(data)
 	if err != nil {
-		return Json{}, err
+		return JsonMapper{}, err
 	}
 	mapper.Array = array
 	return mapper, nil
 }
 
-func newJsonObject(data []byte) (Json, error) {
-	var mapper Json
+func newJsonObject(data []byte) (JsonMapper, error) {
+	var mapper JsonMapper
 	mapper.IsObject = true
 	object, err := parseJsonObject(data)
 	if err != nil {
-		return Json{}, err
+		return JsonMapper{}, err
 	}
 	mapper.Object = object
 	return mapper, nil
@@ -267,7 +267,7 @@ func isObjectOrArray(data []byte, brackOrParen byte) bool {
 
 func parseTime(t *any) (time.Time, error) {
 	if t == nil {
-		return time.Time{}, fmt.Errorf(nullConversionErrStr, "string")
+		return time.Time{}, NewNullConversionErr("string")
 	}
 	timeAsString, ok := (*t).(string)
 	if !ok {

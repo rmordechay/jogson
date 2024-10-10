@@ -1,13 +1,12 @@
 package jsonmapper
 
 import (
-	"fmt"
 	"strconv"
 )
 
-func getAsString(data *any, j JsonError) string {
+func getAsString(data *any, j jsonEntity) string {
 	if data == nil {
-		j.SetLastError(fmt.Errorf(nullConversionErrStr, "string"))
+		j.SetLastError(NewNullConversionErr("string"))
 		return ""
 	}
 	switch (*data).(type) {
@@ -20,14 +19,14 @@ func getAsString(data *any, j JsonError) string {
 	case bool:
 		return strconv.FormatBool((*data).(bool))
 	default:
-		j.SetLastError(fmt.Errorf(typeConversionErrStr, *data, "string"))
+		j.SetLastError(NewTypeConversionErr(*data, "string"))
 		return ""
 	}
 }
 
-func getAsInt(data *any, j JsonError) int {
+func getAsInt(data *any, j jsonEntity) int {
 	if data == nil {
-		j.SetLastError(fmt.Errorf(nullConversionErrStr, "int"))
+		j.SetLastError(NewNullConversionErr("int"))
 		return 0
 	}
 	switch (*data).(type) {
@@ -36,32 +35,32 @@ func getAsInt(data *any, j JsonError) int {
 	case int:
 		return (*data).(int)
 	default:
-		j.SetLastError(fmt.Errorf(typeConversionErrStr, *data, "int"))
+		j.SetLastError(NewTypeConversionErr(*data, "int"))
 		return 0
 	}
 }
 
-func getAsFloat(data *any, j JsonError) float64 {
+func getAsFloat(data *any, j jsonEntity) float64 {
 	if data == nil {
-		j.SetLastError(fmt.Errorf(nullConversionErrStr, "float64"))
+		j.SetLastError(NewNullConversionErr("float64"))
 		return 0
 	}
 	v, ok := (*data).(float64)
 	if !ok {
-		j.SetLastError(fmt.Errorf(typeConversionErrStr, *data, "float64"))
+		j.SetLastError(NewTypeConversionErr(*data, "float64"))
 		return 0
 	}
 	return v
 }
 
-func getAsBool(data *any, j JsonError) bool {
+func getAsBool(data *any, j jsonEntity) bool {
 	if data == nil {
-		j.SetLastError(fmt.Errorf(nullConversionErrStr, "bool"))
+		j.SetLastError(NewNullConversionErr("bool"))
 		return false
 	}
 	v, ok := (*data).(bool)
 	if !ok {
-		j.SetLastError(fmt.Errorf(typeConversionErrStr, *data, "bool"))
+		j.SetLastError(NewTypeConversionErr(*data, "bool"))
 		return false
 	}
 	return v
