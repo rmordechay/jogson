@@ -62,13 +62,13 @@ jsonString := `{
 ### Check Types
 
 ```go
-fmt.Println(mapper.IsObject) // true
-fmt.Println(mapper.IsBool) // false
-fmt.Println(mapper.IsInt) // false
-fmt.Println(mapper.IsFloat) // false
-fmt.Println(mapper.IsString) // false
-fmt.Println(mapper.IsArray) // false
-fmt.Println(mapper.IsNull) // false
+fmt.Println(mapper.IsObject)    // true
+fmt.Println(mapper.IsBool)      // false
+fmt.Println(mapper.IsInt)       // false
+fmt.Println(mapper.IsFloat)     // false
+fmt.Println(mapper.IsString)    // false
+fmt.Println(mapper.IsArray)     // false
+fmt.Println(mapper.IsNull)      // false
 ```
 
 ### Objects
@@ -91,9 +91,9 @@ values := object.Values()
 // Iterating over an object with key, value pair
 children := object.GetObject("children")
 for key, child := range children.Elements() {
-fmt.Println("Child name:", key) // Rachel, Sara
-fmt.Println(child.Object.GetInt("age")) // 15, 19
-fmt.Println(child.Object.GetBool("is_funny")) // false, true
+    fmt.Println("Child name:", key)                 // Rachel, Sara
+    fmt.Println(child.Object.GetInt("age"))         // 15, 19
+    fmt.Println(child.Object.GetBool("is_funny"))   // false, true
 }
 ```
 
@@ -111,7 +111,7 @@ secondElement := array.Get(1)
 
 // Iterating over an array
 for _, feature := range array.Elements() {
-fmt.Println(feature.AsString) // tall, ...
+    fmt.Println(feature.AsString) // tall, ...
 }
 
 // Get as a slice of string
