@@ -61,7 +61,7 @@ func isObjectOrArray(data []byte, brackOrParen byte) bool {
 	return false
 }
 
-func parseTime(t *any, j jsonEntity) time.Time {
+func parseTime(t *any, j jsonI) time.Time {
 	if t == nil {
 		j.setLastError(createNullConversionErr(stringTypeStr))
 		return time.Time{}
@@ -117,7 +117,7 @@ func toSnakeCase(str string) string {
 	return string(result)
 }
 
-type jc[T any] func(data *any, j jsonEntity) T
+type jc[T any] func(data *any, j jsonI) T
 
 func getGenericMap[T any](f jc[T], o JsonObject) map[string]T {
 	genericMap := make(map[string]T)
@@ -163,7 +163,7 @@ func getArrayScalar[T any](a *JsonArray, f jc[T], i int, typeString string) T {
 	return f(data, a)
 }
 
-func convertAnyToString(data *any, j jsonEntity) string {
+func convertAnyToString(data *any, j jsonI) string {
 	if data == nil {
 		j.setLastError(createNullConversionErr(stringTypeStr))
 		return ""
@@ -183,7 +183,7 @@ func convertAnyToString(data *any, j jsonEntity) string {
 	}
 }
 
-func convertAnyToInt(data *any, j jsonEntity) int {
+func convertAnyToInt(data *any, j jsonI) int {
 	if data == nil {
 		j.setLastError(createNullConversionErr(intTypeStr))
 		return 0
@@ -199,7 +199,7 @@ func convertAnyToInt(data *any, j jsonEntity) int {
 	}
 }
 
-func convertAnyToFloat(data *any, j jsonEntity) float64 {
+func convertAnyToFloat(data *any, j jsonI) float64 {
 	if data == nil {
 		j.setLastError(createNullConversionErr(floatTypeStr))
 		return 0
@@ -212,7 +212,7 @@ func convertAnyToFloat(data *any, j jsonEntity) float64 {
 	return v
 }
 
-func convertAnyToBool(data *any, j jsonEntity) bool {
+func convertAnyToBool(data *any, j jsonI) bool {
 	if data == nil {
 		j.setLastError(createNullConversionErr(boolTypeStr))
 		return false
@@ -225,7 +225,7 @@ func convertAnyToBool(data *any, j jsonEntity) bool {
 	return v
 }
 
-func convertAnyToObject(data *any, j jsonEntity) JsonObject {
+func convertAnyToObject(data *any, j jsonI) JsonObject {
 	if data == nil {
 		j.setLastError(createNullConversionErr(objectTypeStr))
 		return *EmptyObject()
@@ -245,7 +245,7 @@ func convertAnyToObject(data *any, j jsonEntity) JsonObject {
 	return *obj
 }
 
-func convertAnyToArray(data *any, j jsonEntity) JsonArray {
+func convertAnyToArray(data *any, j jsonI) JsonArray {
 	if data == nil {
 		j.setLastError(createNullConversionErr(arrayTypeStr))
 		return *EmptyArray()

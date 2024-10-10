@@ -41,6 +41,12 @@ func (o *JsonObject) IsEmpty() bool {
 	return len(o.object) == 0
 }
 
+// IsNull checks if the value associated with the key is null
+func (o *JsonObject) IsNull(key string) bool {
+	v := o.object[key]
+	return v == nil
+}
+
 // Keys returns a slice of all keys in the JsonObject.
 func (o *JsonObject) Keys() []string {
 	keys := make([]string, 0, len(o.object))
@@ -193,18 +199,18 @@ func (o *JsonObject) Find(key string) JsonMapper {
 
 // AddKeyValue adds a key-value pair to the JsonObject.
 func (o *JsonObject) AddKeyValue(k string, value any) {
-	switch value.(type) {
+	switch value := value.(type) {
 	case JsonObject:
-		var object any = value.(JsonObject).object
+		var object any = value.object
 		o.object[k] = &object
 	case *JsonObject:
-		var object any = value.(JsonObject).object
+		var object any = value.object
 		o.object[k] = &object
 	case JsonArray:
-		var elements any = value.(JsonArray).elements
+		var elements any = value.elements
 		o.object[k] = &elements
 	case *JsonArray:
-		var elements any = value.(*JsonArray).elements
+		var elements any = value.elements
 		o.object[k] = &elements
 	case nil, string, int, float64, bool, []string, []int, []float64, []bool:
 		o.object[k] = &value

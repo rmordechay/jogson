@@ -4,10 +4,11 @@ import (
 	"time"
 )
 
-type jsonEntity interface {
-	setLastError(err error)
+type jsonI interface {
 	String() string
 	Length() int
+	IsEmpty() bool
+	setLastError(err error)
 }
 
 type JsonType int

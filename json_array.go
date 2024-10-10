@@ -36,6 +36,12 @@ func (a *JsonArray) IsEmpty() bool {
 	return len(a.elements) == 0
 }
 
+// IsNull checks if element at index i is null
+func (a *JsonArray) IsNull(i int) bool {
+	v := a.elements[i]
+	return v == nil
+}
+
 // Elements returns all elements in the JsonArray as a slice of JsonMapper objects.
 func (a *JsonArray) Elements() []JsonMapper {
 	jsons := make([]JsonMapper, 0, len(a.elements))
@@ -153,24 +159,24 @@ func (a *JsonArray) GetArray(i int) *JsonArray {
 }
 
 // AddElement appends a new element to the JsonArray.
-func (a *JsonArray) AddElement(value any) {
-	switch value.(type) {
+func (a *JsonArray) AddElement(element any) {
+	switch value := element.(type) {
 	case JsonObject:
-		var object any = value.(JsonObject).object
+		var object any = value.object
 		a.elements = append(a.elements, &object)
 	case *JsonObject:
-		var object any = value.(JsonObject).object
+		var object any = value.object
 		a.elements = append(a.elements, &object)
 	case JsonArray:
-		var valueElements any = value.(JsonArray).elements
+		var valueElements any = value.elements
 		a.elements = append(a.elements, &valueElements)
 	case *JsonArray:
-		var valueElements any = value.(*JsonArray).elements
+		var valueElements any = value.elements
 		a.elements = append(a.elements, &valueElements)
 	case nil, string, int, float64, bool, []string, []int, []float64, []bool:
 		a.elements = append(a.elements, &value)
 	default:
-		a.setLastError(fmt.Errorf("could not add value of type %T", value))
+		a.setLastError(fmt.Errorf("could not add element of type %T", value))
 	}
 }
 

@@ -192,50 +192,50 @@ func (m *JsonMapper) String() string {
 }
 
 func getMapperFromField(data *any) JsonMapper {
-	var mapper JsonMapper
 	if data == nil {
 		return JsonMapper{IsNull: true}
 	}
-	value := *data
-	switch value.(type) {
+
+	var mapper JsonMapper
+	switch value := (*data).(type) {
 	case bool:
 		mapper.IsBool = true
-		mapper.AsBool = value.(bool)
+		mapper.AsBool = value
 	case int:
 		mapper.IsInt = true
-		mapper.AsInt = value.(int)
+		mapper.AsInt = value
 	case float64:
-		if value == float64(int(value.(float64))) {
+		if value == float64(int(value)) {
 			mapper.IsInt = true
-			mapper.AsInt = int(value.(float64))
+			mapper.AsInt = int(value)
 		} else {
 			mapper.IsFloat = true
 		}
-		mapper.AsFloat = value.(float64)
+		mapper.AsFloat = value
 	case string:
 		mapper.IsString = true
-		mapper.AsString = value.(string)
+		mapper.AsString = value
 	case map[string]any:
 		mapper.IsObject = true
-		mapper.AsObject = convertAnyToObject(&value, nil)
+		mapper.AsObject = convertAnyToObject(data, nil)
 	case []float64:
 		mapper.IsArray = true
-		mapper.AsArray = convertSliceToJsonArray(value.([]float64))
+		mapper.AsArray = convertSliceToJsonArray(value)
 	case []int:
 		mapper.IsArray = true
-		mapper.AsArray = convertSliceToJsonArray(value.([]int))
+		mapper.AsArray = convertSliceToJsonArray(value)
 	case []string:
 		mapper.IsArray = true
-		mapper.AsArray = convertSliceToJsonArray(value.([]string))
+		mapper.AsArray = convertSliceToJsonArray(value)
 	case []bool:
 		mapper.IsArray = true
-		mapper.AsArray = convertSliceToJsonArray(value.([]bool))
+		mapper.AsArray = convertSliceToJsonArray(value)
 	case []*any:
 		mapper.IsArray = true
-		mapper.AsArray = *NewArray(value.([]*any))
+		mapper.AsArray = *NewArray(value)
 	case []any:
 		mapper.IsArray = true
-		mapper.AsArray = *NewArray(convertToSlicePtr(value.([]any)))
+		mapper.AsArray = *NewArray(convertToSlicePtr(value))
 	case nil:
 		mapper.IsNull = true
 	default:

@@ -79,6 +79,12 @@ object := mapper.AsObject
 // Check if a key exists
 var keyExists bool = object.Has("children")
 
+// Check if the object is empty
+var objectEmpty bool = object.IsEmpty()
+
+// Check if a key contains a null value
+var valueNull bool = object.IsNull("children")
+
 // Get the object's size
 var keyExists bool = object.Length()
 
