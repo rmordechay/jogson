@@ -1,7 +1,6 @@
 package tests
 
 import (
-	"fmt"
 	"github.com/rmordechay/jsonmapper"
 	"github.com/stretchr/testify/assert"
 	"math"
@@ -71,9 +70,6 @@ func TestArrayAs2DArray(t *testing.T) {
 	mapper, _ := jsonmapper.FromString(json2DIntArrayTest)
 	array := mapper.AsArray
 	jsonArray := array.As2DArray()
-	fmt.Println(jsonArray)
-	fmt.Println(jsonArray[0].String())
-	fmt.Println(jsonArray[1].String())
 	assert.ElementsMatch(t, []int{1, 2}, jsonArray[0].AsIntArray())
 	assert.ElementsMatch(t, []int{3, 4}, array.As2DArray()[1].AsIntArray())
 }

@@ -29,8 +29,8 @@ func (d JsonType) String() string {
 		"int",
 		"float64",
 		"string",
-		"AsObject",
-		"AsArray",
+		"object",
+		"array",
 		"null",
 		"invalid",
 	}[d]
