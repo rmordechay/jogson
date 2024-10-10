@@ -187,6 +187,16 @@ func (a *JsonArray) ForEach(f func(j JsonMapper)) {
 	}
 }
 
+// Map returns a slice of the mapped the values of the array
+func Map[T any](jsonArray *JsonArray, f func(j JsonMapper) T) []T {
+	arr := make([]T, 0, len(jsonArray.elements))
+	for _, element := range jsonArray.elements {
+		mapper := f(getMapperFromField(element))
+		arr = append(arr, mapper)
+	}
+	return arr
+}
+
 // Filter returns a new JsonArray containing only the elements that satisfy the given filter function.
 func (a *JsonArray) Filter(f func(j JsonMapper) bool) JsonArray {
 	var arr = EmptyArray()

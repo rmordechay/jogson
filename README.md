@@ -7,10 +7,10 @@ A simple Go library to simplify working with JSON without the need to define str
 * [Installation](#Installation)
 * [Create a Mapper](#Create-a-mapper)
 * [Read from JSON](#Read-from-JSON)
-    * [Check Types](#Check-Types)
     * [Objects](#Objects)
     * [Arrays](#Arrays)
     * [Scalars](#Scalars)
+    * [Types](#types)
     * [Find Elements](#Find-Elements)
     * [Get as JSON String](#get-as-json-string)
 * [Write to JSON](#Write-to-JSON)
@@ -57,18 +57,6 @@ jsonString := `{
         "Sara":   {"age": 19, "is_funny": true}
     }
 }`
-```
-
-### Check Types
-
-```go
-fmt.Println(mapper.IsObject)    // true
-fmt.Println(mapper.IsBool)      // false
-fmt.Println(mapper.IsInt)       // false
-fmt.Println(mapper.IsFloat)     // false
-fmt.Println(mapper.IsString)    // false
-fmt.Println(mapper.IsArray)     // false
-fmt.Println(mapper.IsNull)      // false
 ```
 
 ### Objects
@@ -199,6 +187,18 @@ The following formats are supported:
 * `time.DateTime`
 * `time.DateOnly`
 * `time.TimeOnly`
+
+### Types
+
+```go
+fmt.Println(mapper.IsObject)    // true
+fmt.Println(mapper.IsBool)      // false
+fmt.Println(mapper.IsInt)       // false
+fmt.Println(mapper.IsFloat)     // false
+fmt.Println(mapper.IsString)    // false
+fmt.Println(mapper.IsArray)     // false
+fmt.Println(mapper.IsNull)      // false
+```
 
 ### Find Elements
 
