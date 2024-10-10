@@ -30,25 +30,13 @@ type Json struct {
 }
 
 func FromBytes(data []byte) (Json, error) {
-	var mapper Json
 	if isObjectOrArray(data, '[') {
-		mapper.IsArray = true
-		array, err := parseJsonArray(data)
-		if err != nil {
-			return Json{}, err
-		}
-		mapper.Array = array
+		return newJsonArray(data)
 	} else if isObjectOrArray(data, '{') {
-		mapper.IsObject = true
-		object, err := parseJsonObject(data)
-		if err != nil {
-			return Json{}, err
-		}
-		mapper.Object = object
+		return newJsonObject(data)
 	} else {
 		return Json{}, errors.New("could not parse JSON")
 	}
-	return mapper, nil
 }
 
 func FromStruct[T any](s T) (Json, error) {
@@ -226,6 +214,28 @@ func convertToMapValuesPtr(data map[string]interface{}) map[string]*interface{} 
 		jsonObject[k] = &v
 	}
 	return jsonObject
+}
+
+func newJsonArray(data []byte) (Json, error) {
+	var mapper Json
+	mapper.IsArray = true
+	array, err := parseJsonArray(data)
+	if err != nil {
+		return Json{}, err
+	}
+	mapper.Array = array
+	return mapper, nil
+}
+
+func newJsonObject(data []byte) (Json, error) {
+	var mapper Json
+	mapper.IsObject = true
+	object, err := parseJsonObject(data)
+	if err != nil {
+		return Json{}, err
+	}
+	mapper.Object = object
+	return mapper, nil
 }
 
 func isObjectOrArray(data []byte, brackOrParen byte) bool {

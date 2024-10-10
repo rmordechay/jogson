@@ -129,9 +129,11 @@ func (o *JsonObject) GetObject(key string) *JsonObject {
 		}
 		switch (*v).(type) {
 		case map[string]*interface{}:
-			return &JsonObject{object: (*v).(map[string]*interface{})}
+			object := (*v).(map[string]*interface{})
+			return &JsonObject{object: object}
 		case map[string]interface{}:
-			return &JsonObject{object: convertToMapValuesPtr((*v).(map[string]interface{}))}
+			dataPtr := convertToMapValuesPtr((*v).(map[string]interface{}))
+			return &JsonObject{object: dataPtr}
 		default:
 			o.LastError = fmt.Errorf(typeConversionErrStr, *v, JsonObject{})
 			return &JsonObject{}

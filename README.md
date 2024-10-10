@@ -5,17 +5,17 @@
 A simple Go library to simplify working with JSON without the need to define structs.
 
 * [Installation](#Installation)
-* [Creating a mapper](#creating-a-mapper)
-* [Reading from JSON](#Reading-from-JSON)
-  * [Creating a mapper](#creating-a-mapper)
+* [Create a Mapper](#Create-a-mapper)
+* [Read from JSON](#Read-from-JSON)
   * [Check Types](#Check-Types)
   * [Objects](#Objects)
   * [Get Values](#Primitive-Types)
   * [Arrays](#Arrays)
   * [Find Elements](#Find-Elements)
   * [Print JSON](#Get-JSON-as-string)
-* [Writing to JSON](#Writing-to-JSON)
-  * [Write elements](#Write-elements)
+* [Write to JSON](#Write-to-JSON)
+  * [Write Object](#Write-object)
+  * [Write Array](#Write-array)
 
 
 ## Installation
@@ -25,7 +25,7 @@ To install the library, use:
 go get github.com/rmordechay/jsonmapper
 ```
 
-### Creating a Mapper
+### Create a Mapper
 There are multiple ways to create a mapper.
 ```go
 // From bytes
@@ -38,7 +38,7 @@ mapper, err := jsonmapper.FromStruct(jsonStruct)
 mapper, err := jsonmapper.FromFile(jsonFilePath)
 ```
 
-## Reading from JSON
+## Read from JSON
 Once you have the `mapper`, you can read the data easily. Consider the following JSON
 ```go
 jsonString := `{
@@ -173,7 +173,7 @@ fmt.Println(mapper.Object.Get("children").PrettyString())
 // }
 ```
 
-## Writing to JSON
+## Write to JSON
 To write a JSON object or array is as simple as reading from it.
 ### Write Object
 ```go
