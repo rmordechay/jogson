@@ -1,6 +1,7 @@
 package tests
 
 import (
+	"fmt"
 	"github.com/rmordechay/jsonmapper"
 	"github.com/stretchr/testify/assert"
 	"math"
@@ -10,18 +11,18 @@ import (
 func TestArrayFilter(t *testing.T) {
 	mapper, err := jsonmapper.FromString(jsonObjectArrayTest)
 	assert.NoError(t, err)
-	filteredArr := mapper.Array.Filter(func(element jsonmapper.JsonMapper) bool {
-		return element.Object.GetString("name") == "Chris"
+	filteredArr := mapper.AsArray.Filter(func(element jsonmapper.JsonMapper) bool {
+		return element.AsObject.GetString("name") == "Chris"
 	})
 	assert.Equal(t, 1, filteredArr.Length())
-	assert.Equal(t, "Chris", filteredArr.Elements()[0].Object.GetString("name"))
+	assert.Equal(t, "Chris", filteredArr.Elements()[0].AsObject.GetString("name"))
 }
 
 func TestArrayFilterNull(t *testing.T) {
 	mapper, err := jsonmapper.FromString(jsonAnyArrayTest)
 	assert.NoError(t, err)
-	filteredArr := mapper.Array.FilterNull()
-	assert.Equal(t, 5, mapper.Array.Length())
+	filteredArr := mapper.AsArray.FilterNull()
+	assert.Equal(t, 5, mapper.AsArray.Length())
 	assert.Equal(t, 4, filteredArr.Length())
 	filteredArr.ForEach(func(j jsonmapper.JsonMapper) {
 		assert.True(t, !j.IsNull)
@@ -32,7 +33,7 @@ func TestArrayForEach(t *testing.T) {
 	mapper, err := jsonmapper.FromString(jsonObjectArrayTest)
 	assert.NoError(t, err)
 	wasVisited := false
-	mapper.Array.ForEach(func(mapper jsonmapper.JsonMapper) {
+	mapper.AsArray.ForEach(func(mapper jsonmapper.JsonMapper) {
 		wasVisited = true
 		assert.NotNil(t, mapper)
 	})
@@ -50,39 +51,43 @@ func TestIndexOutOfBoundError(t *testing.T) {
 
 func TestArrayAsStringArray(t *testing.T) {
 	mapper, _ := jsonmapper.FromString(jsonStringArrayTest)
-	array := mapper.Array
+	array := mapper.AsArray
 	assert.ElementsMatch(t, []string{"Jason", "Chris", "Rachel"}, array.AsStringArray())
 }
 
 func TestArrayAsIntArray(t *testing.T) {
 	mapper, _ := jsonmapper.FromString(jsonIntArrayTest)
-	array := mapper.Array
+	array := mapper.AsArray
 	assert.ElementsMatch(t, []int{0, 15, -54, -346, 9223372036854775807}, array.AsIntArray())
 }
 
 func TestArrayAsFloatArray(t *testing.T) {
 	mapper, _ := jsonmapper.FromString(jsonFloatArrayTest)
-	array := mapper.Array
+	array := mapper.AsArray
 	assert.ElementsMatch(t, []float64{15.13, 2, 45.3984, -1.81, 9.223372036854776}, array.AsFloatArray())
 }
 
 func TestArrayAs2DArray(t *testing.T) {
 	mapper, _ := jsonmapper.FromString(json2DIntArrayTest)
-	array := mapper.Array
-	assert.ElementsMatch(t, []int{1, 2}, array.As2DArray()[0].AsIntArray())
+	array := mapper.AsArray
+	jsonArray := array.As2DArray()
+	fmt.Println(jsonArray)
+	fmt.Println(jsonArray[0].String())
+	fmt.Println(jsonArray[1].String())
+	assert.ElementsMatch(t, []int{1, 2}, jsonArray[0].AsIntArray())
 	assert.ElementsMatch(t, []int{3, 4}, array.As2DArray()[1].AsIntArray())
 }
 
 func TestArrayAsObjectArray(t *testing.T) {
 	mapper, _ := jsonmapper.FromString(jsonObjectArrayTest)
-	array := mapper.Array
+	array := mapper.AsArray
 	assert.Equal(t, "Jason", array.AsObjectArray()[0].GetString("name"))
 	assert.Equal(t, "Chris", array.AsObjectArray()[1].GetString("name"))
 }
 
 func TestArrayGetString(t *testing.T) {
 	mapper, _ := jsonmapper.FromString(jsonAnyArrayTest)
-	array := mapper.Array
+	array := mapper.AsArray
 
 	s := array.GetString(0)
 	assert.NoError(t, array.LastError)
@@ -111,7 +116,7 @@ func TestArrayGetString(t *testing.T) {
 
 func TestArrayGetStringFails(t *testing.T) {
 	mapper, _ := jsonmapper.FromString(jsonAnyArrayTest)
-	array := mapper.Array
+	array := mapper.AsArray
 
 	s := array.GetString(10)
 	assert.ErrorIs(t, array.LastError, jsonmapper.IndexOutOfRangeErr)
@@ -124,7 +129,7 @@ func TestArrayGetStringFails(t *testing.T) {
 
 func TestArrayGetInt(t *testing.T) {
 	mapper, _ := jsonmapper.FromString(jsonIntArrayTest)
-	array := mapper.Array
+	array := mapper.AsArray
 
 	i := array.GetInt(0)
 	assert.NoError(t, array.LastError)
@@ -145,7 +150,7 @@ func TestArrayGetInt(t *testing.T) {
 
 func TestArrayGetIntFails(t *testing.T) {
 	mapper, _ := jsonmapper.FromString(jsonAnyArrayTest)
-	array := mapper.Array
+	array := mapper.AsArray
 
 	i := array.GetInt(10)
 	assert.ErrorIs(t, array.LastError, jsonmapper.IndexOutOfRangeErr)
@@ -162,7 +167,7 @@ func TestArrayGetIntFails(t *testing.T) {
 
 func TestArrayGetFloat(t *testing.T) {
 	mapper, _ := jsonmapper.FromString(jsonFloatArrayTest)
-	array := mapper.Array
+	array := mapper.AsArray
 
 	f := array.GetFloat(0)
 	assert.NoError(t, array.LastError)
@@ -187,7 +192,7 @@ func TestArrayGetFloat(t *testing.T) {
 
 func TestArrayGetFloatFails(t *testing.T) {
 	mapper, _ := jsonmapper.FromString(jsonAnyArrayTest)
-	array := mapper.Array
+	array := mapper.AsArray
 
 	f := array.GetFloat(10)
 	assert.ErrorIs(t, array.LastError, jsonmapper.IndexOutOfRangeErr)
@@ -204,7 +209,7 @@ func TestArrayGetFloatFails(t *testing.T) {
 
 func TestArrayGetArray(t *testing.T) {
 	mapper, _ := jsonmapper.FromString(json2DArrayTest)
-	array := mapper.Array
+	array := mapper.AsArray
 
 	nestedArray := array.GetArray(0)
 	assert.ElementsMatch(t, []int{1, 2}, nestedArray.AsIntArray())
@@ -212,7 +217,7 @@ func TestArrayGetArray(t *testing.T) {
 
 func TestArrayGetArrayFails(t *testing.T) {
 	mapper, _ := jsonmapper.FromString(json2DArrayTest)
-	array := mapper.Array
+	array := mapper.AsArray
 
 	innerArr := array.GetArray(5)
 	assert.ErrorIs(t, array.LastError, jsonmapper.IndexOutOfRangeErr)
@@ -229,7 +234,7 @@ func TestArrayGetArrayFails(t *testing.T) {
 
 func TestArrayGetObject(t *testing.T) {
 	mapper, _ := jsonmapper.FromString(jsonObjectArrayTest)
-	array := mapper.Array
+	array := mapper.AsArray
 
 	obj := array.GetObject(1)
 	assert.Equal(t, "Chris", obj.GetString("name"))
@@ -237,7 +242,7 @@ func TestArrayGetObject(t *testing.T) {
 
 func TestArrayGetObjectFails(t *testing.T) {
 	mapper, _ := jsonmapper.FromString(jsonArrayWithNullTest)
-	array := mapper.Array
+	array := mapper.AsArray
 
 	obj := array.GetObject(10)
 	assert.ErrorIs(t, array.LastError, jsonmapper.IndexOutOfRangeErr)

@@ -27,8 +27,8 @@ type JsonMapper struct {
 	AsInt    int
 	AsFloat  float64
 	AsString string
-	Object   JsonObject
-	Array    JsonArray
+	AsObject JsonObject
+	AsArray  JsonArray
 }
 
 // FromBytes parses JSON data from a byte slice.
@@ -91,9 +91,9 @@ func (m *JsonMapper) PrettyString() string {
 	} else if m.IsString {
 		return fmt.Sprintf("%v", m.AsString)
 	} else if m.IsObject {
-		return m.Object.PrettyString()
+		return m.AsObject.PrettyString()
 	} else if m.IsArray {
-		return fmt.Sprintf("%v", m.Array)
+		return fmt.Sprintf("%v", m.AsArray)
 	}
 	return ""
 }
@@ -110,9 +110,9 @@ func (m *JsonMapper) String() string {
 	case m.IsString:
 		return fmt.Sprintf("%v", m.AsString)
 	case m.IsObject:
-		return fmt.Sprintf("%v", m.Object)
+		return fmt.Sprintf("%v", m.AsObject)
 	case m.IsArray:
-		return fmt.Sprintf("%v", m.Array)
+		return fmt.Sprintf("%v", m.AsArray)
 	}
 	return ""
 }
@@ -163,25 +163,25 @@ func getMapperFromField(data *any) JsonMapper {
 		mapper.AsString = value.(string)
 	case map[string]any:
 		mapper.IsObject = true
-		mapper.Object = getAsJsonObject(&value, nil)
+		mapper.AsObject = convertAnyToObject(&value, nil)
 	case []float64:
 		mapper.IsArray = true
-		mapper.Array = getAsJsonArray(value.([]float64))
+		mapper.AsArray = convertSliceToJsonArray(value.([]float64))
 	case []int:
 		mapper.IsArray = true
-		mapper.Array = getAsJsonArray(value.([]int))
+		mapper.AsArray = convertSliceToJsonArray(value.([]int))
 	case []string:
 		mapper.IsArray = true
-		mapper.Array = getAsJsonArray(value.([]string))
+		mapper.AsArray = convertSliceToJsonArray(value.([]string))
 	case []bool:
 		mapper.IsArray = true
-		mapper.Array = getAsJsonArray(value.([]bool))
+		mapper.AsArray = convertSliceToJsonArray(value.([]bool))
 	case []*any:
 		mapper.IsArray = true
-		mapper.Array = JsonArray{elements: value.([]*any)}
+		mapper.AsArray = JsonArray{elements: value.([]*any)}
 	case []any:
 		mapper.IsArray = true
-		mapper.Array = JsonArray{elements: convertToSlicePtr(value.([]any))}
+		mapper.AsArray = JsonArray{elements: convertToSlicePtr(value.([]any))}
 	case nil:
 		mapper.IsNull = true
 	default:
@@ -235,7 +235,7 @@ func newJsonArray(data []byte) (JsonMapper, error) {
 	if err != nil {
 		return JsonMapper{}, err
 	}
-	mapper.Array = array
+	mapper.AsArray = array
 	return mapper, nil
 }
 
@@ -246,7 +246,7 @@ func newJsonObject(data []byte) (JsonMapper, error) {
 	if err != nil {
 		return JsonMapper{}, err
 	}
-	mapper.Object = object
+	mapper.AsObject = object
 	return mapper, nil
 }
 

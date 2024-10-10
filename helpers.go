@@ -4,7 +4,25 @@ import (
 	"strconv"
 )
 
-func getAsString(data *any, j jsonEntity) string {
+type F[T any] func(data *any, j jsonEntity) T
+
+func asGenericMap[T any](f F[T], o JsonObject) map[string]T {
+	genericMap := make(map[string]T)
+	for k, v := range o.object {
+		genericMap[k] = f(v, &o)
+	}
+	return genericMap
+}
+
+func asGenericArray[T any](f F[T], o JsonArray) []T {
+	arr := make([]T, 0, len(o.elements))
+	for _, element := range o.elements {
+		arr = append(arr, f(element, &o))
+	}
+	return arr
+}
+
+func convertAnyToString(data *any, j jsonEntity) string {
 	if data == nil {
 		j.SetLastError(NewNullConversionErr("string"))
 		return ""
@@ -24,7 +42,7 @@ func getAsString(data *any, j jsonEntity) string {
 	}
 }
 
-func getAsInt(data *any, j jsonEntity) int {
+func convertAnyToInt(data *any, j jsonEntity) int {
 	if data == nil {
 		j.SetLastError(NewNullConversionErr("int"))
 		return 0
@@ -40,7 +58,7 @@ func getAsInt(data *any, j jsonEntity) int {
 	}
 }
 
-func getAsFloat(data *any, j jsonEntity) float64 {
+func convertAnyToFloat(data *any, j jsonEntity) float64 {
 	if data == nil {
 		j.SetLastError(NewNullConversionErr("float64"))
 		return 0
@@ -53,7 +71,7 @@ func getAsFloat(data *any, j jsonEntity) float64 {
 	return v
 }
 
-func getAsBool(data *any, j jsonEntity) bool {
+func convertAnyToBool(data *any, j jsonEntity) bool {
 	if data == nil {
 		j.SetLastError(NewNullConversionErr("bool"))
 		return false
@@ -66,9 +84,9 @@ func getAsBool(data *any, j jsonEntity) bool {
 	return v
 }
 
-func getAsJsonObject(data *any, j jsonEntity) JsonObject {
+func convertAnyToObject(data *any, j jsonEntity) JsonObject {
 	if data == nil {
-		j.SetLastError(NewNullConversionErr("string"))
+		j.SetLastError(NewNullConversionErr("JsonObject"))
 		return JsonObject{}
 	}
 	v, ok := (*data).(map[string]any)
@@ -86,13 +104,34 @@ func getAsJsonObject(data *any, j jsonEntity) JsonObject {
 	return obj
 }
 
-func getAsJsonArray[T any](data []T) JsonArray {
-	var arr JsonArray
-	array := make([]*any, len(data))
-	for i, v := range data {
-		var valAny any = v
-		array[i] = &valAny
+func convertAnyToArray(data *any, j jsonEntity) JsonArray {
+	if data == nil {
+		j.SetLastError(NewNullConversionErr("JsonArray"))
+		return JsonArray{}
 	}
-	arr.elements = array
-	return arr
+	v, ok := (*data).([]any)
+	if !ok {
+		j.SetLastError(NewTypeConversionErr(data, "JsonArray"))
+		return JsonArray{}
+	}
+
+	var array JsonArray
+	var elements = make([]*any, 0, len(v))
+	for _, value := range v {
+		value := value
+		elements = append(elements, &value)
+	}
+	array.elements = elements
+	return array
+}
+
+func convertSliceToJsonArray[T any](data []T) JsonArray {
+	var jsonArray JsonArray
+	sliceAnyPtr := make([]*any, 0, len(data))
+	for _, v := range data {
+		var valAny any = v
+		sliceAnyPtr = append(sliceAnyPtr, &valAny)
+	}
+	jsonArray.elements = sliceAnyPtr
+	return jsonArray
 }

@@ -35,53 +35,29 @@ func (a *JsonArray) Elements() []JsonMapper {
 
 // AsStringArray converts the elements of the JsonArray into a slice of strings.
 func (a *JsonArray) AsStringArray() []string {
-	arr := make([]string, 0, len(a.elements))
-	for _, element := range a.elements {
-		asString := getAsString(element, a)
-		arr = append(arr, asString)
-	}
-	return arr
+	return asGenericArray(convertAnyToString, *a)
 }
 
 // AsIntArray converts the elements of the JsonArray into a slice of integers.
 func (a *JsonArray) AsIntArray() []int {
-	arr := make([]int, 0, len(a.elements))
-	for _, element := range a.elements {
-		asInt := getAsInt(element, a)
-		arr = append(arr, asInt)
-	}
-	return arr
+	return asGenericArray(convertAnyToInt, *a)
 }
 
 // AsFloatArray converts the elements of the JsonArray into a slice of floats.
 func (a *JsonArray) AsFloatArray() []float64 {
-	arr := make([]float64, 0, len(a.elements))
-	for _, element := range a.elements {
-		asFloat := getAsFloat(element, a)
-		arr = append(arr, asFloat)
-	}
-	return arr
+	return asGenericArray(convertAnyToFloat, *a)
 }
 
 // As2DArray converts the elements of the JsonArray into a two-dimensional array, returning
 // a slice of JsonArray objects.
 func (a *JsonArray) As2DArray() []JsonArray {
-	arr := make([]JsonArray, 0, len(a.elements))
-	for _, element := range a.elements {
-		asJsonObject := getAsJsonArray((*element).([]any))
-		arr = append(arr, asJsonObject)
-	}
-	return arr
+	array := asGenericArray(convertAnyToArray, *a)
+	return array
 }
 
 // AsObjectArray converts the elements of the JsonArray into a slice of JsonObject objects.
 func (a *JsonArray) AsObjectArray() []JsonObject {
-	arr := make([]JsonObject, 0, len(a.elements))
-	for _, element := range a.elements {
-		asJsonObject := getAsJsonObject(element, a)
-		arr = append(arr, asJsonObject)
-	}
-	return arr
+	return asGenericArray(convertAnyToObject, *a)
 }
 
 // GetString retrieves the string value from the element at the specified index.
@@ -90,7 +66,7 @@ func (a *JsonArray) GetString(i int) string {
 		a.SetLastError(NewIndexOutOfRangeErr(i, a.Length()))
 		return ""
 	}
-	return getAsString(a.elements[i], a)
+	return convertAnyToString(a.elements[i], a)
 }
 
 // GetInt retrieves the integer value from the element at the specified index.
@@ -99,7 +75,7 @@ func (a *JsonArray) GetInt(i int) int {
 		a.SetLastError(NewIndexOutOfRangeErr(i, a.Length()))
 		return 0
 	}
-	return getAsInt(a.elements[i], a)
+	return convertAnyToInt(a.elements[i], a)
 }
 
 // GetFloat retrieves the float value from the element at the specified index.
@@ -108,7 +84,7 @@ func (a *JsonArray) GetFloat(i int) float64 {
 		a.SetLastError(NewIndexOutOfRangeErr(i, a.Length()))
 		return 0
 	}
-	return getAsFloat(a.elements[i], a)
+	return convertAnyToFloat(a.elements[i], a)
 }
 
 // GetBool retrieves the boolean value from the element at the specified index.
@@ -117,7 +93,7 @@ func (a *JsonArray) GetBool(i int) bool {
 		a.SetLastError(NewIndexOutOfRangeErr(i, a.Length()))
 		return false
 	}
-	return getAsBool(a.elements[i], a)
+	return convertAnyToBool(a.elements[i], a)
 }
 
 // GetTime retrieves the time value from the element at the specified index, returning an error if conversion fails.

@@ -44,7 +44,7 @@ func TestWriteArrayStringToObject(t *testing.T) {
 	obj.AddKeyValue("strings", []string{"string1", "string2", "string4"})
 	objElements := obj.Elements()
 
-	stringArray := objElements["strings"].Array
+	stringArray := objElements["strings"].AsArray
 	arrayElements := stringArray.Elements()
 
 	assert.True(t, objElements["strings"].IsArray)
@@ -71,7 +71,7 @@ func TestWriteArrayStringsToObject(t *testing.T) {
 	obj.AddKeyValue("strings", []string{"string1", "string2", "string4"})
 	objElements := obj.Elements()
 
-	stringArray := objElements["strings"].Array
+	stringArray := objElements["strings"].AsArray
 	arrayElements := stringArray.Elements()
 
 	assert.True(t, objElements["strings"].IsArray)
@@ -85,7 +85,7 @@ func TestWriteObjectArrayInt(t *testing.T) {
 	obj.AddKeyValue("numbers", []int{1, 2, 4})
 	objElements := obj.Elements()
 
-	numberArray := objElements["numbers"].Array
+	numberArray := objElements["numbers"].AsArray
 	arrayElements := numberArray.Elements()
 
 	assert.True(t, objElements["numbers"].IsArray)
@@ -99,7 +99,7 @@ func TestWriteArrayFloatToObject(t *testing.T) {
 	obj.AddKeyValue("numbers", []float64{1.5, 2.0, 4.2})
 	objElements := obj.Elements()
 
-	numberArray := objElements["numbers"].Array
+	numberArray := objElements["numbers"].AsArray
 	arrayElements := numberArray.Elements()
 
 	assert.True(t, objElements["numbers"].IsArray)

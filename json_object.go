@@ -50,6 +50,31 @@ func (o *JsonObject) Elements() map[string]JsonMapper {
 	return jsons
 }
 
+// AsStringMap returns the object as map of string, string
+func (o *JsonObject) AsStringMap() map[string]string {
+	return asGenericMap(convertAnyToString, *o)
+}
+
+// AsIntMap returns the object as map of (string, int)
+func (o *JsonObject) AsIntMap() map[string]int {
+	return asGenericMap(convertAnyToInt, *o)
+}
+
+// AsFloatMap returns the object as map of (string, float64)
+func (o *JsonObject) AsFloatMap() map[string]float64 {
+	return asGenericMap(convertAnyToFloat, *o)
+}
+
+// As2DMap returns the object as map of (string, JsonArray)
+func (o *JsonObject) As2DMap() map[string]JsonArray {
+	return asGenericMap(convertAnyToArray, *o)
+}
+
+// AsObjectMap returns the object as map of (string, JsonObject)
+func (o *JsonObject) AsObjectMap() map[string]JsonObject {
+	return asGenericMap(convertAnyToObject, *o)
+}
+
 // Has checks if the specified key exists in the JsonObject.
 func (o *JsonObject) Has(key string) bool {
 	for k := range o.object {
@@ -67,7 +92,7 @@ func (o *JsonObject) GetString(key string) string {
 		if k != key {
 			continue
 		}
-		return getAsString(v, o)
+		return convertAnyToString(v, o)
 	}
 	o.SetLastError(NewKeyNotFoundErr(key))
 	return ""
@@ -84,7 +109,7 @@ func (o *JsonObject) GetInt(key string) int {
 			o.SetLastError(NewNullConversionErr("int"))
 			return 0
 		}
-		return getAsInt(v, o)
+		return convertAnyToInt(v, o)
 	}
 	o.SetLastError(NewKeyNotFoundErr(key))
 	return 0
@@ -101,7 +126,7 @@ func (o *JsonObject) GetFloat(key string) float64 {
 			o.SetLastError(NewNullConversionErr("float64"))
 			return 0
 		}
-		return getAsFloat(v, o)
+		return convertAnyToFloat(v, o)
 	}
 	o.SetLastError(NewKeyNotFoundErr(key))
 	return 0
@@ -118,7 +143,7 @@ func (o *JsonObject) GetBool(key string) bool {
 			o.SetLastError(NewNullConversionErr("bool"))
 			return false
 		}
-		return getAsBool(v, o)
+		return convertAnyToBool(v, o)
 	}
 	o.SetLastError(NewKeyNotFoundErr(key))
 	return false
@@ -200,7 +225,7 @@ func (o *JsonObject) Find(key string) JsonMapper {
 			return field
 		}
 		if field.IsObject {
-			return field.Object.Find(key)
+			return field.AsObject.Find(key)
 		}
 	}
 	return JsonMapper{}

@@ -74,7 +74,7 @@ fmt.Println(mapper.IsNull)      // false
 ### Objects
 
 ```go
-object := mapper.Object
+object := mapper.AsObject
 
 // Check if a key exists
 var keyExists bool = object.Has("children")
@@ -92,8 +92,8 @@ values := object.Values()
 children := object.GetObject("children")
 for key, child := range children.Elements() {
     fmt.Println("Child name:", key)                 // Rachel, Sara
-    fmt.Println(child.Object.GetInt("age"))         // 15, 19
-    fmt.Println(child.Object.GetBool("is_funny"))   // false, true
+    fmt.Println(child.AsObject.GetInt("age"))         // 15, 19
+    fmt.Println(child.AsObject.GetBool("is_funny"))   // false, true
 }
 ```
 
@@ -101,7 +101,7 @@ for key, child := range children.Elements() {
 
 ```go
 // Get array
-array := mapper.Object.GetArray("features")
+array := mapper.AsObject.GetArray("features")
 
 // Get array length
 arrayLen := array.Length() // 2
@@ -138,7 +138,7 @@ in the parameter type (objects take `string` as key and arrays take `int` as ind
 #### From Object
 
 ```go
-object := mapper.Object
+object := mapper.AsObject
 // string 
 var name string = object.GetString("name") // Jason
 // int 
@@ -152,7 +152,7 @@ var isFunny bool = object.GetBool("is_funny") // false
 #### From Array
 
 ```go
-array := mapper.Array
+array := mapper.AsArray
 // string 
 var s string = array.GetString(0)
 // int 
@@ -199,7 +199,7 @@ The following formats are supported:
 You can search for a nested element.
 
 ```go
-element := mapper.Object.Find("Rachel")
+element := mapper.AsObject.Find("Rachel")
 fmt.Println(element.IsObject) // true 
 fmt.Println(element.Has("is_funny")) // true 
 ```
@@ -209,17 +209,17 @@ fmt.Println(element.Has("is_funny")) // true
 You can get a string from every JSON element which is a valid JSON
 
 ```go
-fmt.Println(mapper.Object.String())
+fmt.Println(mapper.AsObject.String())
 // output: {"age":43,"children":{"Rachel":{"age":15,"is_funny":false},"Sara":{"age":19,"is_funny":true}},"features":["tall","blue eyes"],"is_funny":false,"name":"Jason"}
 
-fmt.Println(mapper.Object.Get("children").String())
+fmt.Println(mapper.AsObject.Get("children").String())
 // output: {"Rachel":{"age":15,"is_funny":false},"Sara":{"age":19,"is_funny":true}}
 ```
 
 or with pretty string
 
 ```go
-fmt.Println(mapper.Object.Get("children").PrettyString())
+fmt.Println(mapper.AsObject.Get("children").PrettyString())
 // output:
 // {
 //    "Rachel": {

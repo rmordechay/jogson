@@ -9,7 +9,7 @@ import (
 func TestObjectGetKeys(t *testing.T) {
 	mapper, err := jsonmapper.FromString(jsonObjectTest)
 	assert.NoError(t, err)
-	keys := mapper.Object.Keys()
+	keys := mapper.AsObject.Keys()
 	assert.Equal(t, 5, len(keys))
 	assert.Contains(t, keys, "name")
 	assert.Contains(t, keys, "age")
@@ -19,7 +19,7 @@ func TestObjectGetKeys(t *testing.T) {
 func TestObjectGetValues(t *testing.T) {
 	mapper, err := jsonmapper.FromString(jsonObjectTest)
 	assert.NoError(t, err)
-	values := mapper.Object.Values()
+	values := mapper.AsObject.Values()
 	assert.Equal(t, 5, len(values))
 	for _, v := range values {
 		assert.True(t, v.AsString == "Jason" || v.IsNull || v.AsInt == 15 || v.AsBool || v.AsFloat == 1.81)
@@ -29,14 +29,14 @@ func TestObjectGetValues(t *testing.T) {
 func TestElementNotFound(t *testing.T) {
 	mapper, err := jsonmapper.FromString(jsonObjectTest)
 	assert.NoError(t, err)
-	_ = mapper.Object.GetFloat("not found")
-	assert.Error(t, mapper.Object.LastError)
-	assert.ErrorIs(t, mapper.Object.LastError, jsonmapper.KeyNotFoundErr)
+	_ = mapper.AsObject.GetFloat("not found")
+	assert.Error(t, mapper.AsObject.LastError)
+	assert.ErrorIs(t, mapper.AsObject.LastError, jsonmapper.KeyNotFoundErr)
 }
 
 func TestObjectGetString(t *testing.T) {
 	mapper, _ := jsonmapper.FromString(jsonObjectTest)
-	object := mapper.Object
+	object := mapper.AsObject
 
 	s := object.GetString("name")
 	assert.NoError(t, object.LastError)
@@ -57,7 +57,7 @@ func TestObjectGetString(t *testing.T) {
 
 func TestObjectGetStringFails(t *testing.T) {
 	mapper, _ := jsonmapper.FromString(jsonObjectTest)
-	object := mapper.Object
+	object := mapper.AsObject
 
 	s := object.GetString("not found")
 	assert.ErrorIs(t, object.LastError, jsonmapper.KeyNotFoundErr)
@@ -70,7 +70,7 @@ func TestObjectGetStringFails(t *testing.T) {
 
 func TestObjectGetInt(t *testing.T) {
 	mapper, _ := jsonmapper.FromString(jsonObjectTest)
-	object := mapper.Object
+	object := mapper.AsObject
 
 	i := object.GetInt("age")
 	assert.NoError(t, object.LastError)
@@ -83,7 +83,7 @@ func TestObjectGetInt(t *testing.T) {
 
 func TestObjectGetIntFails(t *testing.T) {
 	mapper, _ := jsonmapper.FromString(jsonObjectTest)
-	object := mapper.Object
+	object := mapper.AsObject
 
 	i := object.GetInt("not found")
 	assert.ErrorIs(t, object.LastError, jsonmapper.KeyNotFoundErr)
@@ -100,7 +100,7 @@ func TestObjectGetIntFails(t *testing.T) {
 
 func TestObjectGetFloat(t *testing.T) {
 	mapper, _ := jsonmapper.FromString(jsonObjectTest)
-	object := mapper.Object
+	object := mapper.AsObject
 
 	f := object.GetFloat("age")
 	assert.NoError(t, object.LastError)
@@ -113,7 +113,7 @@ func TestObjectGetFloat(t *testing.T) {
 
 func TestObjectGetFloatFails(t *testing.T) {
 	mapper, _ := jsonmapper.FromString(jsonObjectTest)
-	object := mapper.Object
+	object := mapper.AsObject
 
 	f := object.GetFloat("not found")
 	assert.ErrorIs(t, object.LastError, jsonmapper.KeyNotFoundErr)
@@ -130,7 +130,7 @@ func TestObjectGetFloatFails(t *testing.T) {
 
 func TestObjectGetBool(t *testing.T) {
 	mapper, _ := jsonmapper.FromString(jsonObjectTest)
-	object := mapper.Object
+	object := mapper.AsObject
 
 	b := object.GetBool("is_funny")
 	assert.NoError(t, object.LastError)
@@ -139,7 +139,7 @@ func TestObjectGetBool(t *testing.T) {
 
 func TestObjectGetBoolFails(t *testing.T) {
 	mapper, _ := jsonmapper.FromString(jsonObjectTest)
-	object := mapper.Object
+	object := mapper.AsObject
 
 	b := object.GetBool("not found")
 	assert.ErrorIs(t, object.LastError, jsonmapper.KeyNotFoundErr)
@@ -156,7 +156,7 @@ func TestObjectGetBoolFails(t *testing.T) {
 
 func TestObjectGetArray(t *testing.T) {
 	mapper, _ := jsonmapper.FromString(jsonObjectWithArrayTest)
-	object := mapper.Object
+	object := mapper.AsObject
 
 	array := object.GetArray("names")
 	assert.ElementsMatch(t, []string{"Jason", "Chris", "Rachel"}, array.AsStringArray())
@@ -164,7 +164,7 @@ func TestObjectGetArray(t *testing.T) {
 
 func TestObjectGetArrayFails(t *testing.T) {
 	mapper, _ := jsonmapper.FromString(jsonObjectWithArrayTest)
-	object := mapper.Object
+	object := mapper.AsObject
 
 	arr := object.GetArray("not found")
 	assert.ErrorIs(t, object.LastError, jsonmapper.KeyNotFoundErr)
@@ -181,7 +181,7 @@ func TestObjectGetArrayFails(t *testing.T) {
 
 func TestObjectGetObject(t *testing.T) {
 	mapper, _ := jsonmapper.FromString(jsonObjectNestedArrayTest)
-	object := mapper.Object
+	object := mapper.AsObject
 
 	obj := object.GetObject("personTest")
 	assert.Equal(t, "Jason", obj.GetString("name"))
@@ -189,7 +189,7 @@ func TestObjectGetObject(t *testing.T) {
 
 func TestObjectGetObjectFails(t *testing.T) {
 	mapper, _ := jsonmapper.FromString(jsonObjectTest)
-	object := mapper.Object
+	object := mapper.AsObject
 
 	obj := object.GetObject("not found")
 	assert.ErrorIs(t, object.LastError, jsonmapper.KeyNotFoundErr)
@@ -202,13 +202,12 @@ func TestObjectGetObjectFails(t *testing.T) {
 	obj = object.GetObject("address")
 	assert.ErrorIs(t, object.LastError, jsonmapper.NullConversionErr)
 	assert.Equal(t, &jsonmapper.JsonObject{}, obj)
-
 }
 
 func TestConvertKeysToSnakeCase(t *testing.T) {
 	mapper, err := jsonmapper.FromString(jsonObjectKeysPascalCaseTest)
 	assert.NoError(t, err)
-	object := mapper.Object
+	object := mapper.AsObject
 	snakeCase := object.TransformObjectKeys()
 	assert.NoError(t, object.LastError)
 	assert.ElementsMatch(t, []string{"children", "name", "age", "address", "second_address", "is_funny"}, snakeCase.Keys())

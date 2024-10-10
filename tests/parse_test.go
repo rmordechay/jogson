@@ -14,7 +14,7 @@ func TestParseJsonObjectFromString(t *testing.T) {
 	mapper, err := jsonmapper.FromString(jsonObjectTest)
 	assert.NoError(t, err)
 
-	actual := removeWhiteSpaces(mapper.Object.String())
+	actual := removeWhiteSpaces(mapper.AsObject.String())
 
 	assert.True(t, mapper.IsObject)
 	assert.Contains(t, actual, `"age":15`)
@@ -25,31 +25,31 @@ func TestParseJsonArrayFromString(t *testing.T) {
 	mapper, err := jsonmapper.FromString(jsonObjectArrayTest)
 	assert.NoError(t, err)
 
-	actual := removeWhiteSpaces(mapper.Array.String())
+	actual := removeWhiteSpaces(mapper.AsArray.String())
 	expected := removeWhiteSpaces(jsonObjectArrayTest)
 
 	assert.True(t, mapper.IsArray)
 	assert.Equal(t, expected, actual)
-	assert.Equal(t, mapper.Array.Length(), 2)
+	assert.Equal(t, mapper.AsArray.Length(), 2)
 }
 
 func TestParseJsonArrayFromStringWithNulls(t *testing.T) {
 	mapper, err := jsonmapper.FromString(jsonArrayWithNullTest)
 	assert.NoError(t, err)
 
-	actual := removeWhiteSpaces(mapper.Array.String())
+	actual := removeWhiteSpaces(mapper.AsArray.String())
 	expected := removeWhiteSpaces(jsonArrayWithNullTest)
 
 	assert.True(t, mapper.IsArray)
 	assert.Equal(t, expected, actual)
-	assert.Equal(t, 4, mapper.Array.Length())
+	assert.Equal(t, 4, mapper.AsArray.Length())
 }
 
 func TestParseJsonObjectFromBytes(t *testing.T) {
 	mapper, err := jsonmapper.FromBytes([]byte(jsonObjectTest))
 	assert.NoError(t, err)
 
-	actual := removeWhiteSpaces(mapper.Object.String())
+	actual := removeWhiteSpaces(mapper.AsObject.String())
 
 	assert.True(t, mapper.IsObject)
 	assert.Contains(t, actual, `"age":15`)
@@ -60,12 +60,12 @@ func TestParseJsonArrayFromBytes(t *testing.T) {
 	mapper, err := jsonmapper.FromBytes([]byte(jsonObjectArrayTest))
 	assert.NoError(t, err)
 
-	actual := removeWhiteSpaces(mapper.Array.String())
+	actual := removeWhiteSpaces(mapper.AsArray.String())
 	expected := removeWhiteSpaces(jsonObjectArrayTest)
 
 	assert.True(t, mapper.IsArray)
 	assert.Equal(t, expected, actual)
-	assert.Equal(t, mapper.Array.Length(), 2)
+	assert.Equal(t, mapper.AsArray.Length(), 2)
 }
 
 func TestParseJsonArrayFromStruct(t *testing.T) {
@@ -76,8 +76,8 @@ func TestParseJsonArrayFromStruct(t *testing.T) {
 	mapper, err := jsonmapper.FromStruct(testStruct)
 	assert.NoError(t, err)
 	assert.True(t, mapper.IsObject)
-	assert.Equal(t, "John", mapper.Object.GetString("name"))
-	assert.Equal(t, 15, mapper.Object.GetInt("Age"))
+	assert.Equal(t, "John", mapper.AsObject.GetString("name"))
+	assert.Equal(t, 15, mapper.AsObject.GetInt("Age"))
 }
 
 func TestParseJsonArrayFromStruct2(t *testing.T) {
@@ -113,13 +113,13 @@ func TestParseJsonArrayFromStruct2(t *testing.T) {
 	mapper, err := jsonmapper.FromStruct(person)
 	assert.NoError(t, err)
 	assert.NotNil(t, mapper)
-	assert.Equal(t, 45, mapper.Object.GetInt("Age"))
-	assert.Equal(t, "1981-05-30T00:00:00Z", mapper.Object.GetString("Birthday"))
-	getTime, err := mapper.Object.GetTime("Birthday")
+	assert.Equal(t, 45, mapper.AsObject.GetInt("Age"))
+	assert.Equal(t, "1981-05-30T00:00:00Z", mapper.AsObject.GetString("Birthday"))
+	getTime, err := mapper.AsObject.GetTime("Birthday")
 	assert.NoError(t, err)
 	assert.Equal(t, birthday, getTime)
-	assert.Equal(t, 1.85, mapper.Object.GetFloat("Height"))
-	assert.Equal(t, true, mapper.Object.GetBool("IsFunny"))
+	assert.Equal(t, 1.85, mapper.AsObject.GetFloat("Height"))
+	assert.Equal(t, true, mapper.AsObject.GetBool("IsFunny"))
 }
 
 func TestParseJsonObjectFromFile(t *testing.T) {
@@ -127,7 +127,7 @@ func TestParseJsonObjectFromFile(t *testing.T) {
 	mapper, err := jsonmapper.FromFile(path)
 	assert.NoError(t, err)
 
-	actual := removeWhiteSpaces(mapper.Object.String())
+	actual := removeWhiteSpaces(mapper.AsObject.String())
 	fileExpected, err := os.ReadFile(path)
 	expected := removeWhiteSpaces(string(fileExpected))
 
@@ -141,24 +141,24 @@ func TestParseJsonArrayFromFile(t *testing.T) {
 	mapper, err := jsonmapper.FromFile(path)
 	assert.NoError(t, err)
 
-	actual := removeWhiteSpaces(mapper.Array.String())
+	actual := removeWhiteSpaces(mapper.AsArray.String())
 	fileExpected, err := os.ReadFile(path)
 	expected := removeWhiteSpaces(string(fileExpected))
 
 	assert.NoError(t, err)
 	assert.True(t, mapper.IsArray)
 	assert.Equal(t, expected, actual)
-	assert.Equal(t, mapper.Array.Length(), 2)
+	assert.Equal(t, mapper.AsArray.Length(), 2)
 }
 
 func TestParseTime(t *testing.T) {
 	mapper, err := jsonmapper.FromString(jsonTimeTest)
 	assert.NoError(t, err)
-	actualTime1, err := mapper.Object.GetTime("time1")
+	actualTime1, err := mapper.AsObject.GetTime("time1")
 	assert.NoError(t, err)
-	actualTime2, err := mapper.Object.GetTime("time2")
+	actualTime2, err := mapper.AsObject.GetTime("time2")
 	assert.NoError(t, err)
-	actualTime3, err := mapper.Object.GetTime("time3")
+	actualTime3, err := mapper.AsObject.GetTime("time3")
 	assert.NoError(t, err)
 	expectedTime1, _ := time.Parse(time.RFC3339, "2024-10-06T17:59:44Z")
 	expectedTime2, _ := time.Parse(time.RFC3339, "2024-10-06T17:59:44+00:00")
@@ -171,7 +171,7 @@ func TestParseTime(t *testing.T) {
 func TestParseTimeInvalid(t *testing.T) {
 	mapper, err := jsonmapper.FromString(jsonInvalidTimeTest)
 	assert.NoError(t, err)
-	for _, v := range mapper.Object.Elements() {
+	for _, v := range mapper.AsObject.Elements() {
 		_, err = v.AsTime()
 		assert.Error(t, err)
 	}
