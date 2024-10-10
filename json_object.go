@@ -88,6 +88,11 @@ func (o *JsonObject) Has(key string) bool {
 	return ok
 }
 
+// Get retrieves the value associated with the key and returns it as a JsonMapper
+func (o *JsonObject) Get(key string) JsonMapper {
+	return getMapperFromField(o.object[key])
+}
+
 // GetString retrieves the string value associated with the specified key.
 // If the key does not exist, the value is invalid or is null, an error will be set to LastError.
 func (o *JsonObject) GetString(key string) string {

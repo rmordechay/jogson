@@ -67,6 +67,11 @@ func (a *JsonArray) AsObjectArray() []JsonObject {
 	return getGenericArray(convertAnyToObject, *a)
 }
 
+// Get retrieves the value at index i and returns it as a JsonMapper
+func (a *JsonArray) Get(i int) JsonMapper {
+	return getMapperFromField(a.elements[i])
+}
+
 // GetString retrieves the string value from the element at the specified index.
 // If the index is out of range, the value is invalid or is null, an error will be set to LastError.
 func (a *JsonArray) GetString(i int) string {
