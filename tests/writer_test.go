@@ -6,6 +6,26 @@ import (
 	"testing"
 )
 
+func TestWriteObjectToObject(t *testing.T) {
+
+}
+
+func TestWriteArrayToObject(t *testing.T) {
+	obj := jsonmapper.NewObject()
+	arr := jsonmapper.NewArray()
+	arr.AddElement(1)
+	arr.AddElement(4)
+	arr.AddElement(6)
+	obj.AddKeyValue("children", arr)
+
+	assert.NoError(t, obj.LastError)
+	assert.True(t, obj.Has("children"))
+	array := obj.GetArray("children")
+	assert.NoError(t, obj.LastError)
+	assert.Equal(t, 3, array.Length())
+	assert.Equal(t, 4, array.GetInt(1))
+}
+
 func TestWriteStringToObject(t *testing.T) {
 	obj := jsonmapper.NewObject()
 	obj.AddKeyValue("name", "chris")

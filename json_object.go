@@ -7,15 +7,20 @@ import (
 
 // JsonObject represents a JSON object
 type JsonObject struct {
-	object    map[string]*interface{}
+	object    map[string]*any
 	LastError error
 }
 
 // NewObject creates and returns a new JsonObject.
 func NewObject() JsonObject {
 	var obj JsonObject
-	obj.object = make(map[string]*interface{})
+	obj.object = make(map[string]*any)
 	return obj
+}
+
+// Length returns the number of elements in the JsonObject.
+func (o *JsonObject) Length() int {
+	return len(o.object)
 }
 
 // Keys returns a slice of all keys in the JsonObject.
@@ -76,7 +81,7 @@ func (o *JsonObject) GetInt(key string) int {
 			continue
 		}
 		if v == nil {
-			o.LastError = fmt.Errorf(nullConversionErrStr, 0)
+			o.LastError = fmt.Errorf(nullConversionErrStr, "int")
 			return 0
 		}
 		return getAsInt(v, o)
@@ -93,7 +98,7 @@ func (o *JsonObject) GetFloat(key string) float64 {
 			continue
 		}
 		if v == nil {
-			o.LastError = fmt.Errorf(nullConversionErrStr, 0.0)
+			o.LastError = fmt.Errorf(nullConversionErrStr, "float64")
 			return 0
 		}
 		return getAsFloat(v, o)
@@ -110,7 +115,7 @@ func (o *JsonObject) GetBool(key string) bool {
 			continue
 		}
 		if v == nil {
-			o.LastError = fmt.Errorf(nullConversionErrStr, false)
+			o.LastError = fmt.Errorf(nullConversionErrStr, "bool")
 			return false
 		}
 		return getAsBool(v, o)
@@ -127,7 +132,7 @@ func (o *JsonObject) GetTime(key string) (time.Time, error) {
 			continue
 		}
 		if v == nil {
-			return time.Time{}, fmt.Errorf(nullConversionErrStr, time.Time{})
+			return time.Time{}, fmt.Errorf(nullConversionErrStr, "time.Time")
 		}
 		return parseTime(v)
 	}
@@ -142,18 +147,18 @@ func (o *JsonObject) GetObject(key string) *JsonObject {
 			continue
 		}
 		if v == nil {
-			o.LastError = fmt.Errorf(nullConversionErrStr, JsonObject{})
+			o.LastError = fmt.Errorf(nullConversionErrStr, "JsonObject")
 			return &JsonObject{}
 		}
 		switch (*v).(type) {
-		case map[string]*interface{}:
-			object := (*v).(map[string]*interface{})
+		case map[string]*any:
+			object := (*v).(map[string]*any)
 			return &JsonObject{object: object}
-		case map[string]interface{}:
-			dataPtr := convertToMapValuesPtr((*v).(map[string]interface{}))
+		case map[string]any:
+			dataPtr := convertToMapValuesPtr((*v).(map[string]any))
 			return &JsonObject{object: dataPtr}
 		default:
-			o.LastError = fmt.Errorf(typeConversionErrStr, *v, JsonObject{})
+			o.SetLastError(fmt.Errorf(typeConversionErrStr, *v, "JsonObject"))
 			return &JsonObject{}
 		}
 	}
@@ -169,15 +174,18 @@ func (o *JsonObject) GetArray(key string) *JsonArray {
 			continue
 		}
 		if v == nil {
-			o.LastError = fmt.Errorf(nullConversionErrStr, JsonArray{})
+			o.LastError = fmt.Errorf(nullConversionErrStr, "JsonArray")
 			return &JsonArray{}
 		}
-		jsonArray, ok := (*v).([]interface{})
-		if !ok {
-			o.LastError = fmt.Errorf(typeConversionErrStr, *v, JsonArray{})
+		switch (*v).(type) {
+		case []any:
+			return &JsonArray{elements: convertToSlicePtr((*v).([]any))}
+		case []*any:
+			return &JsonArray{elements: (*v).([]*any)}
+		default:
+			o.SetLastError(fmt.Errorf(typeConversionErrStr, *v, "[]*any"))
 			return &JsonArray{}
 		}
-		return &JsonArray{elements: convertToSlicePtr(jsonArray)}
 	}
 	o.LastError = fmt.Errorf(keyNotFoundErrStr, key)
 	return &JsonArray{}
@@ -199,8 +207,25 @@ func (o *JsonObject) Find(key string) Json {
 }
 
 // AddKeyValue adds a key-value pair to the JsonObject.
-func (o *JsonObject) AddKeyValue(k string, value interface{}) {
-	o.object[k] = &value
+func (o *JsonObject) AddKeyValue(k string, value any) {
+	switch value.(type) {
+	case JsonObject:
+		var object any = value.(JsonObject).object
+		o.object[k] = &object
+	case *JsonObject:
+		var object any = value.(JsonObject).object
+		o.object[k] = &object
+	case JsonArray:
+		var elements any = value.(JsonArray).elements
+		o.object[k] = &elements
+	case *JsonArray:
+		var elements any = value.(*JsonArray).elements
+		o.object[k] = &elements
+	case nil, string, int, float64, bool, []string, []int, []float64, []bool:
+		o.object[k] = &value
+	default:
+		o.LastError = fmt.Errorf("could not add value of type %T", value)
+	}
 }
 
 // ForEach applies the provided function to each key-value pair in the JsonObject.
@@ -244,19 +269,19 @@ func (o *JsonObject) String() string {
 	return string(jsonBytes)
 }
 
-func getAsJsonObject(data *interface{}, j JsonError) JsonObject {
+func getAsJsonObject(data *any, j JsonError) JsonObject {
 	if data == nil {
-		j.SetLastError(fmt.Errorf(nullConversionErrStr, ""))
+		j.SetLastError(fmt.Errorf(nullConversionErrStr, "string"))
 		return JsonObject{}
 	}
-	v, ok := (*data).(map[string]interface{})
+	v, ok := (*data).(map[string]any)
 	if !ok {
-		j.SetLastError(fmt.Errorf(typeConversionErrStr, data, JsonObject{}))
+		j.SetLastError(fmt.Errorf(typeConversionErrStr, data, "JsonObject"))
 		return JsonObject{}
 	}
 
 	var obj JsonObject
-	var object = make(map[string]*interface{})
+	var object = make(map[string]*any)
 	for key, value := range v {
 		object[key] = &value
 	}
@@ -264,18 +289,18 @@ func getAsJsonObject(data *interface{}, j JsonError) JsonObject {
 	return obj
 }
 
-func transformKeys(m map[string]*interface{}) map[string]*interface{} {
-	newMap := make(map[string]*interface{})
+func transformKeys(m map[string]*any) map[string]*any {
+	newMap := make(map[string]*any)
 	for key, value := range m {
 		newKey := toSnakeCase(key)
 		if value == nil {
 			newMap[newKey] = value
 			continue
 		}
-		nestedMap, ok := (*value).(map[string]interface{})
+		nestedMap, ok := (*value).(map[string]any)
 		if ok {
 			nestedResult := transformKeys(convertToMapValuesPtr(nestedMap))
-			var nestedInterface interface{} = nestedResult
+			var nestedInterface any = nestedResult
 			newMap[newKey] = &nestedInterface
 		} else {
 			newMap[newKey] = value

@@ -7,16 +7,21 @@ import (
 
 // JsonArray represents a JSON array
 type JsonArray struct {
-	elements  []*interface{}
+	elements  []*any
 	LastError error
 }
 
 // NewArray initializes and returns a new instance of JsonArray with an empty list of elements.
 func NewArray() *JsonArray {
 	var arr JsonArray
-	elements := make([]*interface{}, 0)
+	elements := make([]*any, 0)
 	arr.elements = elements
 	return &arr
+}
+
+// Length returns the number of elements in the JsonArray.
+func (a *JsonArray) Length() int {
+	return len(a.elements)
 }
 
 // Elements returns all elements in the JsonArray as a slice of Json objects.
@@ -28,13 +33,13 @@ func (a *JsonArray) Elements() []Json {
 	return jsons
 }
 
-// As2DArray converts the elements of the JsonArray into a two-dimensional array,
-// returning a slice of JsonArray objects.
+// As2DArray converts the elements of the JsonArray into a two-dimensional array, returning
+// a slice of JsonArray objects.
 func (a *JsonArray) As2DArray() []JsonArray {
 	arr := make([]JsonArray, 0, len(a.elements))
 	a.LastError = nil
 	for _, element := range a.elements {
-		asJsonObject := getAsJsonArray((*element).([]interface{}))
+		asJsonObject := getAsJsonArray((*element).([]any))
 		if a.LastError != nil {
 			break
 		}
@@ -134,7 +139,7 @@ func (a *JsonArray) GetTime(key int) (time.Time, error) {
 			continue
 		}
 		if v == nil {
-			return time.Time{}, fmt.Errorf(nullConversionErrStr, time.Time{})
+			return time.Time{}, fmt.Errorf(nullConversionErrStr, "time.Time")
 		}
 		return parseTime(v)
 	}
@@ -149,16 +154,16 @@ func (a *JsonArray) GetObject(i int) *JsonObject {
 	}
 	element := a.elements[i]
 	if element == nil {
-		a.SetLastError(fmt.Errorf(nullConversionErrStr, JsonObject{}))
+		a.SetLastError(fmt.Errorf(nullConversionErrStr, "JsonObject"))
 		return &JsonObject{}
 	}
 	switch (*element).(type) {
-	case map[string]*interface{}:
-		return &JsonObject{object: (*element).(map[string]*interface{})}
-	case map[string]interface{}:
-		return &JsonObject{object: convertToMapValuesPtr((*element).(map[string]interface{}))}
+	case map[string]*any:
+		return &JsonObject{object: (*element).(map[string]*any)}
+	case map[string]any:
+		return &JsonObject{object: convertToMapValuesPtr((*element).(map[string]any))}
 	default:
-		a.SetLastError(fmt.Errorf(typeConversionErrStr, *element, JsonObject{}))
+		a.SetLastError(fmt.Errorf(typeConversionErrStr, *element, "JsonObject"))
 		return &JsonObject{}
 	}
 }
@@ -171,24 +176,19 @@ func (a *JsonArray) GetArray(i int) JsonArray {
 	}
 	element := a.elements[i]
 	if element == nil {
-		a.SetLastError(fmt.Errorf(nullConversionErrStr, JsonArray{}))
+		a.SetLastError(fmt.Errorf(nullConversionErrStr, "JsonArray"))
 		return JsonArray{}
 	}
-	v, ok := (*element).([]interface{})
+	v, ok := (*element).([]any)
 	if !ok {
-		a.SetLastError(fmt.Errorf(typeConversionErrStr, *element, JsonArray{}))
+		a.SetLastError(fmt.Errorf(typeConversionErrStr, *element, "JsonArray"))
 		return JsonArray{}
 	}
 	return JsonArray{elements: convertToSlicePtr(v)}
 }
 
-// Length returns the number of elements in the JsonArray.
-func (a *JsonArray) Length() int {
-	return len(a.elements)
-}
-
 // AddElement appends a new element to the JsonArray.
-func (a *JsonArray) AddElement(value interface{}) {
+func (a *JsonArray) AddElement(value any) {
 	a.elements = append(a.elements, &value)
 }
 
@@ -260,9 +260,9 @@ func (a *JsonArray) String() string {
 
 func getAsJsonArray[T any](data []T) JsonArray {
 	var arr JsonArray
-	array := make([]*interface{}, len(data))
+	array := make([]*any, len(data))
 	for i, v := range data {
-		var valAny interface{} = v
+		var valAny any = v
 		array[i] = &valAny
 	}
 	arr.elements = array

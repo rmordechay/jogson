@@ -139,7 +139,7 @@ func (m *Json) getType() JsonType {
 	return Invalid
 }
 
-func getMapperFromField(data *interface{}) Json {
+func getMapperFromField(data *any) Json {
 	var mapper Json
 	if data == nil {
 		return Json{IsNull: true}
@@ -163,7 +163,7 @@ func getMapperFromField(data *interface{}) Json {
 	case string:
 		mapper.IsString = true
 		mapper.AsString = value.(string)
-	case map[string]interface{}:
+	case map[string]any:
 		mapper.IsObject = true
 		mapper.Object = getAsJsonObject(&value, nil)
 	case []float64:
@@ -178,12 +178,12 @@ func getMapperFromField(data *interface{}) Json {
 	case []bool:
 		mapper.IsArray = true
 		mapper.Array = getAsJsonArray(value.([]bool))
-	case []*interface{}:
+	case []*any:
 		mapper.IsArray = true
-		mapper.Array = JsonArray{elements: value.([]*interface{})}
-	case []interface{}:
+		mapper.Array = JsonArray{elements: value.([]*any)}
+	case []any:
 		mapper.IsArray = true
-		mapper.Array = JsonArray{elements: convertToSlicePtr(value.([]interface{}))}
+		mapper.Array = JsonArray{elements: convertToSlicePtr(value.([]any))}
 	case nil:
 		mapper.IsNull = true
 	default:
@@ -203,7 +203,7 @@ func parseJsonObject(data []byte) (JsonObject, error) {
 
 func parseJsonArray(data []byte) (JsonArray, error) {
 	var ja JsonArray
-	var arr []*interface{}
+	var arr []*any
 	err := unmarshal(data, &arr)
 	if err != nil {
 		return JsonArray{}, err
@@ -212,16 +212,16 @@ func parseJsonArray(data []byte) (JsonArray, error) {
 	return ja, nil
 }
 
-func convertToSlicePtr(data []interface{}) []*interface{} {
-	array := make([]*interface{}, len(data))
+func convertToSlicePtr(data []any) []*any {
+	array := make([]*any, len(data))
 	for i, v := range data {
 		array[i] = &v
 	}
 	return array
 }
 
-func convertToMapValuesPtr(data map[string]interface{}) map[string]*interface{} {
-	jsonObject := make(map[string]*interface{}, len(data))
+func convertToMapValuesPtr(data map[string]any) map[string]*any {
+	jsonObject := make(map[string]*any, len(data))
 	for k, v := range data {
 		jsonObject[k] = &v
 	}
@@ -265,9 +265,9 @@ func isObjectOrArray(data []byte, brackOrParen byte) bool {
 	return false
 }
 
-func parseTime(t *interface{}) (time.Time, error) {
+func parseTime(t *any) (time.Time, error) {
 	if t == nil {
-		return time.Time{}, fmt.Errorf(nullConversionErrStr, "")
+		return time.Time{}, fmt.Errorf(nullConversionErrStr, "string")
 	}
 	timeAsString, ok := (*t).(string)
 	if !ok {
@@ -282,7 +282,7 @@ func parseTime(t *interface{}) (time.Time, error) {
 	return time.Time{}, fmt.Errorf("the value '%v' could not be converted to type time.Time", timeAsString)
 }
 
-func marshal(v interface{}) ([]byte, error) {
+func marshal(v any) ([]byte, error) {
 	jsonBytes, err := jsonIter.Marshal(v)
 	if err != nil {
 		return nil, err
@@ -290,7 +290,7 @@ func marshal(v interface{}) ([]byte, error) {
 	return jsonBytes, nil
 }
 
-func marshalIndent(v interface{}) ([]byte, error) {
+func marshalIndent(v any) ([]byte, error) {
 	// jsoniter has a bug with indentation
 	jsonBytes, err := json.MarshalIndent(v, "", "  ")
 	if err != nil {
@@ -299,7 +299,7 @@ func marshalIndent(v interface{}) ([]byte, error) {
 	return jsonBytes, nil
 }
 
-func unmarshal(data []byte, v interface{}) error {
+func unmarshal(data []byte, v any) error {
 	return jsonIter.Unmarshal(data, &v)
 }
 

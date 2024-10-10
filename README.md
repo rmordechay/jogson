@@ -73,6 +73,9 @@ object := mapper.Object
 // Check if a key exists
 var keyExists bool = object.Has("children")
 
+// Get the object's size
+var keyExists bool = object.Length()
+
 // Get object's keys
 var keys []string = object.Keys()
 

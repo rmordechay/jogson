@@ -5,9 +5,9 @@ import (
 	"strconv"
 )
 
-func getAsString(data *interface{}, j JsonError) string {
+func getAsString(data *any, j JsonError) string {
 	if data == nil {
-		j.SetLastError(fmt.Errorf(nullConversionErrStr, ""))
+		j.SetLastError(fmt.Errorf(nullConversionErrStr, "string"))
 		return ""
 	}
 	switch (*data).(type) {
@@ -20,14 +20,14 @@ func getAsString(data *interface{}, j JsonError) string {
 	case bool:
 		return strconv.FormatBool((*data).(bool))
 	default:
-		j.SetLastError(fmt.Errorf(typeConversionErrStr, *data, ""))
+		j.SetLastError(fmt.Errorf(typeConversionErrStr, *data, "string"))
 		return ""
 	}
 }
 
-func getAsInt(data *interface{}, j JsonError) int {
+func getAsInt(data *any, j JsonError) int {
 	if data == nil {
-		j.SetLastError(fmt.Errorf(nullConversionErrStr, 0))
+		j.SetLastError(fmt.Errorf(nullConversionErrStr, "int"))
 		return 0
 	}
 	switch (*data).(type) {
@@ -36,32 +36,32 @@ func getAsInt(data *interface{}, j JsonError) int {
 	case int:
 		return (*data).(int)
 	default:
-		j.SetLastError(fmt.Errorf(typeConversionErrStr, *data, 0))
+		j.SetLastError(fmt.Errorf(typeConversionErrStr, *data, "int"))
 		return 0
 	}
 }
 
-func getAsFloat(data *interface{}, j JsonError) float64 {
+func getAsFloat(data *any, j JsonError) float64 {
 	if data == nil {
-		j.SetLastError(fmt.Errorf(nullConversionErrStr, 0.0))
+		j.SetLastError(fmt.Errorf(nullConversionErrStr, "float64"))
 		return 0
 	}
 	v, ok := (*data).(float64)
 	if !ok {
-		j.SetLastError(fmt.Errorf(typeConversionErrStr, *data, 0.0))
+		j.SetLastError(fmt.Errorf(typeConversionErrStr, *data, "float64"))
 		return 0
 	}
 	return v
 }
 
-func getAsBool(data *interface{}, j JsonError) bool {
+func getAsBool(data *any, j JsonError) bool {
 	if data == nil {
-		j.SetLastError(fmt.Errorf(nullConversionErrStr, false))
+		j.SetLastError(fmt.Errorf(nullConversionErrStr, "bool"))
 		return false
 	}
 	v, ok := (*data).(bool)
 	if !ok {
-		j.SetLastError(fmt.Errorf(typeConversionErrStr, *data, false))
+		j.SetLastError(fmt.Errorf(typeConversionErrStr, *data, "bool"))
 		return false
 	}
 	return v

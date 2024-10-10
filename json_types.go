@@ -4,6 +4,8 @@ import "time"
 
 type JsonError interface {
 	SetLastError(err error)
+	String() string
+	Length() int
 }
 
 type JsonType int
@@ -33,8 +35,8 @@ func (d JsonType) String() string {
 }
 
 var (
-	nullConversionErrStr  = "value is null and could not be converted to %T"
-	typeConversionErrStr  = "the type '%T' could not be converted to %T"
+	nullConversionErrStr  = "value is null and could not be converted to %s"
+	typeConversionErrStr  = "the type '%T' could not be converted to %s"
 	keyNotFoundErrStr     = "the requested key '%v' was not found"
 	indexOutOfRangeErrStr = "index out of range [%v] with length %v"
 )
