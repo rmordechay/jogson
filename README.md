@@ -10,7 +10,7 @@ A simple Go library to simplify working with JSON without the need to define str
     * [Check Types](#Check-Types)
     * [Objects](#Objects)
     * [Arrays](#Arrays)
-    * [Primitive Type](#Primitive-Types)
+    * [Scalars](#Scalars)
     * [Find Elements](#Find-Elements)
     * [Get as JSON String](#get-as-json-string)
 * [Write to JSON](#Write-to-JSON)
