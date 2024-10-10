@@ -59,135 +59,111 @@ func (o *JsonObject) Elements() map[string]JsonMapper {
 
 // AsStringMap returns the object as map of string, string
 func (o *JsonObject) AsStringMap() map[string]string {
-	return asGenericMap(convertAnyToString, *o)
+	return getGenericMap(convertAnyToString, *o)
 }
 
 // AsIntMap returns the object as map of (string, int)
 func (o *JsonObject) AsIntMap() map[string]int {
-	return asGenericMap(convertAnyToInt, *o)
+	return getGenericMap(convertAnyToInt, *o)
 }
 
 // AsFloatMap returns the object as map of (string, float64)
 func (o *JsonObject) AsFloatMap() map[string]float64 {
-	return asGenericMap(convertAnyToFloat, *o)
+	return getGenericMap(convertAnyToFloat, *o)
 }
 
 // As2DMap returns the object as map of (string, JsonArray)
 func (o *JsonObject) As2DMap() map[string]JsonArray {
-	return asGenericMap(convertAnyToArray, *o)
+	return getGenericMap(convertAnyToArray, *o)
 }
 
 // AsObjectMap returns the object as map of (string, JsonObject)
 func (o *JsonObject) AsObjectMap() map[string]JsonObject {
-	return asGenericMap(convertAnyToObject, *o)
+	return getGenericMap(convertAnyToObject, *o)
 }
 
 // Has checks if the specified key exists in the JsonObject.
 func (o *JsonObject) Has(key string) bool {
-	for k := range o.object {
-		if k == key {
-			return true
-		}
-	}
-	return false
-}
-
-func getObjScalar[T any](o *JsonObject, f jc[T], key string, typeString string) T {
-	var zero T
-	for k, v := range o.object {
-		if k != key {
-			continue
-		}
-		if v == nil {
-			o.SetLastError(createNullConversionErr(typeString))
-			return zero
-		}
-		return f(v, o)
-	}
-	o.SetLastError(createKeyNotFoundErr(key))
-	return zero
+	_, ok := o.object[key]
+	return ok
 }
 
 // GetString retrieves the string value associated with the specified key.
-// If the key does not exist or the value is not a string, it sets LastError.
+// If the key does not exist, the value is invalid or is null, an error will be set to LastError.
 func (o *JsonObject) GetString(key string) string {
-	return getObjScalar(o, convertAnyToString, key, stringTypeStr)
+	return getObjectScalar(o, convertAnyToString, key, stringTypeStr)
 }
 
 // GetInt retrieves the int value associated with the specified key.
-// If the key does not exist or the value is not an int, it sets LastError.
+// If the key does not exist, the value is invalid or is null, an error will be set to LastError.
 func (o *JsonObject) GetInt(key string) int {
-	return getObjScalar(o, convertAnyToInt, key, intTypeStr)
+	return getObjectScalar(o, convertAnyToInt, key, intTypeStr)
 }
 
 // GetFloat retrieves the float64 value associated with the specified key.
-// If the key does not exist or the value is not a float, it sets LastError.
+// If the key does not exist, the value is invalid or is null, an error will be set to LastError.
 func (o *JsonObject) GetFloat(key string) float64 {
-	return getObjScalar(o, convertAnyToFloat, key, floatTypeStr)
+	return getObjectScalar(o, convertAnyToFloat, key, floatTypeStr)
 }
 
 // GetBool retrieves the bool value associated with the specified key.
-// If the key does not exist or the value is not a bool, it sets LastError.
+// If the key does not exist, the value is invalid or is null, an error will be set to LastError.
 func (o *JsonObject) GetBool(key string) bool {
-	return getObjScalar(o, convertAnyToBool, key, boolTypeStr)
+	return getObjectScalar(o, convertAnyToBool, key, boolTypeStr)
 }
 
 // GetTime retrieves the time.Time value associated with the specified key.
-// If the key does not exist or the value is not a valid time, it returns an error.
+// If the key does not exist, the value is invalid or is null, an error will be set to LastError.
 func (o *JsonObject) GetTime(key string) time.Time {
-	return getObjScalar(o, parseTime, key, timeTypeStr)
+	return getObjectScalar(o, parseTime, key, timeTypeStr)
 }
 
 // GetObject retrieves a nested JsonObject associated with the specified key.
-// If the key does not exist or the value is not a valid object, it sets LastError.
+// If the key does not exist, the value is invalid or is null, an error will be set to LastError.
 func (o *JsonObject) GetObject(key string) *JsonObject {
-	for k, v := range o.object {
-		if k != key {
-			continue
-		}
-		if v == nil {
-			o.SetLastError(createNullConversionErr(objectTypeStr))
-			return EmptyObject()
-		}
-		switch (*v).(type) {
-		case map[string]*any:
-			data := (*v).(map[string]*any)
-			return NewObject(data)
-		case map[string]any:
-			dataPtr := convertToMapValuesPtr((*v).(map[string]any))
-			return NewObject(dataPtr)
-		default:
-			o.SetLastError(createTypeConversionErr(*v, objectTypeStr))
-			return EmptyObject()
-		}
+	v, ok := o.object[key]
+	if !ok {
+		o.SetLastError(createKeyNotFoundErr(key))
+		return EmptyObject()
 	}
-	o.SetLastError(createKeyNotFoundErr(key))
-	return EmptyObject()
+	if v == nil {
+		o.SetLastError(createNullConversionErr(objectTypeStr))
+		return EmptyObject()
+	}
+	switch (*v).(type) {
+	case map[string]*any:
+		data := (*v).(map[string]*any)
+		return NewObject(data)
+	case map[string]any:
+		dataPtr := convertToMapValuesPtr((*v).(map[string]any))
+		return NewObject(dataPtr)
+	default:
+		o.SetLastError(createTypeConversionErr(*v, objectTypeStr))
+		return EmptyObject()
+	}
 }
 
 // GetArray retrieves an array of JsonArray associated with the specified key.
-// If the key does not exist or the value is not a valid array, it sets LastError.
+// If the key does not exist, the value is invalid or is null, an error will be set to LastError.
 func (o *JsonObject) GetArray(key string) *JsonArray {
-	for k, v := range o.object {
-		if k != key {
-			continue
-		}
-		if v == nil {
-			o.SetLastError(createNullConversionErr(arrayTypeStr))
-			return EmptyArray()
-		}
-		switch (*v).(type) {
-		case []any:
-			return NewArray(convertToSlicePtr((*v).([]any)))
-		case []*any:
-			return NewArray((*v).([]*any))
-		default:
-			o.SetLastError(createTypeConversionErr(*v, arrayTypeStr))
-			return EmptyArray()
-		}
+	v, ok := o.object[key]
+	if !ok {
+		o.SetLastError(createKeyNotFoundErr(key))
+		return EmptyArray()
 	}
-	o.SetLastError(createKeyNotFoundErr(key))
-	return EmptyArray()
+	if v == nil {
+		o.SetLastError(createNullConversionErr(arrayTypeStr))
+		return EmptyArray()
+	}
+	switch (*v).(type) {
+	case []any:
+		return NewArray(convertToSlicePtr((*v).([]any)))
+	case []*any:
+		return NewArray((*v).([]*any))
+	default:
+		o.SetLastError(createTypeConversionErr(*v, arrayTypeStr))
+		return EmptyArray()
+	}
 }
 
 // Find searches for a key in the JsonObject and its nested objects.
@@ -273,7 +249,7 @@ func transformKeys(m map[string]*any) map[string]*any {
 	for key, value := range m {
 		newKey := toSnakeCase(key)
 		if value == nil {
-			newMap[newKey] = value
+			newMap[newKey] = nil
 			continue
 		}
 		nestedMap, ok := (*value).(map[string]any)

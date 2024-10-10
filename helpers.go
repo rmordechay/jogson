@@ -119,7 +119,7 @@ func toSnakeCase(str string) string {
 
 type jc[T any] func(data *any, j jsonEntity) T
 
-func asGenericMap[T any](f jc[T], o JsonObject) map[string]T {
+func getGenericMap[T any](f jc[T], o JsonObject) map[string]T {
 	genericMap := make(map[string]T)
 	for k, v := range o.object {
 		genericMap[k] = f(v, &o)
@@ -127,12 +127,40 @@ func asGenericMap[T any](f jc[T], o JsonObject) map[string]T {
 	return genericMap
 }
 
-func asGenericArray[T any](f jc[T], o JsonArray) []T {
+func getGenericArray[T any](f jc[T], o JsonArray) []T {
 	arr := make([]T, 0, len(o.elements))
 	for _, element := range o.elements {
 		arr = append(arr, f(element, &o))
 	}
 	return arr
+}
+
+func getObjectScalar[T any](o *JsonObject, f jc[T], key string, typeString string) T {
+	var zero T
+	v, ok := o.object[key]
+	if !ok {
+		o.SetLastError(createKeyNotFoundErr(key))
+		return zero
+	}
+	if v == nil {
+		o.SetLastError(createNullConversionErr(typeString))
+		return zero
+	}
+	return f(v, o)
+}
+
+func getArrayScalar[T any](a *JsonArray, f jc[T], i int, typeString string) T {
+	var zero T
+	if i >= a.Length() {
+		a.SetLastError(createIndexOutOfRangeErr(i, a.Length()))
+		return zero
+	}
+	data := a.elements[i]
+	if data == nil {
+		a.SetLastError(createNullConversionErr(typeString))
+		return zero
+	}
+	return f(data, a)
 }
 
 func convertAnyToString(data *any, j jsonEntity) string {

@@ -42,71 +42,63 @@ func (a *JsonArray) Elements() []JsonMapper {
 
 // AsStringArray converts the elements of the JsonArray into a slice of strings.
 func (a *JsonArray) AsStringArray() []string {
-	return asGenericArray(convertAnyToString, *a)
+	return getGenericArray(convertAnyToString, *a)
 }
 
 // AsIntArray converts the elements of the JsonArray into a slice of integers.
 func (a *JsonArray) AsIntArray() []int {
-	return asGenericArray(convertAnyToInt, *a)
+	return getGenericArray(convertAnyToInt, *a)
 }
 
 // AsFloatArray converts the elements of the JsonArray into a slice of floats.
 func (a *JsonArray) AsFloatArray() []float64 {
-	return asGenericArray(convertAnyToFloat, *a)
+	return getGenericArray(convertAnyToFloat, *a)
 }
 
 // As2DArray converts the elements of the JsonArray into a two-dimensional array, returning
 // a slice of JsonArray objects.
 func (a *JsonArray) As2DArray() []JsonArray {
-	array := asGenericArray(convertAnyToArray, *a)
+	array := getGenericArray(convertAnyToArray, *a)
 	return array
 }
 
 // AsObjectArray converts the elements of the JsonArray into a slice of JsonObject objects.
 func (a *JsonArray) AsObjectArray() []JsonObject {
-	return asGenericArray(convertAnyToObject, *a)
-}
-
-func getArrayScalar[T any](a *JsonArray, f jc[T], i int, typeString string) T {
-	var zero T
-	if i >= a.Length() {
-		a.SetLastError(createIndexOutOfRangeErr(i, a.Length()))
-		return zero
-	}
-	data := a.elements[i]
-	if data == nil {
-		a.SetLastError(createNullConversionErr(typeString))
-		return zero
-	}
-	return f(data, a)
+	return getGenericArray(convertAnyToObject, *a)
 }
 
 // GetString retrieves the string value from the element at the specified index.
+// If the index is out of range, the value is invalid or is null, an error will be set to LastError.
 func (a *JsonArray) GetString(i int) string {
 	return getArrayScalar(a, convertAnyToString, i, stringTypeStr)
 }
 
 // GetInt retrieves the integer value from the element at the specified index.
+// If the index is out of range, the value is invalid or is null, an error will be set to LastError.
 func (a *JsonArray) GetInt(i int) int {
 	return getArrayScalar(a, convertAnyToInt, i, intTypeStr)
 }
 
 // GetFloat retrieves the float value from the element at the specified index.
+// If the index is out of range, the value is invalid or is null, an error will be set to LastError.
 func (a *JsonArray) GetFloat(i int) float64 {
 	return getArrayScalar(a, convertAnyToFloat, i, floatTypeStr)
 }
 
 // GetBool retrieves the boolean value from the element at the specified index.
+// If the index is out of range, the value is invalid or is null, an error will be set to LastError.
 func (a *JsonArray) GetBool(i int) bool {
 	return getArrayScalar(a, convertAnyToBool, i, boolTypeStr)
 }
 
 // GetTime retrieves the time value from the element at the specified index, returning an error if conversion fails.
+// If the index is out of range, the value is invalid or is null, an error will be set to LastError.
 func (a *JsonArray) GetTime(i int) time.Time {
 	return getArrayScalar(a, parseTime, i, timeTypeStr)
 }
 
 // GetObject retrieves the JsonObject from the element at the specified index.
+// If the index is out of range, the value is invalid or is null, an error will be set to LastError.
 func (a *JsonArray) GetObject(i int) *JsonObject {
 	if i >= a.Length() {
 		a.SetLastError(createIndexOutOfRangeErr(i, a.Length()))
@@ -131,6 +123,7 @@ func (a *JsonArray) GetObject(i int) *JsonObject {
 }
 
 // GetArray retrieves the JsonArray from the element at the specified index.
+// If the index is out of range, the value is invalid or is null, an error will be set to LastError.
 func (a *JsonArray) GetArray(i int) *JsonArray {
 	if i >= a.Length() {
 		a.SetLastError(createIndexOutOfRangeErr(i, a.Length()))
