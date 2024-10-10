@@ -30,6 +30,17 @@ func (o *JsonObject) Length() int {
 	return len(o.object)
 }
 
+// Has checks if the specified key exists in the JsonObject.
+func (o *JsonObject) Has(key string) bool {
+	_, ok := o.object[key]
+	return ok
+}
+
+// IsEmpty checks if the JSON object has no fields in it
+func (o *JsonObject) IsEmpty() bool {
+	return len(o.object) == 0
+}
+
 // Keys returns a slice of all keys in the JsonObject.
 func (o *JsonObject) Keys() []string {
 	keys := make([]string, 0, len(o.object))
@@ -82,12 +93,6 @@ func (o *JsonObject) AsObjectMap() map[string]JsonObject {
 	return getGenericMap(convertAnyToObject, *o)
 }
 
-// Has checks if the specified key exists in the JsonObject.
-func (o *JsonObject) Has(key string) bool {
-	_, ok := o.object[key]
-	return ok
-}
-
 // Get retrieves the value associated with the key and returns it as a JsonMapper
 func (o *JsonObject) Get(key string) JsonMapper {
 	return getMapperFromField(o.object[key])
@@ -128,11 +133,11 @@ func (o *JsonObject) GetTime(key string) time.Time {
 func (o *JsonObject) GetObject(key string) *JsonObject {
 	v, ok := o.object[key]
 	if !ok {
-		o.SetLastError(createKeyNotFoundErr(key))
+		o.setLastError(createKeyNotFoundErr(key))
 		return EmptyObject()
 	}
 	if v == nil {
-		o.SetLastError(createNullConversionErr(objectTypeStr))
+		o.setLastError(createNullConversionErr(objectTypeStr))
 		return EmptyObject()
 	}
 	switch (*v).(type) {
@@ -143,7 +148,7 @@ func (o *JsonObject) GetObject(key string) *JsonObject {
 		dataPtr := convertToMapValuesPtr((*v).(map[string]any))
 		return NewObject(dataPtr)
 	default:
-		o.SetLastError(createTypeConversionErr(*v, objectTypeStr))
+		o.setLastError(createTypeConversionErr(*v, objectTypeStr))
 		return EmptyObject()
 	}
 }
@@ -153,11 +158,11 @@ func (o *JsonObject) GetObject(key string) *JsonObject {
 func (o *JsonObject) GetArray(key string) *JsonArray {
 	v, ok := o.object[key]
 	if !ok {
-		o.SetLastError(createKeyNotFoundErr(key))
+		o.setLastError(createKeyNotFoundErr(key))
 		return EmptyArray()
 	}
 	if v == nil {
-		o.SetLastError(createNullConversionErr(arrayTypeStr))
+		o.setLastError(createNullConversionErr(arrayTypeStr))
 		return EmptyArray()
 	}
 	switch (*v).(type) {
@@ -166,7 +171,7 @@ func (o *JsonObject) GetArray(key string) *JsonArray {
 	case []*any:
 		return NewArray((*v).([]*any))
 	default:
-		o.SetLastError(createTypeConversionErr(*v, arrayTypeStr))
+		o.setLastError(createTypeConversionErr(*v, arrayTypeStr))
 		return EmptyArray()
 	}
 }
@@ -204,7 +209,7 @@ func (o *JsonObject) AddKeyValue(k string, value any) {
 	case nil, string, int, float64, bool, []string, []int, []float64, []bool:
 		o.object[k] = &value
 	default:
-		o.SetLastError(fmt.Errorf("could not add value of type %T", value))
+		o.setLastError(fmt.Errorf("could not add value of type %T", value))
 	}
 }
 
@@ -232,7 +237,7 @@ func (o *JsonObject) TransformObjectKeys() JsonObject {
 }
 
 // SetLastError sets the LastError field of the JsonObject to the provided error.
-func (o *JsonObject) SetLastError(err error) {
+func (o *JsonObject) setLastError(err error) {
 	o.LastError = err
 }
 

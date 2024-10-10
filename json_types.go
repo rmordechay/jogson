@@ -5,7 +5,7 @@ import (
 )
 
 type jsonEntity interface {
-	SetLastError(err error)
+	setLastError(err error)
 	String() string
 	Length() int
 }

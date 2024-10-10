@@ -63,12 +63,12 @@ func isObjectOrArray(data []byte, brackOrParen byte) bool {
 
 func parseTime(t *any, j jsonEntity) time.Time {
 	if t == nil {
-		j.SetLastError(createNullConversionErr(stringTypeStr))
+		j.setLastError(createNullConversionErr(stringTypeStr))
 		return time.Time{}
 	}
 	timeAsString, ok := (*t).(string)
 	if !ok {
-		j.SetLastError(fmt.Errorf("cannot convert type %T to type time.Time\n", t))
+		j.setLastError(fmt.Errorf("cannot convert type %T to type time.Time\n", t))
 		return time.Time{}
 	}
 	for _, layout := range timeLayouts {
@@ -77,7 +77,7 @@ func parseTime(t *any, j jsonEntity) time.Time {
 			return parsedTime
 		}
 	}
-	j.SetLastError(fmt.Errorf("the value '%v' could not be converted to type time.Time", timeAsString))
+	j.setLastError(fmt.Errorf("the value '%v' could not be converted to type time.Time", timeAsString))
 	return time.Time{}
 }
 
@@ -139,11 +139,11 @@ func getObjectScalar[T any](o *JsonObject, f jc[T], key string, typeString strin
 	var zero T
 	v, ok := o.object[key]
 	if !ok {
-		o.SetLastError(createKeyNotFoundErr(key))
+		o.setLastError(createKeyNotFoundErr(key))
 		return zero
 	}
 	if v == nil {
-		o.SetLastError(createNullConversionErr(typeString))
+		o.setLastError(createNullConversionErr(typeString))
 		return zero
 	}
 	return f(v, o)
@@ -152,12 +152,12 @@ func getObjectScalar[T any](o *JsonObject, f jc[T], key string, typeString strin
 func getArrayScalar[T any](a *JsonArray, f jc[T], i int, typeString string) T {
 	var zero T
 	if i >= a.Length() {
-		a.SetLastError(createIndexOutOfRangeErr(i, a.Length()))
+		a.setLastError(createIndexOutOfRangeErr(i, a.Length()))
 		return zero
 	}
 	data := a.elements[i]
 	if data == nil {
-		a.SetLastError(createNullConversionErr(typeString))
+		a.setLastError(createNullConversionErr(typeString))
 		return zero
 	}
 	return f(data, a)
@@ -165,7 +165,7 @@ func getArrayScalar[T any](a *JsonArray, f jc[T], i int, typeString string) T {
 
 func convertAnyToString(data *any, j jsonEntity) string {
 	if data == nil {
-		j.SetLastError(createNullConversionErr(stringTypeStr))
+		j.setLastError(createNullConversionErr(stringTypeStr))
 		return ""
 	}
 	switch (*data).(type) {
@@ -178,14 +178,14 @@ func convertAnyToString(data *any, j jsonEntity) string {
 	case bool:
 		return strconv.FormatBool((*data).(bool))
 	default:
-		j.SetLastError(createTypeConversionErr(*data, stringTypeStr))
+		j.setLastError(createTypeConversionErr(*data, stringTypeStr))
 		return ""
 	}
 }
 
 func convertAnyToInt(data *any, j jsonEntity) int {
 	if data == nil {
-		j.SetLastError(createNullConversionErr(intTypeStr))
+		j.setLastError(createNullConversionErr(intTypeStr))
 		return 0
 	}
 	switch (*data).(type) {
@@ -194,19 +194,19 @@ func convertAnyToInt(data *any, j jsonEntity) int {
 	case int:
 		return (*data).(int)
 	default:
-		j.SetLastError(createTypeConversionErr(*data, intTypeStr))
+		j.setLastError(createTypeConversionErr(*data, intTypeStr))
 		return 0
 	}
 }
 
 func convertAnyToFloat(data *any, j jsonEntity) float64 {
 	if data == nil {
-		j.SetLastError(createNullConversionErr(floatTypeStr))
+		j.setLastError(createNullConversionErr(floatTypeStr))
 		return 0
 	}
 	v, ok := (*data).(float64)
 	if !ok {
-		j.SetLastError(createTypeConversionErr(*data, floatTypeStr))
+		j.setLastError(createTypeConversionErr(*data, floatTypeStr))
 		return 0
 	}
 	return v
@@ -214,12 +214,12 @@ func convertAnyToFloat(data *any, j jsonEntity) float64 {
 
 func convertAnyToBool(data *any, j jsonEntity) bool {
 	if data == nil {
-		j.SetLastError(createNullConversionErr(boolTypeStr))
+		j.setLastError(createNullConversionErr(boolTypeStr))
 		return false
 	}
 	v, ok := (*data).(bool)
 	if !ok {
-		j.SetLastError(createTypeConversionErr(*data, boolTypeStr))
+		j.setLastError(createTypeConversionErr(*data, boolTypeStr))
 		return false
 	}
 	return v
@@ -227,12 +227,12 @@ func convertAnyToBool(data *any, j jsonEntity) bool {
 
 func convertAnyToObject(data *any, j jsonEntity) JsonObject {
 	if data == nil {
-		j.SetLastError(createNullConversionErr(objectTypeStr))
+		j.setLastError(createNullConversionErr(objectTypeStr))
 		return *EmptyObject()
 	}
 	v, ok := (*data).(map[string]any)
 	if !ok {
-		j.SetLastError(createTypeConversionErr(data, objectTypeStr))
+		j.setLastError(createTypeConversionErr(data, objectTypeStr))
 		return *EmptyObject()
 	}
 
@@ -247,12 +247,12 @@ func convertAnyToObject(data *any, j jsonEntity) JsonObject {
 
 func convertAnyToArray(data *any, j jsonEntity) JsonArray {
 	if data == nil {
-		j.SetLastError(createNullConversionErr(arrayTypeStr))
+		j.setLastError(createNullConversionErr(arrayTypeStr))
 		return *EmptyArray()
 	}
 	v, ok := (*data).([]any)
 	if !ok {
-		j.SetLastError(createTypeConversionErr(data, arrayTypeStr))
+		j.setLastError(createTypeConversionErr(data, arrayTypeStr))
 		return *EmptyArray()
 	}
 

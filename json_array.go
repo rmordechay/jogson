@@ -31,6 +31,11 @@ func (a *JsonArray) Length() int {
 	return len(a.elements)
 }
 
+// IsEmpty checks if the JSON array has no elements in it
+func (a *JsonArray) IsEmpty() bool {
+	return len(a.elements) == 0
+}
+
 // Elements returns all elements in the JsonArray as a slice of JsonMapper objects.
 func (a *JsonArray) Elements() []JsonMapper {
 	jsons := make([]JsonMapper, 0, len(a.elements))
@@ -106,12 +111,12 @@ func (a *JsonArray) GetTime(i int) time.Time {
 // If the index is out of range, the value is invalid or is null, an error will be set to LastError.
 func (a *JsonArray) GetObject(i int) *JsonObject {
 	if i >= a.Length() {
-		a.SetLastError(createIndexOutOfRangeErr(i, a.Length()))
+		a.setLastError(createIndexOutOfRangeErr(i, a.Length()))
 		return EmptyObject()
 	}
 	element := a.elements[i]
 	if element == nil {
-		a.SetLastError(createNullConversionErr(objectTypeStr))
+		a.setLastError(createNullConversionErr(objectTypeStr))
 		return EmptyObject()
 	}
 	switch (*element).(type) {
@@ -122,7 +127,7 @@ func (a *JsonArray) GetObject(i int) *JsonObject {
 		data := convertToMapValuesPtr((*element).(map[string]any))
 		return NewObject(data)
 	default:
-		a.SetLastError(createTypeConversionErr(*element, objectTypeStr))
+		a.setLastError(createTypeConversionErr(*element, objectTypeStr))
 		return EmptyObject()
 	}
 }
@@ -131,17 +136,17 @@ func (a *JsonArray) GetObject(i int) *JsonObject {
 // If the index is out of range, the value is invalid or is null, an error will be set to LastError.
 func (a *JsonArray) GetArray(i int) *JsonArray {
 	if i >= a.Length() {
-		a.SetLastError(createIndexOutOfRangeErr(i, a.Length()))
+		a.setLastError(createIndexOutOfRangeErr(i, a.Length()))
 		return EmptyArray()
 	}
 	element := a.elements[i]
 	if element == nil {
-		a.SetLastError(createNullConversionErr(arrayTypeStr))
+		a.setLastError(createNullConversionErr(arrayTypeStr))
 		return EmptyArray()
 	}
 	v, ok := (*element).([]any)
 	if !ok {
-		a.SetLastError(createTypeConversionErr(*element, arrayTypeStr))
+		a.setLastError(createTypeConversionErr(*element, arrayTypeStr))
 		return EmptyArray()
 	}
 	return NewArray(convertToSlicePtr(v))
@@ -165,7 +170,7 @@ func (a *JsonArray) AddElement(value any) {
 	case nil, string, int, float64, bool, []string, []int, []float64, []bool:
 		a.elements = append(a.elements, &value)
 	default:
-		a.SetLastError(fmt.Errorf("could not add value of type %T", value))
+		a.setLastError(fmt.Errorf("could not add value of type %T", value))
 	}
 }
 
@@ -225,7 +230,7 @@ func (a *JsonArray) Any() bool {
 }
 
 // SetLastError sets the last error encountered in the JsonArray.
-func (a *JsonArray) SetLastError(err error) {
+func (a *JsonArray) setLastError(err error) {
 	a.LastError = err
 }
 
