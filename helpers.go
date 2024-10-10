@@ -11,26 +11,6 @@ import (
 
 var jsonIter = jsoniter.ConfigCompatibleWithStandardLibrary
 
-func (m *JsonMapper) getType() JsonType {
-	switch {
-	case m.IsBool:
-		return Bool
-	case m.IsInt:
-		return Int
-	case m.IsFloat:
-		return Float
-	case m.IsString:
-		return String
-	case m.IsObject:
-		return Object
-	case m.IsNull:
-		return Null
-	case m.IsArray:
-		return Array
-	}
-	return Invalid
-}
-
 func convertToSlicePtr(data []any) []*any {
 	array := make([]*any, len(data))
 	for i, v := range data {

@@ -6,12 +6,11 @@ import (
 )
 
 var (
-	nullConversionErrStr     = "null value cannot be converted to '%s'"
-	typeConversionErrStr     = "'%T' could not be converted to %s"
-	keyNotFoundErrStr        = "'%v'"
-	indexOutOfRangeErrStr    = "[%v] with length %v"
-	timeTypeConversionErrStr = "cannot convert type '%v' to time.Time"
-	invalidTime              = "'%v' could not be parsed as time"
+	nullConversionErrStr  = "null value cannot be converted to '%s'"
+	typeConversionErrStr  = "'%T' could not be converted to %s"
+	keyNotFoundErrStr     = "'%v'"
+	indexOutOfRangeErrStr = "[%v] with length %v"
+	invalidTime           = "'%v' could not be parsed as time"
 )
 
 var (
@@ -37,10 +36,6 @@ func createKeyNotFoundErr(key string) error {
 
 func createIndexOutOfRangeErr(i int, length int) error {
 	return errors.Join(IndexOutOfRangeErr, fmt.Errorf(indexOutOfRangeErrStr, i, length))
-}
-
-func createTimeTypeConversionErr(fromType JsonType) error {
-	return errors.Join(TimeTypeConversionErr, fmt.Errorf(timeTypeConversionErrStr, fromType))
 }
 
 func createNewInvalidTimeErr(v any) error {

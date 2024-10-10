@@ -11,19 +11,6 @@ type jsonI interface {
 	setLastError(err error)
 }
 
-type JsonType int
-
-const (
-	Bool JsonType = iota
-	Int
-	Float
-	String
-	Object
-	Array
-	Null
-	Invalid
-)
-
 const (
 	boolTypeStr   = "bool"
 	intTypeStr    = "int"
@@ -33,19 +20,6 @@ const (
 	arrayTypeStr  = "JsonArray"
 	timeTypeStr   = "time.Time"
 )
-
-func (d JsonType) String() string {
-	return [...]string{
-		boolTypeStr,
-		intTypeStr,
-		floatTypeStr,
-		stringTypeStr,
-		objectTypeStr,
-		arrayTypeStr,
-		"null",
-		"invalid",
-	}[d]
-}
 
 var timeLayouts = []string{
 	time.RFC3339,
