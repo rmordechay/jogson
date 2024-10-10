@@ -23,26 +23,26 @@ var (
 	InvalidTimeErr        = errors.New("ERROR: invalid time")
 )
 
-func NewNullConversionErr(toType string) error {
+func createNullConversionErr(toType string) error {
 	return errors.Join(NullConversionErr, fmt.Errorf(nullConversionErrStr, toType))
 }
 
-func NewTypeConversionErr(fromType any, toType any) error {
+func createTypeConversionErr(fromType any, toType any) error {
 	return errors.Join(TypeConversionErr, fmt.Errorf(typeConversionErrStr, fromType, toType))
 }
 
-func NewKeyNotFoundErr(key string) error {
+func createKeyNotFoundErr(key string) error {
 	return errors.Join(KeyNotFoundErr, fmt.Errorf(keyNotFoundErrStr, key))
 }
 
-func NewIndexOutOfRangeErr(i int, length int) error {
+func createIndexOutOfRangeErr(i int, length int) error {
 	return errors.Join(IndexOutOfRangeErr, fmt.Errorf(indexOutOfRangeErrStr, i, length))
 }
 
-func NewTimeTypeConversionErr(fromType JsonType) error {
+func createTimeTypeConversionErr(fromType JsonType) error {
 	return errors.Join(TimeTypeConversionErr, fmt.Errorf(timeTypeConversionErrStr, fromType))
 }
 
-func NewInvalidTimeErr(v any) error {
+func createNewInvalidTimeErr(v any) error {
 	return errors.Join(InvalidTimeErr, fmt.Errorf(invalidTime, v))
 }

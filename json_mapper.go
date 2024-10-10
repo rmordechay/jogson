@@ -84,7 +84,7 @@ func FromBuffer(reader io.Reader) (JsonMapper, error) {
 // Only works if the JSON value is a string and can be parsed as a valid time.
 func (m *JsonMapper) AsTime() (time.Time, error) {
 	if !m.IsString {
-		return time.Time{}, NewTimeTypeConversionErr(m.getType())
+		return time.Time{}, createTimeTypeConversionErr(m.getType())
 	}
 	for _, layout := range timeLayouts {
 		parsedTime, err := time.Parse(layout, m.AsString)
@@ -92,7 +92,7 @@ func (m *JsonMapper) AsTime() (time.Time, error) {
 			return parsedTime, nil
 		}
 	}
-	return time.Time{}, NewInvalidTimeErr(m.AsString)
+	return time.Time{}, createNewInvalidTimeErr(m.AsString)
 }
 
 func (m *JsonMapper) ProcessJsonList(numberOfWorkers int, f func(o JsonObject)) {

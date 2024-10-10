@@ -130,9 +130,9 @@ var nestedArray []JsonArray = array.As2DArray()
 var objectArray []JsonObject = array.AsObjectArray()
 ```
 
-### Primitive Types
+### Scalars
 
-Getting primitive types - `string`, `int`, `float64` or `bool` - is similar both for object and array and only differ
+Getting scalars - `string`, `int`, etc. - is similar both for object and array and only differ
 in the parameter type (objects take `string` as key and arrays take `int` as index)
 
 #### From Object
