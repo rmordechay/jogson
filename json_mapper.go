@@ -12,6 +12,9 @@ import (
 
 var jsonIter = jsoniter.ConfigCompatibleWithStandardLibrary
 
+// Json represents a generic JSON type.
+// It contains fields for all supported JSON types like bool, int, float, string, object, and array,
+// as well as Go supported types.
 type Json struct {
 	IsBool   bool
 	IsInt    bool
@@ -29,6 +32,8 @@ type Json struct {
 	Array    JsonArray
 }
 
+// FromBytes parses JSON data from a byte slice.
+// It automatically determines whether the input is a JSON object or array.
 func FromBytes(data []byte) (Json, error) {
 	if isObjectOrArray(data, '[') {
 		return newJsonArray(data)
@@ -39,6 +44,7 @@ func FromBytes(data []byte) (Json, error) {
 	}
 }
 
+// FromStruct serializes a Go struct into JSON and parses it into a Json object.
 func FromStruct[T any](s T) (Json, error) {
 	jsonBytes, err := marshal(s)
 	if err != nil {
@@ -47,6 +53,7 @@ func FromStruct[T any](s T) (Json, error) {
 	return FromBytes(jsonBytes)
 }
 
+// FromFile reads a JSON file from the given path and parses it into a Json object.
 func FromFile(path string) (Json, error) {
 	file, err := os.ReadFile(path)
 	if err != nil {
@@ -55,10 +62,13 @@ func FromFile(path string) (Json, error) {
 	return FromBytes(file)
 }
 
+// FromString parses JSON from a string into a Json object.
 func FromString(data string) (Json, error) {
 	return FromBytes([]byte(data))
 }
 
+// AsTime attempts to convert the JSON value to a time.Time object.
+// Only works if the JSON value is a string and can be parsed as a valid time.
 func (m *Json) AsTime() (time.Time, error) {
 	if !m.IsString {
 		return time.Time{}, fmt.Errorf("cannot convert type %v to type time.Time\n", m.getType())
@@ -72,6 +82,25 @@ func (m *Json) AsTime() (time.Time, error) {
 	return time.Time{}, fmt.Errorf("the value '%v' could not be converted to type time.Time", m.AsString)
 }
 
+// PrettyString returns a formatted, human-readable string representation of the Json value.
+func (m *Json) PrettyString() string {
+	if m.IsBool {
+		return fmt.Sprintf("%v", m.AsBool)
+	} else if m.IsInt {
+		return fmt.Sprintf("%v", m.AsInt)
+	} else if m.IsFloat {
+		return fmt.Sprintf("%v", m.AsFloat)
+	} else if m.IsString {
+		return fmt.Sprintf("%v", m.AsString)
+	} else if m.IsObject {
+		return m.Object.PrettyString()
+	} else if m.IsArray {
+		return fmt.Sprintf("%v", m.Array)
+	}
+	return ""
+}
+
+// String returns a string representation Json type in JSON format.
 func (m *Json) String() string {
 	switch {
 	case m.IsBool:
@@ -85,23 +114,6 @@ func (m *Json) String() string {
 	case m.IsObject:
 		return fmt.Sprintf("%v", m.Object)
 	case m.IsArray:
-		return fmt.Sprintf("%v", m.Array)
-	}
-	return ""
-}
-
-func (m *Json) PrettyString() string {
-	if m.IsBool {
-		return fmt.Sprintf("%v", m.AsBool)
-	} else if m.IsInt {
-		return fmt.Sprintf("%v", m.AsInt)
-	} else if m.IsFloat {
-		return fmt.Sprintf("%v", m.AsFloat)
-	} else if m.IsString {
-		return fmt.Sprintf("%v", m.AsString)
-	} else if m.IsObject {
-		return m.Object.PrettyString()
-	} else if m.IsArray {
 		return fmt.Sprintf("%v", m.Array)
 	}
 	return ""

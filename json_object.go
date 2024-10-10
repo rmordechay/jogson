@@ -5,17 +5,20 @@ import (
 	"time"
 )
 
+// JsonObject represents a JSON object
 type JsonObject struct {
 	object    map[string]*interface{}
 	LastError error
 }
 
+// NewObject creates and returns a new JsonObject.
 func NewObject() JsonObject {
 	var obj JsonObject
 	obj.object = make(map[string]*interface{})
 	return obj
 }
 
+// Keys returns a slice of all keys in the JsonObject.
 func (o *JsonObject) Keys() []string {
 	keys := make([]string, 0, len(o.object))
 	for key := range o.object {
@@ -24,6 +27,7 @@ func (o *JsonObject) Keys() []string {
 	return keys
 }
 
+// Values returns a slice of all values in the JsonObject as Json types.
 func (o *JsonObject) Values() []Json {
 	values := make([]Json, 0, len(o.object))
 	for _, v := range o.object {
@@ -32,6 +36,7 @@ func (o *JsonObject) Values() []Json {
 	return values
 }
 
+// Elements returns a map of all elements in the JsonObject with their keys.
 func (o *JsonObject) Elements() map[string]Json {
 	jsons := make(map[string]Json)
 	for k, v := range o.object {
@@ -40,6 +45,7 @@ func (o *JsonObject) Elements() map[string]Json {
 	return jsons
 }
 
+// Has checks if the specified key exists in the JsonObject.
 func (o *JsonObject) Has(key string) bool {
 	for k := range o.object {
 		if k == key {
@@ -49,6 +55,8 @@ func (o *JsonObject) Has(key string) bool {
 	return false
 }
 
+// GetString retrieves the string value associated with the specified key.
+// If the key does not exist or the value is not a string, it sets LastError.
 func (o *JsonObject) GetString(key string) string {
 	for k, v := range o.object {
 		if k != key {
@@ -60,6 +68,8 @@ func (o *JsonObject) GetString(key string) string {
 	return ""
 }
 
+// GetInt retrieves the int value associated with the specified key.
+// If the key does not exist or the value is not an int, it sets LastError.
 func (o *JsonObject) GetInt(key string) int {
 	for k, v := range o.object {
 		if k != key {
@@ -75,6 +85,8 @@ func (o *JsonObject) GetInt(key string) int {
 	return 0
 }
 
+// GetFloat retrieves the float64 value associated with the specified key.
+// If the key does not exist or the value is not a float, it sets LastError.
 func (o *JsonObject) GetFloat(key string) float64 {
 	for k, v := range o.object {
 		if k != key {
@@ -90,6 +102,8 @@ func (o *JsonObject) GetFloat(key string) float64 {
 	return 0
 }
 
+// GetBool retrieves the bool value associated with the specified key.
+// If the key does not exist or the value is not a bool, it sets LastError.
 func (o *JsonObject) GetBool(key string) bool {
 	for k, v := range o.object {
 		if k != key {
@@ -105,6 +119,8 @@ func (o *JsonObject) GetBool(key string) bool {
 	return false
 }
 
+// GetTime retrieves the time.Time value associated with the specified key.
+// If the key does not exist or the value is not a valid time, it returns an error.
 func (o *JsonObject) GetTime(key string) (time.Time, error) {
 	for k, v := range o.object {
 		if k != key {
@@ -118,6 +134,8 @@ func (o *JsonObject) GetTime(key string) (time.Time, error) {
 	return time.Time{}, fmt.Errorf(keyNotFoundErrStr, key)
 }
 
+// GetObject retrieves a nested JsonObject associated with the specified key.
+// If the key does not exist or the value is not a valid object, it sets LastError.
 func (o *JsonObject) GetObject(key string) *JsonObject {
 	for k, v := range o.object {
 		if k != key {
@@ -143,6 +161,8 @@ func (o *JsonObject) GetObject(key string) *JsonObject {
 	return &JsonObject{}
 }
 
+// GetArray retrieves an array of JsonArray associated with the specified key.
+// If the key does not exist or the value is not a valid array, it sets LastError.
 func (o *JsonObject) GetArray(key string) *JsonArray {
 	for k, v := range o.object {
 		if k != key {
@@ -163,6 +183,8 @@ func (o *JsonObject) GetArray(key string) *JsonArray {
 	return &JsonArray{}
 }
 
+// Find searches for a key in the JsonObject and its nested objects.
+// Returns the Json associated with the key if found; otherwise, returns an empty Json.
 func (o *JsonObject) Find(key string) Json {
 	for k, v := range o.object {
 		field := getMapperFromField(v)
@@ -176,16 +198,19 @@ func (o *JsonObject) Find(key string) Json {
 	return Json{}
 }
 
+// AddKeyValue adds a key-value pair to the JsonObject.
 func (o *JsonObject) AddKeyValue(k string, value interface{}) {
 	o.object[k] = &value
 }
 
+// ForEach applies the provided function to each key-value pair in the JsonObject.
 func (o *JsonObject) ForEach(f func(key string, j Json)) {
 	for k, element := range o.object {
 		f(k, getMapperFromField(element))
 	}
 }
 
+// Filter returns a new JsonObject containing only the key-value pairs for which the provided function returns true.
 func (o *JsonObject) Filter(f func(key string, j Json) bool) JsonObject {
 	var obj = NewObject()
 	for k, element := range o.object {
@@ -196,19 +221,24 @@ func (o *JsonObject) Filter(f func(key string, j Json) bool) JsonObject {
 	return obj
 }
 
+// SetLastError sets the LastError field of the JsonObject to the provided error.
 func (o *JsonObject) SetLastError(err error) {
 	o.LastError = err
 }
 
+// TransformObjectKeys returns a new JsonObject with transformed keys, where keys are converted to snake_case.
 func (o *JsonObject) TransformObjectKeys() JsonObject {
 	return JsonObject{object: transformKeys(o.object)}
 }
 
+// PrettyString returns a pretty-printed string representation of the JsonObject.
 func (o *JsonObject) PrettyString() string {
 	jsonBytes, _ := marshalIndent(o.object)
 	return string(jsonBytes)
 }
 
+// String returns a string representation of the JsonObject in JSON format.
+// Returns: A string containing the JSON representation.
 func (o *JsonObject) String() string {
 	jsonBytes, _ := marshal(o.object)
 	return string(jsonBytes)

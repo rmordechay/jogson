@@ -5,11 +5,13 @@ import (
 	"time"
 )
 
+// JsonArray represents a JSON array
 type JsonArray struct {
 	elements  []*interface{}
 	LastError error
 }
 
+// NewArray initializes and returns a new instance of JsonArray with an empty list of elements.
 func NewArray() *JsonArray {
 	var arr JsonArray
 	elements := make([]*interface{}, 0)
@@ -17,6 +19,7 @@ func NewArray() *JsonArray {
 	return &arr
 }
 
+// Elements returns all elements in the JsonArray as a slice of Json objects.
 func (a *JsonArray) Elements() []Json {
 	jsons := make([]Json, 0, len(a.elements))
 	for _, element := range a.elements {
@@ -25,6 +28,8 @@ func (a *JsonArray) Elements() []Json {
 	return jsons
 }
 
+// As2DArray converts the elements of the JsonArray into a two-dimensional array,
+// returning a slice of JsonArray objects.
 func (a *JsonArray) As2DArray() []JsonArray {
 	arr := make([]JsonArray, 0, len(a.elements))
 	a.LastError = nil
@@ -38,6 +43,7 @@ func (a *JsonArray) As2DArray() []JsonArray {
 	return arr
 }
 
+// AsObjectArray converts the elements of the JsonArray into a slice of JsonObject objects.
 func (a *JsonArray) AsObjectArray() []JsonObject {
 	arr := make([]JsonObject, 0, len(a.elements))
 	a.LastError = nil
@@ -51,6 +57,7 @@ func (a *JsonArray) AsObjectArray() []JsonObject {
 	return arr
 }
 
+// AsStringArray converts the elements of the JsonArray into a slice of strings.
 func (a *JsonArray) AsStringArray() []string {
 	arr := make([]string, 0, len(a.elements))
 	a.LastError = nil
@@ -64,6 +71,7 @@ func (a *JsonArray) AsStringArray() []string {
 	return arr
 }
 
+// AsIntArray converts the elements of the JsonArray into a slice of integers.
 func (a *JsonArray) AsIntArray() []int {
 	arr := make([]int, 0, len(a.elements))
 	for _, element := range a.elements {
@@ -73,6 +81,7 @@ func (a *JsonArray) AsIntArray() []int {
 	return arr
 }
 
+// AsFloatArray converts the elements of the JsonArray into a slice of floats.
 func (a *JsonArray) AsFloatArray() []float64 {
 	arr := make([]float64, 0, len(a.elements))
 	for _, element := range a.elements {
@@ -82,6 +91,7 @@ func (a *JsonArray) AsFloatArray() []float64 {
 	return arr
 }
 
+// GetString retrieves the string value from the element at the specified index.
 func (a *JsonArray) GetString(i int) string {
 	if i >= a.Length() {
 		a.SetLastError(fmt.Errorf(indexOutOfRangeErrStr, i, a.Length()))
@@ -90,6 +100,7 @@ func (a *JsonArray) GetString(i int) string {
 	return getAsString(a.elements[i], a)
 }
 
+// GetInt retrieves the integer value from the element at the specified index.
 func (a *JsonArray) GetInt(i int) int {
 	if i >= a.Length() {
 		a.SetLastError(fmt.Errorf(indexOutOfRangeErrStr, i, a.Length()))
@@ -98,6 +109,7 @@ func (a *JsonArray) GetInt(i int) int {
 	return getAsInt(a.elements[i], a)
 }
 
+// GetFloat retrieves the float value from the element at the specified index.
 func (a *JsonArray) GetFloat(i int) float64 {
 	if i >= a.Length() {
 		a.SetLastError(fmt.Errorf(indexOutOfRangeErrStr, i, a.Length()))
@@ -106,6 +118,7 @@ func (a *JsonArray) GetFloat(i int) float64 {
 	return getAsFloat(a.elements[i], a)
 }
 
+// GetBool retrieves the boolean value from the element at the specified index.
 func (a *JsonArray) GetBool(i int) bool {
 	if i >= a.Length() {
 		a.SetLastError(fmt.Errorf(indexOutOfRangeErrStr, i, a.Length()))
@@ -114,6 +127,7 @@ func (a *JsonArray) GetBool(i int) bool {
 	return getAsBool(a.elements[i], a)
 }
 
+// GetTime retrieves the time value from the element at the specified index, returning an error if conversion fails.
 func (a *JsonArray) GetTime(key int) (time.Time, error) {
 	for k, v := range a.elements {
 		if k != key {
@@ -127,6 +141,7 @@ func (a *JsonArray) GetTime(key int) (time.Time, error) {
 	return time.Time{}, fmt.Errorf(keyNotFoundErrStr, key)
 }
 
+// GetObject retrieves the JsonObject from the element at the specified index.
 func (a *JsonArray) GetObject(i int) *JsonObject {
 	if i >= a.Length() {
 		a.SetLastError(fmt.Errorf(indexOutOfRangeErrStr, i, a.Length()))
@@ -148,6 +163,7 @@ func (a *JsonArray) GetObject(i int) *JsonObject {
 	}
 }
 
+// GetArray retrieves the JsonArray from the element at the specified index.
 func (a *JsonArray) GetArray(i int) JsonArray {
 	if i >= a.Length() {
 		a.SetLastError(fmt.Errorf(indexOutOfRangeErrStr, i, a.Length()))
@@ -166,20 +182,24 @@ func (a *JsonArray) GetArray(i int) JsonArray {
 	return JsonArray{elements: convertToSlicePtr(v)}
 }
 
+// Length returns the number of elements in the JsonArray.
 func (a *JsonArray) Length() int {
 	return len(a.elements)
 }
 
+// AddElement appends a new element to the JsonArray.
 func (a *JsonArray) AddElement(value interface{}) {
 	a.elements = append(a.elements, &value)
 }
 
+// ForEach applies the given function to each element in the JsonArray.
 func (a *JsonArray) ForEach(f func(j Json)) {
 	for _, element := range a.elements {
 		f(getMapperFromField(element))
 	}
 }
 
+// Filter returns a new JsonArray containing only the elements that satisfy the given filter function.
 func (a *JsonArray) Filter(f func(j Json) bool) JsonArray {
 	var arr = NewArray()
 	for _, element := range a.elements {
@@ -190,6 +210,7 @@ func (a *JsonArray) Filter(f func(j Json) bool) JsonArray {
 	return *arr
 }
 
+// FilterNull returns a new JsonArray excluding any elements that are null.
 func (a *JsonArray) FilterNull() JsonArray {
 	var arr = NewArray()
 	for _, element := range a.elements {
@@ -201,6 +222,7 @@ func (a *JsonArray) FilterNull() JsonArray {
 	return *arr
 }
 
+// All returns true if all elements in the JsonArray are non-null.
 func (a *JsonArray) All() bool {
 	for _, element := range a.elements {
 		field := getMapperFromField(element)
@@ -211,6 +233,7 @@ func (a *JsonArray) All() bool {
 	return true
 }
 
+// Any returns true if any element in the JsonArray is non-null.
 func (a *JsonArray) Any() bool {
 	if len(a.elements) == 0 {
 		return true
@@ -224,10 +247,12 @@ func (a *JsonArray) Any() bool {
 	return false
 }
 
+// SetLastError sets the last error encountered in the JsonArray.
 func (a *JsonArray) SetLastError(err error) {
 	a.LastError = err
 }
 
+// String returns a string representation of the JsonArray in JSON format.
 func (a *JsonArray) String() string {
 	jsonBytes, _ := marshal(a.elements)
 	return string(jsonBytes)
