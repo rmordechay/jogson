@@ -1,6 +1,7 @@
 module github.com/rmordechay/jsonmapper
 
 require (
+	github.com/google/uuid v1.6.0
 	github.com/json-iterator/go v1.1.12
 	github.com/stretchr/testify v1.9.0
 )

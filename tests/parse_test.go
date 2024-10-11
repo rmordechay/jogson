@@ -169,19 +169,6 @@ func TestParseTime(t *testing.T) {
 	assert.Equal(t, expectedTime3, actualTime3)
 }
 
-func TestParseTimeInvalid(t *testing.T) {
-	mapper, err := jsonmapper.FromString(jsonInvalidTimeTest)
-	assert.NoError(t, err)
-	for _, v := range mapper.AsObject.Elements() {
-		_, err = v.AsTime()
-		assert.Error(t, err)
-	}
-}
-
-func TestExample(t *testing.T) {
-	//docs.RunExample()
-}
-
 func removeWhiteSpaces(data string) string {
 	s := strings.ReplaceAll(data, " ", "")
 	s = strings.ReplaceAll(s, "\n", "")

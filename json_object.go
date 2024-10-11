@@ -100,11 +100,14 @@ func (o *JsonObject) AsObjectMap() map[string]JsonObject {
 }
 
 // Get retrieves the value associated with the key and returns it as a JsonMapper
+// If the key does not exist, the value is invalid or is null, an error will be set to LastError.
 func (o *JsonObject) Get(key string) JsonMapper {
 	return getMapperFromField(o.object[key])
 }
 
-// GetString retrieves the string value associated with the specified key.
+// GetString retrieves the value associated with the specified key as string. JSON values that are not
+// proper string values, i.e. numbers or booleans, will still be converted to string. For example, the value 3
+// will be converted to "3".
 // If the key does not exist, the value is invalid or is null, an error will be set to LastError.
 func (o *JsonObject) GetString(key string) string {
 	return getObjectScalar(o, convertAnyToString, key, stringTypeStr)

@@ -36,36 +36,6 @@ func (a *JsonArray) IsEmpty() bool {
 	return len(a.elements) == 0
 }
 
-// ContainsString checks if the JSON array contains the string s
-func (a *JsonArray) ContainsString(s string) bool {
-	for _, element := range a.elements {
-		if *element == s {
-			return true
-		}
-	}
-	return false
-}
-
-// ContainsInt checks if the JSON array contains the int i
-func (a *JsonArray) ContainsInt(i int) bool {
-	for _, element := range a.elements {
-		if *element == i {
-			return true
-		}
-	}
-	return false
-}
-
-// ContainsFloat checks if the JSON array contains the float f
-func (a *JsonArray) ContainsFloat(f float64) bool {
-	for _, element := range a.elements {
-		if *element == f {
-			return true
-		}
-	}
-	return false
-}
-
 // IsNull checks if element at index i is null
 func (a *JsonArray) IsNull(i int) bool {
 	v := a.elements[i]
@@ -107,7 +77,38 @@ func (a *JsonArray) AsObjectArray() []JsonObject {
 	return getGenericArray(convertAnyToObject, *a)
 }
 
+// ContainsString checks if the JSON array contains the string s
+func (a *JsonArray) ContainsString(s string) bool {
+	for _, element := range a.elements {
+		if *element == s {
+			return true
+		}
+	}
+	return false
+}
+
+// ContainsInt checks if the JSON array contains the int i
+func (a *JsonArray) ContainsInt(i int) bool {
+	for _, element := range a.elements {
+		if *element == i {
+			return true
+		}
+	}
+	return false
+}
+
+// ContainsFloat checks if the JSON array contains the float f
+func (a *JsonArray) ContainsFloat(f float64) bool {
+	for _, element := range a.elements {
+		if *element == f {
+			return true
+		}
+	}
+	return false
+}
+
 // Get retrieves the value at index i and returns it as a JsonMapper
+// If the index is out of range, the value is invalid or is null, an error will be set to LastError.
 func (a *JsonArray) Get(i int) JsonMapper {
 	if i >= a.Length() {
 		a.setLastError(createIndexOutOfRangeErr(i, a.Length()))
@@ -116,7 +117,8 @@ func (a *JsonArray) Get(i int) JsonMapper {
 	return getMapperFromField(a.elements[i])
 }
 
-// GetString retrieves the string value from the element at the specified index.
+// GetString retrieves the string value from the element at the specified index. Values that are not
+// proper JSON string values, i.e. numbers or booleans, will still be converted to string.
 // If the index is out of range, the value is invalid or is null, an error will be set to LastError.
 func (a *JsonArray) GetString(i int) string {
 	return getArrayScalar(a, convertAnyToString, i, stringTypeStr)

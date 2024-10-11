@@ -20,12 +20,11 @@ A simple Go library to simplify working with JSON without the need to define str
 ## Installation
 
 To install the library, use:
-
 ```bash
 go get github.com/rmordechay/jsonmapper
 ```
 
-### Create a Mapper
+## Create a Mapper
 
 There are multiple ways to create a mapper.
 
@@ -243,3 +242,41 @@ arr.AddElement(15)
 arr.AddElement(19)
 fmt.Println(arr.String()) // [15,19]
 ```
+
+## Design
+
+There are 3 structs that are important to know when working with the library
+* `JsonMapper` struct for generic JSON.
+* `JsonObject` represents JSON object.
+* `JsonArray`  represents JSON array.
+
+#### JsonMapper
+Most likely, when you read JSON, you would start with a `JsonMapper` (see [Create a Mapper](#Create-a-mapper)).
+`JsonMapper` is a struct that hold your JSON data. It has several `AsX` and `IsX` fields with which you can get the data and check
+the type, respectively. For example, if your data is a JSON object, you can call `JsonMapper.AsObject`, or if it's a string, `JsonMapper.AsString`.
+If you don't know the type and want to check it dynamically, you can use `JsonMapper.IsObject`, `JsonMapper.IsString`, etc. If the underlying data
+is null, then `IsNull` will be set to true. `JsonMapper` is also returned in cases where the return type can be any JSON
+type. For example, `JsonArray.Elements()` returns a slice `[]JsonMapper` which you can iterate over or query specific elements.
+
+### JsonObject
+`JsonObject` holds JSON object data and has different methods to read from JSON object or write to it. The simplest way to get a `JsonObject`
+is to call `JsonMapper.AsObject`. Once you have an instance, you get use the various methods to get data. 
+
+### JsonArray
+
+## Good to know
+
+### `As`, `Is` and `Get`
+The prefixes, `As`, `Is` and `Get` have similar semantics across the library.
+* `IsX`: checks for the value's time. For example `JsonMapper.IsBool`
+* `AsX`: converts the current data to other type representation. For example, `JsonArray.AsStringArray()` converts JsonArray to `[]string`.
+* `GetX`: Fetches the data, usually with some sort of search in the underlying data.
+
+### `JsonObject` and `JsonArray` similarity
+`JsonObject` and `JsonArray` have very similar methods, both in naming and semantics, but with 2 differences
+  * Input: 
+    * `JsonObject`'s methods mostly asks for `string` as the key 
+    * `JsonArray`'s methods mostly asks for `int` as the index
+  * Output:
+    * `JsonObject`'s methods mostly return a map
+    * `JsonArray`'s methods mostly return a slice

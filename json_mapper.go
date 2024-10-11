@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/google/uuid"
 	"io"
 	"os"
 	"sync"
@@ -92,7 +93,14 @@ func (m *JsonMapper) AsTime() (time.Time, error) {
 	return time.Time{}, createNewInvalidTimeErr(m.AsString)
 }
 
-func (m *JsonMapper) ProcessObjects(numberOfWorkers int, f func(o JsonObject)) error {
+func (m *JsonMapper) AsUUID() (uuid.UUID, error) {
+	if !m.IsString {
+		return uuid.Nil, nil
+	}
+	return uuid.Parse(m.AsString)
+}
+
+func (m *JsonMapper) ProcessObjectsWithArgs(numberOfWorkers int, f func(o JsonObject, args ...any), args ...any) error {
 	if m.reader == nil {
 		return errors.New("reader is not set")
 	}
@@ -121,7 +129,7 @@ func (m *JsonMapper) ProcessObjects(numberOfWorkers int, f func(o JsonObject)) e
 		sem <- struct{}{}
 		go func(o JsonObject) {
 			defer func() { <-sem }()
-			f(o)
+			f(o, args...)
 			wg.Done()
 		}(*obj)
 	}
@@ -133,6 +141,12 @@ func (m *JsonMapper) ProcessObjects(numberOfWorkers int, f func(o JsonObject)) e
 
 	wg.Wait()
 	return nil
+}
+
+func (m *JsonMapper) ProcessObjects(numberOfWorkers int, f func(o JsonObject)) error {
+	return m.ProcessObjectsWithArgs(numberOfWorkers, func(o JsonObject, args ...any) {
+		f(o)
+	})
 }
 
 func (m *JsonMapper) Read(p []byte) (n int, err error) {
