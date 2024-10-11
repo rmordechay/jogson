@@ -57,25 +57,37 @@ func FromBytes(data []byte) (JsonMapper, error) {
 		return JsonMapper{IsObject: true, AsObject: *objBytes}, nil
 	}
 	asString := string(data)
-	i, err := strconv.Atoi(asString)
+	var mapper JsonMapper
 
+	i, err := strconv.Atoi(asString)
 	if err == nil {
+		mapper.IsInt = true
+		mapper.AsInt = i
 		return JsonMapper{IsInt: true, AsInt: i}, nil
 	}
 
 	f, err := strconv.ParseFloat(asString, 64)
 	if err == nil {
+		mapper.IsFloat = true
+		mapper.AsFloat = f
 		return JsonMapper{IsFloat: true, AsFloat: f}, nil
 	}
 
 	b, err := strconv.ParseBool(asString)
 	if err == nil {
+		mapper.IsBool = true
+		mapper.AsBool = b
 		return JsonMapper{IsBool: true, AsBool: b}, nil
 	}
+
 	if asString == "null" {
+		mapper.IsNull = true
 		return JsonMapper{IsNull: true}, nil
 	}
+
 	asString = strings.Trim(asString, `"`)
+	mapper.IsString = true
+	mapper.AsString = asString
 	return JsonMapper{IsString: true, AsString: asString}, nil
 }
 

@@ -22,15 +22,6 @@ func NewArrayFromBytes(data []byte) (*JsonArray, error) {
 	return jsonArray, nil
 }
 
-// NewArrayFromStruct serializes a Go struct slice into JsonArray.
-func NewArrayFromStruct[T any](s []T) (*JsonArray, error) {
-	jsonBytes, err := marshal(s)
-	if err != nil {
-		return EmptyArray(), err
-	}
-	return NewArrayFromBytes(jsonBytes)
-}
-
 // NewArrayFromFile reads a JSON file from the given path and parses it into a JsonArray object.
 func NewArrayFromFile(path string) (*JsonArray, error) {
 	file, err := os.ReadFile(path)
