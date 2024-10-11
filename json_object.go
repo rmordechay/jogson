@@ -45,17 +45,17 @@ func NewObjectFromString(data string) (*JsonObject, error) {
 	return NewObjectFromBytes([]byte(data))
 }
 
-// NewObject initializes and returns a new instance of JsonObject.
-func NewObject(data map[string]*any) *JsonObject {
-	var obj JsonObject
-	obj.object = data
-	return &obj
-}
-
 // EmptyObject initializes and returns an empty new instance of JsonObject.
 func EmptyObject() *JsonObject {
 	var obj JsonObject
 	obj.object = make(map[string]*any)
+	return &obj
+}
+
+// newObject initializes and returns a new instance of JsonObject.
+func newObject(data map[string]*any) *JsonObject {
+	var obj JsonObject
+	obj.object = data
 	return &obj
 }
 
@@ -186,10 +186,10 @@ func (o *JsonObject) GetObject(key string) *JsonObject {
 	switch (*v).(type) {
 	case map[string]*any:
 		data := (*v).(map[string]*any)
-		return NewObject(data)
+		return newObject(data)
 	case map[string]any:
 		dataPtr := convertToMapValuesPtr((*v).(map[string]any))
-		return NewObject(dataPtr)
+		return newObject(dataPtr)
 	default:
 		o.setLastError(createTypeConversionErr(*v, objectTypeStr))
 		return EmptyObject()
@@ -210,9 +210,9 @@ func (o *JsonObject) GetArray(key string) *JsonArray {
 	}
 	switch (*v).(type) {
 	case []any:
-		return NewArray(convertToSlicePtr((*v).([]any)))
+		return newArray(convertToSlicePtr((*v).([]any)))
 	case []*any:
-		return NewArray((*v).([]*any))
+		return newArray((*v).([]*any))
 	default:
 		o.setLastError(createTypeConversionErr(*v, arrayTypeStr))
 		return EmptyArray()
@@ -276,7 +276,7 @@ func (o *JsonObject) Filter(f func(key string, j JsonMapper) bool) JsonObject {
 
 // TransformObjectKeys returns a new JsonObject with transformed keys, where keys are converted to snake_case.
 func (o *JsonObject) TransformObjectKeys() JsonObject {
-	return *NewObject(transformKeys(o.object))
+	return *newObject(transformKeys(o.object))
 }
 
 // SetLastError sets the LastError field of the JsonObject to the provided error.

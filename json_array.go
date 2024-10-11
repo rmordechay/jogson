@@ -36,8 +36,8 @@ func NewArrayFromString(data string) (*JsonArray, error) {
 	return NewArrayFromBytes([]byte(data))
 }
 
-// NewArray initializes and returns a new instance of JsonArray.
-func NewArray(data []*any) *JsonArray {
+// newArray initializes and returns a new instance of JsonArray.
+func newArray(data []*any) *JsonArray {
 	var arr JsonArray
 	arr.elements = data
 	return &arr
@@ -188,10 +188,10 @@ func (a *JsonArray) GetObject(i int) *JsonObject {
 	switch (*element).(type) {
 	case map[string]*any:
 		data := (*element).(map[string]*any)
-		return NewObject(data)
+		return newObject(data)
 	case map[string]any:
 		data := convertToMapValuesPtr((*element).(map[string]any))
-		return NewObject(data)
+		return newObject(data)
 	default:
 		a.setLastError(createTypeConversionErr(*element, objectTypeStr))
 		return EmptyObject()
@@ -215,7 +215,7 @@ func (a *JsonArray) GetArray(i int) *JsonArray {
 		a.setLastError(createTypeConversionErr(*element, arrayTypeStr))
 		return EmptyArray()
 	}
-	return NewArray(convertToSlicePtr(v))
+	return newArray(convertToSlicePtr(v))
 }
 
 // AddElement appends a new element to the JsonArray.

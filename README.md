@@ -5,7 +5,7 @@
 A simple Go library to simplify working with JSON without the need to define structs.
 
 * [Installation](#Installation)
-* [Create a Mapper](#Create-a-mapper)
+* [Create a Mapper](#create-a-jsonmapper-jsonobject-or-jsonarray)
 * [Read from JSON](#Read-from-JSON)
     * [Objects](#Objects)
     * [Arrays](#Arrays)
@@ -21,7 +21,6 @@ A simple Go library to simplify working with JSON without the need to define str
   * [JsonMapper](#JsonMapper)
   * [JsonObject](#JsonObject)
   * [JsonArray](#JsonArray)
-  * [Good to know](#good-to-know)
 
 ## Installation
 
@@ -30,19 +29,30 @@ To install the library, use:
 go get github.com/rmordechay/jsonmapper
 ```
 
-## Create a Mapper
+## Create a JsonMapper, JsonObject or JsonArray
 
-There are multiple ways to create a mapper.
+For more information about JsonMapper, JsonObject or JsonArray, see [design](#Design).
 
 ```go
 // From bytes
 mapper, err := jsonmapper.FromBytes([]byte(jsonBytes))
+object, err := jsonmapper.NewObjectFromBytes([]byte(jsonBytes))
+array, err := jsonmapper.NewArrayFromBytes([]byte(jsonBytes))
+
 // From string
 mapper, err := jsonmapper.FromString(jsonString)
+object, err := jsonmapper.NewObjectFromString(jsonString)
+array, err := jsonmapper.NewArrayFromString(jsonString)
+
 // From struct
 mapper, err := jsonmapper.FromStruct(jsonStruct)
+object, err := jsonmapper.NewObjectFromStruct(jsonStruct)
+array, err := jsonmapper.NewArrayFromStruct(jsonStruct)
+
 // From file
 mapper, err := jsonmapper.FromFile(jsonFilePath)
+object, err := jsonmapper.NewObjectFromFile(jsonFilePath)
+array, err := jsonmapper.NewArrayFromFile(jsonFilePath)
 ```
 
 ## Read from JSON
@@ -67,8 +77,6 @@ jsonString := `{
 ### Objects
 
 ```go
-object := mapper.AsObject
-
 // Check if a key exists
 var keyExists bool = object.Has("children")
 
@@ -137,7 +145,6 @@ in the parameter type (objects take `string` as key and arrays take `int` as ind
 #### From Object
 
 ```go
-object := mapper.AsObject
 // string 
 var name string = object.GetString("name") // Jason
 // int 
@@ -151,7 +158,6 @@ var isFunny bool = object.GetBool("is_funny") // false
 #### From Array
 
 ```go
-array := mapper.AsArray
 // string 
 var s string = array.GetString(0)
 // int 
@@ -260,28 +266,19 @@ There are 3 structs that are important to know when working with the library
 
 #### JsonMapper
 
-Most likely, when you read JSON, you would start with a `JsonMapper` (see [Create a Mapper](#Create-a-mapper)).
-`JsonMapper` is a struct that hold your JSON data. It has several `AsX` and `IsX` fields with which you can get the data and check
-the type, respectively. For example, if your data is a JSON object, you can call `JsonMapper.AsObject`, or if it's a string, `JsonMapper.AsString`.
-If you don't know the type and want to check it dynamically, you can use `JsonMapper.IsObject`, `JsonMapper.IsString`, etc. If the underlying data
-is null, then `IsNull` will be set to true. `JsonMapper` is also returned in cases where the return type can be any JSON
-type. For example, `JsonArray.Elements()` returns a slice `[]JsonMapper` which you can iterate over or query specific elements.
+`JsonMapper` is a struct that hold the JSON data, and it serves as a generic type for all possible JSON types. It has `AsX` and `IsX` 
+fields with which you can get the data and check the type, respectively. For example, if your data is a JSON object, you can call `JsonMapper.AsObject`, 
+or if it's a string, `JsonMapper.AsString`. If you don't know the type and want to check it dynamically, you can use `JsonMapper.IsObject`, 
+`JsonMapper.IsString`, etc. `JsonMapper` is also returned in cases where the return type can be any JSON type. For example, `JsonArray.Elements()` 
+returns a slice `[]JsonMapper` over which you can iterate or query specific elements. If the underlying data is null, then `IsNull` will be set to true.
 
 #### JsonObject
 
-`JsonObject` holds JSON object data and has different methods to read from JSON object or write to it. The simplest way to get a `JsonObject`
-is to call `JsonMapper.AsObject`. Once you have an instance, you get use the various methods to get data. 
+`JsonObject` holds JSON object data and has different methods to read from JSON object or write to it. Once you have an instance, you get use 
+the various methods to get data. 
 
 #### JsonArray
-
-
-### Good to know
-
-#### `As`, `Is` and `Get`
-The prefixes, `As`, `Is` and `Get` have similar semantics across the library.
-* `IsX`: checks for the value's time. For example `JsonMapper.IsBool`
-* `AsX`: converts the current data to other type representation. For example, `JsonArray.AsStringArray()` converts JsonArray to `[]string`.
-* `GetX`: Fetches the data, usually with some sort of search in the underlying data.
+`JsonArray` is very similar to `JsonObject`. It also contains the underlying array and methods to read and write data.
 
 #### `JsonObject` and `JsonArray` Similarity
 `JsonObject` and `JsonArray` have very similar methods, both in naming and semantics, but with 2 differences
@@ -291,3 +288,10 @@ The prefixes, `As`, `Is` and `Get` have similar semantics across the library.
   * Output:
     * `JsonObject`'s methods mostly return a map
     * `JsonArray`'s methods mostly return a slice
+
+
+#### `As`, `Is` and `Get`
+The prefixes, `As`, `Is` and `Get` have similar semantics across the library.
+* `IsX`: checks for the value's time. For example `JsonMapper.IsBool`
+* `AsX`: converts the current data to other type representation. For example, `JsonArray.AsStringArray()` converts JsonArray to `[]string`.
+* `GetX`: Fetches the data, usually with some sort of search in the underlying data.

@@ -167,7 +167,7 @@ func (m *JsonMapper) ProcessObjectsWithArgs(numberOfWorkers int, f func(o JsonOb
 		} else if err != nil {
 			return err
 		}
-		obj := NewObject(data)
+		obj := newObject(data)
 		wg.Add(1)
 		sem <- struct{}{}
 		go func(o JsonObject) {
@@ -288,10 +288,10 @@ func getMapperFromField(data *any) JsonMapper {
 		mapper.AsArray = convertSliceToJsonArray(value)
 	case []*any:
 		mapper.IsArray = true
-		mapper.AsArray = *NewArray(value)
+		mapper.AsArray = *newArray(value)
 	case []any:
 		mapper.IsArray = true
-		mapper.AsArray = *NewArray(convertToSlicePtr(value))
+		mapper.AsArray = *newArray(convertToSlicePtr(value))
 	case nil:
 		mapper.IsNull = true
 	}
