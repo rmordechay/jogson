@@ -13,6 +13,7 @@ A simple Go library to simplify working with JSON without the need to define str
     * [Types](#types)
     * [Find Elements](#Find-Elements)
     * [Get as JSON String](#get-as-json-string)
+    * [Error Handling](#Error-handling)
 * [Write to JSON](#Write-to-JSON)
     * [Write Object](#Write-object)
     * [Write Array](#Write-array)
@@ -21,8 +22,6 @@ A simple Go library to simplify working with JSON without the need to define str
   * [JsonObject](#JsonObject)
   * [JsonArray](#JsonArray)
   * [Good to know](#good-to-know)
-    * [`As`, `Is` and `Get`](#as-is-and-get)
-    * [`JsonObject` and `JsonArray` Similarity](#jsonobject-and-jsonarray-similarity)
 
 ## Installation
 
@@ -172,7 +171,7 @@ var birthday time.Time = array.GetTime(0)
 var birthday string = object.GetTime("birthday".Format(time.RFC3339)) // 1981-10-08T00:00:00Z
 ```
 
-The following formats are supported:
+The mapper will try to format the string against different time formats to increase the change of correct parsing. The following formats are supported:
 
 `time.RFC3339` `time.RFC850` `time.RFC822` `time.RFC822Z` `time.RFC1123` `time.RFC1123Z` `time.RFC3339Nano` `time.ANSIC` `time.UnixDate` `time.RubyDate` `time.Layout` `time.Kitchen` `time.Stamp` `time.StampMilli` `time.StampMicro` `time.StampNano` `time.DateTime` `time.DateOnly` `time.TimeOnly`
 
@@ -227,6 +226,8 @@ fmt.Println(mapper.AsObject.Get("children").PrettyString())
 // }
 ```
 
+### Error Handling
+
 ## Write to JSON
 
 To write a JSON object or array is as simple as reading from it.
@@ -257,7 +258,7 @@ There are 3 structs that are important to know when working with the library
 * `JsonObject` represents JSON object.
 * `JsonArray`  represents JSON array.
 
-### JsonMapper
+#### JsonMapper
 
 Most likely, when you read JSON, you would start with a `JsonMapper` (see [Create a Mapper](#Create-a-mapper)).
 `JsonMapper` is a struct that hold your JSON data. It has several `AsX` and `IsX` fields with which you can get the data and check
@@ -266,12 +267,12 @@ If you don't know the type and want to check it dynamically, you can use `JsonMa
 is null, then `IsNull` will be set to true. `JsonMapper` is also returned in cases where the return type can be any JSON
 type. For example, `JsonArray.Elements()` returns a slice `[]JsonMapper` which you can iterate over or query specific elements.
 
-### JsonObject
+#### JsonObject
 
 `JsonObject` holds JSON object data and has different methods to read from JSON object or write to it. The simplest way to get a `JsonObject`
 is to call `JsonMapper.AsObject`. Once you have an instance, you get use the various methods to get data. 
 
-### JsonArray
+#### JsonArray
 
 
 ### Good to know

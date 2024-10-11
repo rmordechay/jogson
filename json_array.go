@@ -2,6 +2,7 @@ package jsonmapper
 
 import (
 	"fmt"
+	"os"
 	"time"
 )
 
@@ -9,6 +10,39 @@ import (
 type JsonArray struct {
 	elements  []*any
 	LastError error
+}
+
+// NewArrayFromBytes parses JSON data from a byte slice.
+func NewArrayFromBytes(data []byte) (*JsonArray, error) {
+	jsonArray := EmptyArray()
+	err := unmarshal(data, &jsonArray.elements)
+	if err != nil {
+		return EmptyArray(), err
+	}
+	return jsonArray, nil
+}
+
+// NewArrayFromStruct serializes a Go struct slice into JsonArray.
+func NewArrayFromStruct[T any](s []T) (*JsonArray, error) {
+	jsonBytes, err := marshal(s)
+	if err != nil {
+		return EmptyArray(), err
+	}
+	return NewArrayFromBytes(jsonBytes)
+}
+
+// NewArrayFromFile reads a JSON file from the given path and parses it into a JsonArray object.
+func NewArrayFromFile(path string) (*JsonArray, error) {
+	file, err := os.ReadFile(path)
+	if err != nil {
+		return EmptyArray(), err
+	}
+	return NewArrayFromBytes(file)
+}
+
+// NewArrayFromString parses JSON from a string into a JsonArray object.
+func NewArrayFromString(data string) (*JsonArray, error) {
+	return NewArrayFromBytes([]byte(data))
 }
 
 // NewArray initializes and returns a new instance of JsonArray.

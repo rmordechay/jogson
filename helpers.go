@@ -29,7 +29,7 @@ func convertToMapValuesPtr(data map[string]any) map[string]*any {
 	return jsonObject
 }
 
-func isObjectOrArray(data []byte, brackOrParen byte) bool {
+func dataStartsWith(data []byte, brackOrParen byte) bool {
 	if len(data) == 0 {
 		return false
 	}

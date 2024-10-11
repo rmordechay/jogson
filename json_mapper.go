@@ -7,6 +7,8 @@ import (
 	"github.com/google/uuid"
 	"io"
 	"os"
+	"strconv"
+	"strings"
 	"sync"
 	"time"
 )
@@ -35,17 +37,46 @@ type JsonMapper struct {
 	offset   int
 	lastRead int
 	reader   io.Reader
+	data     []byte
 }
 
 // FromBytes parses JSON data from a byte slice.
 func FromBytes(data []byte) (JsonMapper, error) {
-	if isObjectOrArray(data, '[') {
-		return newJsonArray(data)
-	} else if isObjectOrArray(data, '{') {
-		return newJsonObject(data)
-	} else {
-		return JsonMapper{}, errors.New("could not parse JSON")
+	if dataStartsWith(data, '[') {
+		arrayBytes, err := NewArrayFromBytes(data)
+		if err != nil {
+			return JsonMapper{}, err
+		}
+		return JsonMapper{IsArray: true, AsArray: *arrayBytes}, nil
 	}
+	if dataStartsWith(data, '{') {
+		objBytes, err := NewObjectFromBytes(data)
+		if err != nil {
+			return JsonMapper{}, err
+		}
+		return JsonMapper{IsObject: true, AsObject: *objBytes}, nil
+	}
+	asString := string(data)
+	i, err := strconv.Atoi(asString)
+
+	if err == nil {
+		return JsonMapper{IsInt: true, AsInt: i}, nil
+	}
+
+	f, err := strconv.ParseFloat(asString, 64)
+	if err == nil {
+		return JsonMapper{IsFloat: true, AsFloat: f}, nil
+	}
+
+	b, err := strconv.ParseBool(asString)
+	if err == nil {
+		return JsonMapper{IsBool: true, AsBool: b}, nil
+	}
+	if asString == "null" {
+		return JsonMapper{IsNull: true}, nil
+	}
+	asString = strings.Trim(asString, `"`)
+	return JsonMapper{IsString: true, AsString: asString}, nil
 }
 
 // FromStruct serializes a Go struct into JSON and parses it into a JsonMapper object.
@@ -253,30 +284,6 @@ func getMapperFromField(data *any) JsonMapper {
 		mapper.IsNull = true
 	}
 	return mapper
-}
-
-func newJsonObject(data []byte) (JsonMapper, error) {
-	jsonObject := EmptyObject()
-	err := unmarshal(data, &jsonObject.object)
-	if err != nil {
-		return JsonMapper{}, err
-	}
-	var mapper JsonMapper
-	mapper.IsObject = true
-	mapper.AsObject = *jsonObject
-	return mapper, nil
-}
-
-func newJsonArray(data []byte) (JsonMapper, error) {
-	jsonArray := EmptyArray()
-	err := unmarshal(data, &jsonArray.elements)
-	if err != nil {
-		return JsonMapper{}, err
-	}
-	var mapper JsonMapper
-	mapper.IsArray = true
-	mapper.AsArray = *jsonArray
-	return mapper, nil
 }
 
 func (m *JsonMapper) resetBuffer() {

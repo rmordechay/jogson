@@ -79,6 +79,40 @@ func TestParseJsonArrayFromStruct(t *testing.T) {
 	assert.Equal(t, 15, mapper.AsObject.GetInt("Age"))
 }
 
+func TestParseOnlyString(t *testing.T) {
+	mapper, err := jsonmapper.FromString(jsonOnlyStringTest)
+	assert.NoError(t, err)
+	assert.True(t, mapper.IsString)
+	assert.Equal(t, "test", mapper.AsString)
+}
+
+func TestParseOnlyInt(t *testing.T) {
+	mapper, err := jsonmapper.FromString(jsonOnlyIntTest)
+	assert.NoError(t, err)
+	assert.True(t, mapper.IsInt)
+	assert.Equal(t, 56, mapper.AsInt)
+}
+
+func TestParseOnlyFloat(t *testing.T) {
+	mapper, err := jsonmapper.FromString(jsonOnlyFloatTest)
+	assert.NoError(t, err)
+	assert.True(t, mapper.IsFloat)
+	assert.Equal(t, 1.2, mapper.AsFloat)
+}
+
+func TestParseOnlyBool(t *testing.T) {
+	mapper, err := jsonmapper.FromString(jsonOnlyBoolTest)
+	assert.NoError(t, err)
+	assert.True(t, mapper.IsBool)
+	assert.Equal(t, true, mapper.AsBool)
+}
+
+func TestParseOnlyNull(t *testing.T) {
+	mapper, err := jsonmapper.FromString(jsonOnlyNullTest)
+	assert.NoError(t, err)
+	assert.True(t, mapper.IsNull)
+}
+
 func TestParseJsonArrayFromStruct2(t *testing.T) {
 	type childTest struct {
 		Age     int
