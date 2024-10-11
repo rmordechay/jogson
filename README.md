@@ -16,6 +16,13 @@ A simple Go library to simplify working with JSON without the need to define str
 * [Write to JSON](#Write-to-JSON)
     * [Write Object](#Write-object)
     * [Write Array](#Write-array)
+* [Design](#Design)
+  * [JsonMapper](#JsonMapper)
+  * [JsonObject](#JsonObject)
+  * [JsonArray](#JsonArray)
+  * [Good to know](#good-to-know)
+    * [`As`, `Is` and `Get`](#as-is-and-get)
+    * [`JsonObject` and `JsonArray` Similarity](#jsonobject-and-jsonarray-similarity)
 
 ## Installation
 
@@ -250,7 +257,8 @@ There are 3 structs that are important to know when working with the library
 * `JsonObject` represents JSON object.
 * `JsonArray`  represents JSON array.
 
-#### JsonMapper
+### JsonMapper
+
 Most likely, when you read JSON, you would start with a `JsonMapper` (see [Create a Mapper](#Create-a-mapper)).
 `JsonMapper` is a struct that hold your JSON data. It has several `AsX` and `IsX` fields with which you can get the data and check
 the type, respectively. For example, if your data is a JSON object, you can call `JsonMapper.AsObject`, or if it's a string, `JsonMapper.AsString`.
@@ -259,20 +267,22 @@ is null, then `IsNull` will be set to true. `JsonMapper` is also returned in cas
 type. For example, `JsonArray.Elements()` returns a slice `[]JsonMapper` which you can iterate over or query specific elements.
 
 ### JsonObject
+
 `JsonObject` holds JSON object data and has different methods to read from JSON object or write to it. The simplest way to get a `JsonObject`
 is to call `JsonMapper.AsObject`. Once you have an instance, you get use the various methods to get data. 
 
 ### JsonArray
 
-## Good to know
 
-### `As`, `Is` and `Get`
+### Good to know
+
+#### `As`, `Is` and `Get`
 The prefixes, `As`, `Is` and `Get` have similar semantics across the library.
 * `IsX`: checks for the value's time. For example `JsonMapper.IsBool`
 * `AsX`: converts the current data to other type representation. For example, `JsonArray.AsStringArray()` converts JsonArray to `[]string`.
 * `GetX`: Fetches the data, usually with some sort of search in the underlying data.
 
-### `JsonObject` and `JsonArray` similarity
+#### `JsonObject` and `JsonArray` Similarity
 `JsonObject` and `JsonArray` have very similar methods, both in naming and semantics, but with 2 differences
   * Input: 
     * `JsonObject`'s methods mostly asks for `string` as the key 
