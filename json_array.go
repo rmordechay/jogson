@@ -31,9 +31,39 @@ func (a *JsonArray) Length() int {
 	return len(a.elements)
 }
 
-// IsEmpty checks if the JSON array has no elements in it
+// IsEmpty checks if the JSON array has no elements
 func (a *JsonArray) IsEmpty() bool {
 	return len(a.elements) == 0
+}
+
+// ContainsString checks if the JSON array contains the string s
+func (a *JsonArray) ContainsString(s string) bool {
+	for _, element := range a.elements {
+		if *element == s {
+			return true
+		}
+	}
+	return false
+}
+
+// ContainsInt checks if the JSON array contains the int i
+func (a *JsonArray) ContainsInt(i int) bool {
+	for _, element := range a.elements {
+		if *element == i {
+			return true
+		}
+	}
+	return false
+}
+
+// ContainsFloat checks if the JSON array contains the float f
+func (a *JsonArray) ContainsFloat(f float64) bool {
+	for _, element := range a.elements {
+		if *element == f {
+			return true
+		}
+	}
+	return false
 }
 
 // IsNull checks if element at index i is null
@@ -69,8 +99,7 @@ func (a *JsonArray) AsFloatArray() []float64 {
 // As2DArray converts the elements of the JsonArray into a two-dimensional array, returning
 // a slice of JsonArray objects.
 func (a *JsonArray) As2DArray() []JsonArray {
-	array := getGenericArray(convertAnyToArray, *a)
-	return array
+	return getGenericArray(convertAnyToArray, *a)
 }
 
 // AsObjectArray converts the elements of the JsonArray into a slice of JsonObject objects.
@@ -80,6 +109,10 @@ func (a *JsonArray) AsObjectArray() []JsonObject {
 
 // Get retrieves the value at index i and returns it as a JsonMapper
 func (a *JsonArray) Get(i int) JsonMapper {
+	if i >= a.Length() {
+		a.setLastError(createIndexOutOfRangeErr(i, a.Length()))
+		return JsonMapper{}
+	}
 	return getMapperFromField(a.elements[i])
 }
 
@@ -191,6 +224,19 @@ func (a *JsonArray) ForEach(f func(j JsonMapper)) {
 func Map[T any](jsonArray *JsonArray, f func(j JsonMapper) T) []T {
 	arr := make([]T, 0, len(jsonArray.elements))
 	for _, element := range jsonArray.elements {
+		mapper := f(getMapperFromField(element))
+		arr = append(arr, mapper)
+	}
+	return arr
+}
+
+// MapNotNull returns a slice of the mapped the values of the array without null values
+func MapNotNull[T any](jsonArray *JsonArray, f func(j JsonMapper) T) []T {
+	arr := make([]T, 0, len(jsonArray.elements))
+	for _, element := range jsonArray.elements {
+		if element == nil {
+			continue
+		}
 		mapper := f(getMapperFromField(element))
 		arr = append(arr, mapper)
 	}

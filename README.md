@@ -168,25 +168,7 @@ var birthday string = object.GetTime("birthday".Format(time.RFC3339)) // 1981-10
 
 The following formats are supported:
 
-* `time.RFC3339`
-* `time.RFC850`
-* `time.RFC822`
-* `time.RFC822Z`
-* `time.RFC1123`
-* `time.RFC1123Z`
-* `time.RFC3339Nano`
-* `time.ANSIC`
-* `time.UnixDate`
-* `time.RubyDate`
-* `time.Layout`
-* `time.Kitchen`
-* `time.Stamp`
-* `time.StampMilli`
-* `time.StampMicro`
-* `time.StampNano`
-* `time.DateTime`
-* `time.DateOnly`
-* `time.TimeOnly`
+`time.RFC3339` `time.RFC850` `time.RFC822` `time.RFC822Z` `time.RFC1123` `time.RFC1123Z` `time.RFC3339Nano` `time.ANSIC` `time.UnixDate` `time.RubyDate` `time.Layout` `time.Kitchen` `time.Stamp` `time.StampMilli` `time.StampMicro` `time.StampNano` `time.DateTime` `time.DateOnly` `time.TimeOnly`
 
 ### Types
 

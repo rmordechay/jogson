@@ -92,29 +92,29 @@ func (m *JsonMapper) AsTime() (time.Time, error) {
 	return time.Time{}, createNewInvalidTimeErr(m.AsString)
 }
 
-func (m *JsonMapper) ProcessJsonList(numberOfWorkers int, f func(o JsonObject)) {
+func (m *JsonMapper) ProcessObjects(numberOfWorkers int, f func(o JsonObject)) error {
 	if m.reader == nil {
-		panic("reader is not set")
+		return errors.New("reader is not set")
 	}
 	if m.buffer == nil {
 		m.buffer = make([]byte, bufferSize)
 	}
+
 	dec := json.NewDecoder(m.reader)
 	_, err := dec.Token()
 	if err != nil {
-		return
+		return err
 	}
 
 	var wg sync.WaitGroup
 	sem := make(chan struct{}, numberOfWorkers)
-
 	for dec.More() {
 		var data map[string]*interface{}
 		err = dec.Decode(&data)
 		if err == io.EOF {
 			break
 		} else if err != nil {
-			return
+			return err
 		}
 		obj := NewObject(data)
 		wg.Add(1)
@@ -128,9 +128,11 @@ func (m *JsonMapper) ProcessJsonList(numberOfWorkers int, f func(o JsonObject)) 
 
 	_, err = dec.Token()
 	if err != nil {
-		return
+		return err
 	}
+
 	wg.Wait()
+	return nil
 }
 
 func (m *JsonMapper) Read(p []byte) (n int, err error) {
