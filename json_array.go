@@ -188,10 +188,10 @@ func (a *JsonArray) GetObject(i int) *JsonObject {
 	switch (*element).(type) {
 	case map[string]*any:
 		data := (*element).(map[string]*any)
-		return newObject(data)
+		return newObjectFromMap(data)
 	case map[string]any:
 		data := convertToMapValuesPtr((*element).(map[string]any))
-		return newObject(data)
+		return newObjectFromMap(data)
 	default:
 		a.setLastError(createTypeConversionErr(*element, objectTypeStr))
 		return EmptyObject()

@@ -167,7 +167,7 @@ func (m *JsonMapper) ProcessObjectsWithArgs(numberOfWorkers int, f func(o JsonOb
 		} else if err != nil {
 			return err
 		}
-		obj := newObject(data)
+		obj := newObjectFromMap(data)
 		wg.Add(1)
 		sem <- struct{}{}
 		go func(o JsonObject) {

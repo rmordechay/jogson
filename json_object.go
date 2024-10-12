@@ -22,15 +22,6 @@ func NewObjectFromBytes(data []byte) (*JsonObject, error) {
 	return jsonObject, nil
 }
 
-// NewObjectFromStruct serializes a Go struct into JsonObject.
-func NewObjectFromStruct[T any](s T) (*JsonObject, error) {
-	jsonBytes, err := marshal(s)
-	if err != nil {
-		return EmptyObject(), err
-	}
-	return NewObjectFromBytes(jsonBytes)
-}
-
 // NewObjectFromFile reads a JSON file from the given path and parses it into a JsonObject object.
 func NewObjectFromFile(path string) (*JsonObject, error) {
 	file, err := os.ReadFile(path)
@@ -38,6 +29,15 @@ func NewObjectFromFile(path string) (*JsonObject, error) {
 		return EmptyObject(), err
 	}
 	return NewObjectFromBytes(file)
+}
+
+// NewObjectFromStruct serializes a Go struct into JsonObject.
+func NewObjectFromStruct[T any](s T) (*JsonObject, error) {
+	jsonBytes, err := marshal(s)
+	if err != nil {
+		return EmptyObject(), err
+	}
+	return NewObjectFromBytes(jsonBytes)
 }
 
 // NewObjectFromString parses JSON from a string into a JsonObject object.
@@ -49,13 +49,6 @@ func NewObjectFromString(data string) (*JsonObject, error) {
 func EmptyObject() *JsonObject {
 	var obj JsonObject
 	obj.object = make(map[string]*any)
-	return &obj
-}
-
-// newObject initializes and returns a new instance of JsonObject.
-func newObject(data map[string]*any) *JsonObject {
-	var obj JsonObject
-	obj.object = data
 	return &obj
 }
 
@@ -186,10 +179,10 @@ func (o *JsonObject) GetObject(key string) *JsonObject {
 	switch (*v).(type) {
 	case map[string]*any:
 		data := (*v).(map[string]*any)
-		return newObject(data)
+		return newObjectFromMap(data)
 	case map[string]any:
 		dataPtr := convertToMapValuesPtr((*v).(map[string]any))
-		return newObject(dataPtr)
+		return newObjectFromMap(dataPtr)
 	default:
 		o.setLastError(createTypeConversionErr(*v, objectTypeStr))
 		return EmptyObject()
@@ -236,23 +229,23 @@ func (o *JsonObject) Find(key string) JsonMapper {
 
 // AddKeyValue adds a key-value pair to the JsonObject.
 func (o *JsonObject) AddKeyValue(k string, value any) {
-	switch value := value.(type) {
+	switch castedValue := value.(type) {
 	case JsonObject:
-		var object any = value.object
+		var object any = castedValue.object
 		o.object[k] = &object
 	case *JsonObject:
-		var object any = value.object
+		var object any = castedValue.object
 		o.object[k] = &object
 	case JsonArray:
-		var elements any = value.elements
+		var elements any = castedValue.elements
 		o.object[k] = &elements
 	case *JsonArray:
-		var elements any = value.elements
+		var elements any = castedValue.elements
 		o.object[k] = &elements
 	case nil, string, int, float64, bool, []string, []int, []float64, []bool:
-		o.object[k] = &value
+		o.object[k] = &castedValue
 	default:
-		o.setLastError(fmt.Errorf("could not add value of type %T", value))
+		o.setLastError(fmt.Errorf("could not add castedValue of type %T", castedValue))
 	}
 }
 
@@ -274,16 +267,6 @@ func (o *JsonObject) Filter(f func(key string, j JsonMapper) bool) JsonObject {
 	return *obj
 }
 
-// TransformObjectKeys returns a new JsonObject with transformed keys, where keys are converted to snake_case.
-func (o *JsonObject) TransformObjectKeys() JsonObject {
-	return *newObject(transformKeys(o.object))
-}
-
-// SetLastError sets the LastError field of the JsonObject to the provided error.
-func (o *JsonObject) setLastError(err error) {
-	o.LastError = err
-}
-
 // PrettyString returns a pretty-printed string representation of the JsonObject.
 func (o *JsonObject) PrettyString() string {
 	jsonBytes, _ := marshalIndent(o.object)
@@ -295,6 +278,23 @@ func (o *JsonObject) PrettyString() string {
 func (o *JsonObject) String() string {
 	jsonBytes, _ := marshal(o.object)
 	return string(jsonBytes)
+}
+
+// SetLastError sets the LastError field of the JsonObject to the provided error.
+func (o *JsonObject) setLastError(err error) {
+	o.LastError = err
+}
+
+// newObjectFromMap initializes and returns a new instance of JsonObject.
+func newObjectFromMap(data map[string]*any) *JsonObject {
+	var obj JsonObject
+	obj.object = data
+	return &obj
+}
+
+// transformObjectKeys returns a new JsonObject with transformed keys, where keys are converted to snake_case.
+func (o *JsonObject) transformObjectKeys() JsonObject {
+	return *newObjectFromMap(transformKeys(o.object))
 }
 
 func transformKeys(m map[string]*any) map[string]*any {
