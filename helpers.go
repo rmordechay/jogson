@@ -11,6 +11,57 @@ import (
 
 var jsonIter = jsoniter.ConfigCompatibleWithStandardLibrary
 
+func getMapperFromField(data *any) JsonMapper {
+	if data == nil {
+		return JsonMapper{IsNull: true}
+	}
+
+	var mapper JsonMapper
+	switch value := (*data).(type) {
+	case bool:
+		mapper.IsBool = true
+		mapper.AsBool = value
+	case int:
+		mapper.IsInt = true
+		mapper.AsInt = value
+	case float64:
+		if value == float64(int(value)) {
+			mapper.IsInt = true
+			mapper.AsInt = int(value)
+		} else {
+			mapper.IsFloat = true
+		}
+		mapper.AsFloat = value
+	case string:
+		mapper.IsString = true
+		mapper.AsString = value
+	case map[string]any:
+		mapper.IsObject = true
+		mapper.AsObject = convertAnyToObject(data, nil)
+	case []float64:
+		mapper.IsArray = true
+		mapper.AsArray = convertSliceToJsonArray(value)
+	case []int:
+		mapper.IsArray = true
+		mapper.AsArray = convertSliceToJsonArray(value)
+	case []string:
+		mapper.IsArray = true
+		mapper.AsArray = convertSliceToJsonArray(value)
+	case []bool:
+		mapper.IsArray = true
+		mapper.AsArray = convertSliceToJsonArray(value)
+	case []*any:
+		mapper.IsArray = true
+		mapper.AsArray = *newArrayFromSlice(value)
+	case []any:
+		mapper.IsArray = true
+		mapper.AsArray = *newArrayFromSlice(convertToSlicePtr(value))
+	case nil:
+		mapper.IsNull = true
+	}
+	return mapper
+}
+
 func convertToSlicePtr(data []any) []*any {
 	array := make([]*any, len(data))
 	for i, v := range data {
@@ -258,4 +309,24 @@ func convertSliceToJsonArray[T any](data []T) JsonArray {
 	}
 	jsonArray.elements = sliceAnyPtr
 	return jsonArray
+}
+
+func transformKeys(m map[string]*any) map[string]*any {
+	newMap := make(map[string]*any)
+	for key, value := range m {
+		newKey := toSnakeCase(key)
+		if value == nil {
+			newMap[newKey] = nil
+			continue
+		}
+		nestedMap, ok := (*value).(map[string]any)
+		if ok {
+			nestedResult := transformKeys(convertToMapValuesPtr(nestedMap))
+			var nestedInterface any = nestedResult
+			newMap[newKey] = &nestedInterface
+		} else {
+			newMap[newKey] = value
+		}
+	}
+	return newMap
 }

@@ -196,7 +196,9 @@ func (m *JsonMapper) Read(p []byte) (n int, err error) {
 	m.lastRead = 0
 	if len(m.buffer) <= m.offset {
 		// Buffer is empty, resetBuffer to recover space.
-		m.resetBuffer()
+		m.buffer = m.buffer[:0]
+		m.offset = 0
+		m.lastRead = 0
 		if len(p) == 0 {
 			return 0, nil
 		}
@@ -245,61 +247,4 @@ func (m *JsonMapper) String() string {
 		return fmt.Sprintf("%v", m.AsArray)
 	}
 	return ""
-}
-
-func getMapperFromField(data *any) JsonMapper {
-	if data == nil {
-		return JsonMapper{IsNull: true}
-	}
-
-	var mapper JsonMapper
-	switch value := (*data).(type) {
-	case bool:
-		mapper.IsBool = true
-		mapper.AsBool = value
-	case int:
-		mapper.IsInt = true
-		mapper.AsInt = value
-	case float64:
-		if value == float64(int(value)) {
-			mapper.IsInt = true
-			mapper.AsInt = int(value)
-		} else {
-			mapper.IsFloat = true
-		}
-		mapper.AsFloat = value
-	case string:
-		mapper.IsString = true
-		mapper.AsString = value
-	case map[string]any:
-		mapper.IsObject = true
-		mapper.AsObject = convertAnyToObject(data, nil)
-	case []float64:
-		mapper.IsArray = true
-		mapper.AsArray = convertSliceToJsonArray(value)
-	case []int:
-		mapper.IsArray = true
-		mapper.AsArray = convertSliceToJsonArray(value)
-	case []string:
-		mapper.IsArray = true
-		mapper.AsArray = convertSliceToJsonArray(value)
-	case []bool:
-		mapper.IsArray = true
-		mapper.AsArray = convertSliceToJsonArray(value)
-	case []*any:
-		mapper.IsArray = true
-		mapper.AsArray = *newArray(value)
-	case []any:
-		mapper.IsArray = true
-		mapper.AsArray = *newArray(convertToSlicePtr(value))
-	case nil:
-		mapper.IsNull = true
-	}
-	return mapper
-}
-
-func (m *JsonMapper) resetBuffer() {
-	m.buffer = m.buffer[:0]
-	m.offset = 0
-	m.lastRead = 0
 }

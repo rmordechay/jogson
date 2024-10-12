@@ -203,9 +203,9 @@ func (o *JsonObject) GetArray(key string) *JsonArray {
 	}
 	switch (*v).(type) {
 	case []any:
-		return newArray(convertToSlicePtr((*v).([]any)))
+		return newArrayFromSlice(convertToSlicePtr((*v).([]any)))
 	case []*any:
-		return newArray((*v).([]*any))
+		return newArrayFromSlice((*v).([]*any))
 	default:
 		o.setLastError(createTypeConversionErr(*v, arrayTypeStr))
 		return EmptyArray()
@@ -285,34 +285,14 @@ func (o *JsonObject) setLastError(err error) {
 	o.LastError = err
 }
 
-// newObjectFromMap initializes and returns a new instance of JsonObject.
-func newObjectFromMap(data map[string]*any) *JsonObject {
-	var obj JsonObject
-	obj.object = data
-	return &obj
-}
-
 // transformObjectKeys returns a new JsonObject with transformed keys, where keys are converted to snake_case.
 func (o *JsonObject) transformObjectKeys() JsonObject {
 	return *newObjectFromMap(transformKeys(o.object))
 }
 
-func transformKeys(m map[string]*any) map[string]*any {
-	newMap := make(map[string]*any)
-	for key, value := range m {
-		newKey := toSnakeCase(key)
-		if value == nil {
-			newMap[newKey] = nil
-			continue
-		}
-		nestedMap, ok := (*value).(map[string]any)
-		if ok {
-			nestedResult := transformKeys(convertToMapValuesPtr(nestedMap))
-			var nestedInterface any = nestedResult
-			newMap[newKey] = &nestedInterface
-		} else {
-			newMap[newKey] = value
-		}
-	}
-	return newMap
+// newObjectFromMap initializes and returns a new instance of JsonObject.
+func newObjectFromMap(data map[string]*any) *JsonObject {
+	var obj JsonObject
+	obj.object = data
+	return &obj
 }

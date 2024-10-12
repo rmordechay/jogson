@@ -36,13 +36,6 @@ func NewArrayFromString(data string) (*JsonArray, error) {
 	return NewArrayFromBytes([]byte(data))
 }
 
-// newArray initializes and returns a new instance of JsonArray.
-func newArray(data []*any) *JsonArray {
-	var arr JsonArray
-	arr.elements = data
-	return &arr
-}
-
 // EmptyArray initializes and returns an empty new instance of JsonArray.
 func EmptyArray() *JsonArray {
 	var arr JsonArray
@@ -215,7 +208,7 @@ func (a *JsonArray) GetArray(i int) *JsonArray {
 		a.setLastError(createTypeConversionErr(*element, arrayTypeStr))
 		return EmptyArray()
 	}
-	return newArray(convertToSlicePtr(v))
+	return newArrayFromSlice(convertToSlicePtr(v))
 }
 
 // AddElement appends a new element to the JsonArray.
@@ -323,8 +316,21 @@ func (a *JsonArray) setLastError(err error) {
 	a.LastError = err
 }
 
+// PrettyString returns a pretty-printed string representation of the JsonArray.
+func (a *JsonArray) PrettyString() string {
+	jsonBytes, _ := marshalIndent(a.elements)
+	return string(jsonBytes)
+}
+
 // String returns a string representation of the JsonArray in JSON format.
 func (a *JsonArray) String() string {
 	jsonBytes, _ := marshal(a.elements)
 	return string(jsonBytes)
+}
+
+// newArrayFromSlice initializes and returns a new instance of JsonArray.
+func newArrayFromSlice(data []*any) *JsonArray {
+	var arr JsonArray
+	arr.elements = data
+	return &arr
 }

@@ -6,6 +6,7 @@ import (
 
 type jsonI interface {
 	String() string
+	PrettyString() string
 	Length() int
 	IsEmpty() bool
 	setLastError(err error)
