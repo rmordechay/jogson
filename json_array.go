@@ -267,7 +267,7 @@ func (a *JsonArray) AddFloatArray(f []float64) {
 	a.elements = append(a.elements, &value)
 }
 
-// AddNull appends nil to the JsonArray.
+// AddNull appends null to the JsonArray.
 func (a *JsonArray) AddNull() {
 	a.elements = append(a.elements, nil)
 }

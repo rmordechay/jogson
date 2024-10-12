@@ -270,3 +270,17 @@ func TestArrayGetTime(t *testing.T) {
 	assert.Equal(t, expectedTime2, actualTime2)
 	assert.Equal(t, expectedTime3, actualTime3)
 }
+
+func TestArrayString(t *testing.T) {
+	mapper, err := jsonmapper.FromString(jsonObjectArrayTest)
+	assert.NoError(t, err)
+	s := mapper.AsArray.String()
+	assert.Equal(t, `[{"name":"Jason"},{"name":"Chris"}]`, s)
+}
+
+func TestArrayPrettyString(t *testing.T) {
+	mapper, err := jsonmapper.FromString(jsonObjectArrayTest)
+	assert.NoError(t, err)
+	expectedArrayStr := "[\n  {\n    \"name\": \"Jason\"\n  },\n  {\n    \"name\": \"Chris\"\n  }\n]"
+	assert.Equal(t, expectedArrayStr, mapper.AsArray.PrettyString())
+}

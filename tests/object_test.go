@@ -239,3 +239,17 @@ func TestConvertKeysToSnakeCase(t *testing.T) {
 	//assert.Equal(t, 15, age)
 	//assert.True(t, isFunny)
 }
+
+func TestObjectString(t *testing.T) {
+	mapper, err := jsonmapper.FromString(jsonObjectTest)
+	assert.NoError(t, err)
+	s := mapper.AsObject.String()
+	assert.Equal(t, `{"address":null,"age":15,"height":1.81,"is_funny":true,"name":"Jason"}`, s)
+}
+
+func TestObjectPrettyString(t *testing.T) {
+	mapper, err := jsonmapper.FromString(jsonObjectTest)
+	assert.NoError(t, err)
+	expectedStr := "{\n  \"address\": null,\n  \"age\": 15,\n  \"height\": 1.81,\n  \"is_funny\": true,\n  \"name\": \"Jason\"\n}"
+	assert.Equal(t, expectedStr, mapper.AsObject.PrettyString())
+}

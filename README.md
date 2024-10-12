@@ -29,7 +29,7 @@ To install the library, use:
 go get github.com/rmordechay/jsonmapper
 ```
 
-## Create a `JsonMapper`, `JsonObject` or `JsonArray`
+## Create JsonMapper, JsonObject or JsonArray
 
 For more information, see [design](#Design).
 

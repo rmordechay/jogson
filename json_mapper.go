@@ -212,7 +212,7 @@ func (m *JsonMapper) Read(p []byte) (n int, err error) {
 	return n, nil
 }
 
-// PrettyString returns a formatted, human-readable string representation of the JsonMapper value.
+// PrettyString returns a valid, pretty JSON string representation of the JsonMapper underlying value.
 func (m *JsonMapper) PrettyString() string {
 	if m.IsBool {
 		return fmt.Sprintf("%v", m.AsBool)
@@ -225,7 +225,7 @@ func (m *JsonMapper) PrettyString() string {
 	} else if m.IsObject {
 		return m.AsObject.PrettyString()
 	} else if m.IsArray {
-		return fmt.Sprintf("%v", m.AsArray)
+		return m.AsArray.PrettyString()
 	}
 	return ""
 }
@@ -242,9 +242,9 @@ func (m *JsonMapper) String() string {
 	case m.IsString:
 		return fmt.Sprintf("%v", m.AsString)
 	case m.IsObject:
-		return fmt.Sprintf("%v", m.AsObject)
+		return m.AsObject.String()
 	case m.IsArray:
-		return fmt.Sprintf("%v", m.AsArray)
+		return m.AsArray.String()
 	}
 	return ""
 }
