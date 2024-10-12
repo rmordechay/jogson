@@ -281,14 +281,18 @@ returns a slice `[]JsonMapper` over which you can iterate or query specific elem
 
 #### JsonObject
 
-`JsonObject` holds JSON object data and has different methods to read from JSON object or write to it. Once you have an instance, you get use 
-the various methods to get data. 
+`JsonObject` holds JSON object data and has different methods to read from JSON object and write to it. Once you have an instance, you can
+use the various methods to read or write data to you object. There are multiple ways to get a `JsonObject`. You can parse it directly, get 
+it as an element of an array, or a value in a parent object.
+
+There are 2 sets of methods that you can use when 
 
 #### JsonArray
-`JsonArray` is very similar to `JsonObject`. It also contains the underlying array and methods to read and write data.
+`JsonArray` is in many ways almost identical to `JsonObject`. It also contains the underlying array and methods to read and write data, and 
+both also keep the same names for the methods. However, they some minor differences. 
 
 #### `JsonObject` and `JsonArray` Similarity
-`JsonObject` and `JsonArray` have very similar methods, both in naming and semantics, but with 2 differences
+`JsonObject` and `JsonArray` have very similar methods, both in naming and semantics. However, they have 2 differences
   * Input:
     * `JsonObject`'s methods mostly asks for `string` as the key 
     * `JsonArray`'s methods mostly asks for `int` as the index
@@ -299,6 +303,6 @@ the various methods to get data.
 
 #### `As`, `Is` and `Get`
 The prefixes, `As`, `Is` and `Get` have similar semantics across the library.
-* `IsX`: checks for the value's time. For example `JsonMapper.IsBool`
+* `IsX`: checks for the value's type. For example `JsonMapper.IsBool`
 * `AsX`: converts the current data to other type representation. For example, `JsonArray.AsStringArray()` converts JsonArray to `[]string`.
 * `GetX`: Fetches the data, usually with some sort of search in the underlying data.
