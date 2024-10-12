@@ -87,7 +87,7 @@ var objectEmpty bool = object.IsEmpty()
 var valueNull bool = object.IsNull("children")
 
 // Get the object's size
-var keyExists bool = object.Length()
+var objectLen int = object.Length()
 
 // Get object's keys
 var keys []string = object.Keys()
@@ -98,7 +98,7 @@ values := object.Values()
 // Iterating over an object with key, value pair
 children := object.GetObject("children")
 for key, child := range children.Elements() {
-    fmt.Println("Child name:", key)                 // Rachel, Sara
+    fmt.Println("Child name:", key)                   // Rachel, Sara
     fmt.Println(child.AsObject.GetInt("age"))         // 15, 19
     fmt.Println(child.AsObject.GetBool("is_funny"))   // false, true
 }
@@ -118,7 +118,7 @@ secondElement := features.Get(1)
 
 // Iterating over an array
 for _, feature := range features.Elements() {
-fmt.Println(feature.AsString) // tall, ...
+    fmt.Println(feature.AsString) // tall, ...
 }
 
 // Get as a slice of string

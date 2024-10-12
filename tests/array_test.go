@@ -41,7 +41,7 @@ func TestArrayForEach(t *testing.T) {
 
 func TestIndexOutOfBoundError(t *testing.T) {
 	array := jsonmapper.EmptyArray()
-	array.AddElement(1)
+	array.AddInt(1)
 	assert.Equal(t, 1, array.Length())
 	assert.Equal(t, 0, array.GetInt(3))
 	assert.Error(t, array.LastError)

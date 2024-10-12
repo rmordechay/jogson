@@ -203,12 +203,15 @@ func (a *JsonArray) GetArray(i int) *JsonArray {
 		a.setLastError(createNullConversionErr(arrayTypeStr))
 		return EmptyArray()
 	}
-	v, ok := (*element).([]any)
-	if !ok {
+	switch v := (*element).(type) {
+	case []*any:
+		return newArrayFromSlice(v)
+	case []any:
+		return newArrayFromSlice(convertToSlicePtr(v))
+	default:
 		a.setLastError(createTypeConversionErr(*element, arrayTypeStr))
 		return EmptyArray()
 	}
-	return newArrayFromSlice(convertToSlicePtr(v))
 }
 
 // AddElement appends a new element to the JsonArray.
@@ -226,11 +229,60 @@ func (a *JsonArray) AddElement(element any) {
 	case *JsonArray:
 		var valueElements any = value.elements
 		a.elements = append(a.elements, &valueElements)
-	case nil, string, int, float64, bool, []string, []int, []float64, []bool:
+	case string, int, float64, bool, []string, []int, []float64, []bool:
 		a.elements = append(a.elements, &value)
+	case nil:
+		a.elements = append(a.elements, nil)
 	default:
 		a.setLastError(fmt.Errorf("could not add element of type %T", value))
 	}
+}
+
+// AddString appends the string s to the JsonArray.
+func (a *JsonArray) AddString(s string) {
+	var object any = s
+	a.elements = append(a.elements, &object)
+}
+
+// AddInt appends the int i to the JsonArray.
+func (a *JsonArray) AddInt(i int) {
+	var object any = i
+	a.elements = append(a.elements, &object)
+}
+
+// AddFloat appends the float f to the JsonArray.
+func (a *JsonArray) AddFloat(f float64) {
+	var object any = f
+	a.elements = append(a.elements, &object)
+}
+
+// AddBool appends the bool b to the JsonArray.
+func (a *JsonArray) AddBool(b bool) {
+	var object any = b
+	a.elements = append(a.elements, &object)
+}
+
+// AddStringArray appends the []string s to the JsonArray.
+func (a *JsonArray) AddStringArray(s []string) {
+	var object any = s
+	a.elements = append(a.elements, &object)
+}
+
+// AddIntArray appends the []int i to the JsonArray.
+func (a *JsonArray) AddIntArray(i []int) {
+	var object any = i
+	a.elements = append(a.elements, &object)
+}
+
+// AddFloatArray appends the []float f to the JsonArray.
+func (a *JsonArray) AddFloatArray(f []float64) {
+	var object any = f
+	a.elements = append(a.elements, &object)
+}
+
+// AddNull appends nil to the JsonArray.
+func (a *JsonArray) AddNull() {
+	a.elements = append(a.elements, nil)
 }
 
 // ForEach applies the given function to each element in the JsonArray.
