@@ -177,7 +177,8 @@ var birthday time.Time = array.GetTime(0)
 var birthday string = object.GetTime("birthday".Format(time.RFC3339)) // 1981-10-08T00:00:00Z
 ```
 
-The mapper will try to format the string against different time formats to increase the change of correct parsing. The following formats are supported:
+The mapper will try to format the string against different time formats to increase the change of correct parsing. The following 
+formats are supported:
 
 `time.RFC3339` `time.RFC850` `time.RFC822` `time.RFC822Z` `time.RFC1123` `time.RFC1123Z` `time.RFC3339Nano` `time.ANSIC` `time.UnixDate` `time.RubyDate` `time.Layout` `time.Kitchen` `time.Stamp` `time.StampMilli` `time.StampMicro` `time.StampNano` `time.DateTime` `time.DateOnly` `time.TimeOnly`
 
@@ -269,40 +270,44 @@ There are 3 structs that are important to know when working with the library
 #### JsonMapper
 
 `JsonMapper` is a struct that holds JSON data and serves as a generic type for all possible JSON types. It has `AsX` and `IsX` 
-fields with which you can get the data and check the type, respectively. For example, if your data is a JSON object, you can call `JsonMapper.AsObject`, 
-or if it's a string, `JsonMapper.AsString`. This struct is best used when you don't know the type at compile time and want to check it dynamically. 
-In this case you can use `JsonMapper.IsArray`, `JsonMapper.IsString`, `JsonMapper.IsFloat`, etc. 
+fields with which you can get the data and check the type, respectively. For example, if your data is a JSON object, 
+you can call `JsonMapper.AsObject`, or if it's a string, `JsonMapper.AsString`. This struct is best used when you don't 
+know the type at compile time and want to check it dynamically. In this case you can use `JsonMapper.IsArray`, 
+`JsonMapper.IsString`, `JsonMapper.IsFloat`, etc. 
 
-Note, in any case, `AsX` never returns nil, but always the zero value. If the underlying data is null, then `IsNull` will be set to true. 
+Note, in any case, `AsX` never returns nil, but always the zero value. If the underlying data is null, then `IsNull` will 
+be set to true. 
 
 `JsonMapper` is also returned in cases where the return type can be any JSON type. For example, `JsonArray.Elements()` 
-returns a slice `[]JsonMapper` over which you can iterate or query specific elements. Other methods that return `JsonMapper` (instead of 
-`JsonObject` or `JsonArray`) are `JsonObject.Values()`, `JsonObject.Get()`, `JsonArray.Get()`, `JsonArray.Find()` and more. 
+returns a slice `[]JsonMapper` over which you can iterate or query specific elements. Other methods that return `JsonMapper` 
+(instead of `JsonObject` or `JsonArray`) are `JsonObject.Values()`, `JsonObject.Get()`, `JsonArray.Get()`, `JsonArray.Find()` and more. 
 
 #### JsonObject
 
-`JsonObject` holds JSON object data and has different methods to read from JSON object and write to it. Once you have an instance, you can
-use the various methods to read or write data to you object. There are multiple ways to get a `JsonObject`. You can parse it directly, get 
-it as an element of an array, or a value in a parent object.
+`JsonObject` holds JSON object data and has different methods to read from JSON object and write to it. Once you have an instance, 
+you can use the various methods to read or write data to you object. There are multiple ways to get a `JsonObject`. You can parse 
+it directly, get it as an element of an array, or a value in a parent object.
 
 There are 2 sets of methods that you can use when 
 
 #### JsonArray
-`JsonArray` is in many ways almost identical to `JsonObject`. It also contains the underlying array and methods to read and write data, and 
-both also keep the same names for the methods. However, they some minor differences. 
+`JsonArray` is in many ways almost identical to `JsonObject`. It also contains the underlying array and methods to read and 
+write data, and both also keep the same names for the methods. However, they some minor differences. 
 
 #### `JsonObject` and `JsonArray` Similarity
-`JsonObject` and `JsonArray` have very similar methods, both in naming and semantics. However, they have 2 differences
+The structs `JsonObject` and `JsonArray` have very similar methods, both in naming and semantics. However, they have 2 differences
   * Input:
     * `JsonObject`'s methods mostly asks for `string` as the key 
     * `JsonArray`'s methods mostly asks for `int` as the index
   * Output:
-    * `JsonObject`'s methods mostly return a map
-    * `JsonArray`'s methods mostly return a slice
+    * `JsonObject`'s methods mostly return a `map` or `JsonObject`
+    * `JsonArray`'s methods mostly return a `slice` or `JsonArray`
 
 
-#### `As`, `Is` and `Get`
-The prefixes, `As`, `Is` and `Get` have similar semantics across the library.
+#### Methods and Variables Prefix
+The prefixes, `As`, `Is`, `Get` and `Add` have similar semantics across the library and can be found in
+`JsonMapper`,`JsonObject` and `JsonArray`
 * `IsX`: checks for the value's type. For example `JsonMapper.IsBool`
 * `AsX`: converts the current data to other type representation. For example, `JsonArray.AsStringArray()` converts JsonArray to `[]string`.
 * `GetX`: Fetches the data, usually with some sort of search in the underlying data.
+* `AddX`: Adds the data to the JSON array or object
