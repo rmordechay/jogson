@@ -5,6 +5,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"math"
 	"testing"
+	"time"
 )
 
 func TestArrayFilter(t *testing.T) {
@@ -251,4 +252,21 @@ func TestArrayGetObjectFails(t *testing.T) {
 	obj = array.GetObject(3)
 	assert.ErrorIs(t, array.LastError, jsonmapper.NullConversionErr)
 	assert.Equal(t, jsonmapper.EmptyObject(), obj)
+}
+
+func TestArrayGetTime(t *testing.T) {
+	mapper, err := jsonmapper.NewArrayFromString(jsonArrayTimeTest)
+	assert.NoError(t, err)
+	actualTime1 := mapper.GetTime(0)
+	assert.NoError(t, mapper.LastError)
+	actualTime2 := mapper.GetTime(1)
+	assert.NoError(t, mapper.LastError)
+	actualTime3 := mapper.GetTime(2)
+	assert.NoError(t, mapper.LastError)
+	expectedTime1, _ := time.Parse(time.RFC3339, "2024-10-06T17:59:44Z")
+	expectedTime2, _ := time.Parse(time.RFC3339, "2024-10-06T17:59:44+00:00")
+	expectedTime3, _ := time.Parse(time.RFC850, "Sunday, 06-Oct-24 17:59:44 UTC")
+	assert.Equal(t, expectedTime1, actualTime1)
+	assert.Equal(t, expectedTime2, actualTime2)
+	assert.Equal(t, expectedTime3, actualTime3)
 }

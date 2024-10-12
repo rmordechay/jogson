@@ -4,6 +4,7 @@ import (
 	"github.com/rmordechay/jsonmapper"
 	"github.com/stretchr/testify/assert"
 	"testing"
+	"time"
 )
 
 func TestObjectGetKeys(t *testing.T) {
@@ -202,6 +203,24 @@ func TestObjectGetObjectFails(t *testing.T) {
 	obj = object.GetObject("address")
 	assert.ErrorIs(t, object.LastError, jsonmapper.NullConversionErr)
 	assert.Equal(t, jsonmapper.EmptyObject(), obj)
+}
+
+func TestObjectGetTime(t *testing.T) {
+	mapper, err := jsonmapper.FromString(jsonObjectTimeTest)
+	assert.NoError(t, err)
+	object := mapper.AsObject
+	actualTime1 := object.GetTime("time1")
+	assert.NoError(t, object.LastError)
+	actualTime2 := object.GetTime("time2")
+	assert.NoError(t, object.LastError)
+	actualTime3 := object.GetTime("time3")
+	assert.NoError(t, object.LastError)
+	expectedTime1, _ := time.Parse(time.RFC3339, "2024-10-06T17:59:44Z")
+	expectedTime2, _ := time.Parse(time.RFC3339, "2024-10-06T17:59:44+00:00")
+	expectedTime3, _ := time.Parse(time.RFC850, "Sunday, 06-Oct-24 17:59:44 UTC")
+	assert.Equal(t, expectedTime1, actualTime1)
+	assert.Equal(t, expectedTime2, actualTime2)
+	assert.Equal(t, expectedTime3, actualTime3)
 }
 
 func TestConvertKeysToSnakeCase(t *testing.T) {

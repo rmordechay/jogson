@@ -237,24 +237,6 @@ func TestParseOnlyNull(t *testing.T) {
 	assert.True(t, mapper.IsNull)
 }
 
-func TestParseTime(t *testing.T) {
-	mapper, err := jsonmapper.FromString(jsonTimeTest)
-	assert.NoError(t, err)
-	object := mapper.AsObject
-	actualTime1 := object.GetTime("time1")
-	assert.NoError(t, object.LastError)
-	actualTime2 := object.GetTime("time2")
-	assert.NoError(t, object.LastError)
-	actualTime3 := object.GetTime("time3")
-	assert.NoError(t, object.LastError)
-	expectedTime1, _ := time.Parse(time.RFC3339, "2024-10-06T17:59:44Z")
-	expectedTime2, _ := time.Parse(time.RFC3339, "2024-10-06T17:59:44+00:00")
-	expectedTime3, _ := time.Parse(time.RFC850, "Sunday, 06-Oct-24 17:59:44 UTC")
-	assert.Equal(t, expectedTime1, actualTime1)
-	assert.Equal(t, expectedTime2, actualTime2)
-	assert.Equal(t, expectedTime3, actualTime3)
-}
-
 func removeWhiteSpaces(data string) string {
 	s := strings.ReplaceAll(data, " ", "")
 	s = strings.ReplaceAll(s, "\n", "")

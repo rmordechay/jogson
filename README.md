@@ -12,7 +12,7 @@ A simple Go library to simplify working with JSON without the need to define str
     * [Scalars](#Scalars)
     * [Types](#types)
     * [Find Elements](#Find-Elements)
-    * [Get as JSON String](#get-json-string)
+    * [Get JSON String](#get-json-string)
 * [Error Handling](#Error-handling)
 * [Write to JSON](#Write-to-JSON)
     * [Write Object](#Write-object)
@@ -177,7 +177,7 @@ var birthday time.Time = array.GetTime(0)
 var birthday string = object.GetTime("birthday".Format(time.RFC3339)) // 1981-10-08T00:00:00Z
 ```
 
-The mapper will try to format the string against different time formats to increase the change of correct parsing. The following 
+The mapper will try to format the string against different time formats to increase the chance of correct parsing. The following 
 formats are supported:
 
 `time.RFC3339` `time.RFC850` `time.RFC822` `time.RFC822Z` `time.RFC1123` `time.RFC1123Z` `time.RFC3339Nano` `time.ANSIC` `time.UnixDate` `time.RubyDate` `time.Layout` `time.Kitchen` `time.Stamp` `time.StampMilli` `time.StampMicro` `time.StampNano` `time.DateTime` `time.DateOnly` `time.TimeOnly`
