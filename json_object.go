@@ -201,11 +201,11 @@ func (o *JsonObject) GetArray(key string) *JsonArray {
 		o.setLastError(createNullConversionErr(arrayTypeStr))
 		return EmptyArray()
 	}
-	switch (*v).(type) {
+	switch castedValue := (*v).(type) {
 	case []any:
-		return newArrayFromSlice(convertToSlicePtr((*v).([]any)))
+		return newArrayFromSlice(convertToSlicePtr(castedValue))
 	case []*any:
-		return newArrayFromSlice((*v).([]*any))
+		return newArrayFromSlice(castedValue)
 	default:
 		o.setLastError(createTypeConversionErr(*v, arrayTypeStr))
 		return EmptyArray()
@@ -228,6 +228,8 @@ func (o *JsonObject) Find(key string) JsonMapper {
 }
 
 // AddKeyValue adds a key-value pair to the JsonObject.
+// Note, this method is slightly slower than the specific AddX() methods, like AddInt(), AddString(), etc.,
+// and it's also not type safe. Use the specific methods rather than this one whenever you can.
 func (o *JsonObject) AddKeyValue(k string, value any) {
 	switch castedValue := value.(type) {
 	case JsonObject:
@@ -247,6 +249,65 @@ func (o *JsonObject) AddKeyValue(k string, value any) {
 	default:
 		o.setLastError(fmt.Errorf("could not add castedValue of type %T", castedValue))
 	}
+}
+
+// AddJsonObject adds a nested JsonObject to the JsonObject associated with the key.
+func (o *JsonObject) AddJsonObject(key string, jsonObject *JsonObject) {
+	var object any = jsonObject.object
+	o.object[key] = &object
+}
+
+// AddJsonArray adds a JsonArray to the JsonObject associated with the key.
+func (o *JsonObject) AddJsonArray(key string, jsonArray *JsonArray) {
+	var elements any = jsonArray.elements
+	o.object[key] = &elements
+}
+
+// AddString adds a float to the JsonObject associated with the key.
+func (o *JsonObject) AddString(key string, s string) {
+	var value any = s
+	o.object[key] = &value
+}
+
+// AddInt adds a float to the JsonObject associated with the key.
+func (o *JsonObject) AddInt(key string, i int) {
+	var value any = i
+	o.object[key] = &value
+}
+
+// AddFloat adds a float to the JsonObject associated with the key.
+func (o *JsonObject) AddFloat(key string, f float64) {
+	var value any = f
+	o.object[key] = &value
+}
+
+// AddBool adds a float to the JsonObject associated with the key.
+func (o *JsonObject) AddBool(key string, b bool) {
+	var value any = b
+	o.object[key] = &value
+}
+
+// AddStringArray adds a float to the JsonObject associated with the key.
+func (o *JsonObject) AddStringArray(key string, s []string) {
+	var value any = s
+	o.object[key] = &value
+}
+
+// AddIntArray adds a float to the JsonObject associated with the key.
+func (o *JsonObject) AddIntArray(key string, i []int) {
+	var value any = i
+	o.object[key] = &value
+}
+
+// AddFloatArray adds a float to the JsonObject associated with the key.
+func (o *JsonObject) AddFloatArray(key string, f []float64) {
+	var value any = f
+	o.object[key] = &value
+}
+
+// AddNull adds nil to the JsonObject associated with the key.
+func (o *JsonObject) AddNull(key string) {
+	o.object[key] = nil
 }
 
 // ForEach applies the provided function to each key-value pair in the JsonObject.

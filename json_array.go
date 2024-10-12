@@ -214,8 +214,10 @@ func (a *JsonArray) GetArray(i int) *JsonArray {
 	}
 }
 
-// AddElement appends a new element to the JsonArray.
-func (a *JsonArray) AddElement(element any) {
+// Add appends a new element to the JsonArray.
+// Note, this method is slightly slower than the specific AddX() methods, like AddInt(), AddString(), etc.,
+// and it's also not type safe. Use the specific methods rather than this one whenever you can.
+func (a *JsonArray) Add(element any) {
 	switch value := element.(type) {
 	case JsonObject:
 		var object any = value.object
@@ -238,46 +240,58 @@ func (a *JsonArray) AddElement(element any) {
 	}
 }
 
+// AddJsonObject appends a JsonObject to the JsonArray.
+func (a *JsonArray) AddJsonObject(jsonObject *JsonObject) {
+	var object any = jsonObject.object
+	a.elements = append(a.elements, &object)
+}
+
+// AddJsonArray appends a nested JsonArray to the JsonArray.
+func (a *JsonArray) AddJsonArray(jsonArray *JsonArray) {
+	var elements any = jsonArray.elements
+	a.elements = append(a.elements, &elements)
+}
+
 // AddString appends the string s to the JsonArray.
 func (a *JsonArray) AddString(s string) {
-	var object any = s
-	a.elements = append(a.elements, &object)
+	var value any = s
+	a.elements = append(a.elements, &value)
 }
 
 // AddInt appends the int i to the JsonArray.
 func (a *JsonArray) AddInt(i int) {
-	var object any = i
-	a.elements = append(a.elements, &object)
+	var value any = i
+	a.elements = append(a.elements, &value)
 }
 
 // AddFloat appends the float f to the JsonArray.
 func (a *JsonArray) AddFloat(f float64) {
-	var object any = f
-	a.elements = append(a.elements, &object)
+	var value any = f
+	a.elements = append(a.elements, &value)
 }
 
 // AddBool appends the bool b to the JsonArray.
 func (a *JsonArray) AddBool(b bool) {
-	var object any = b
-	a.elements = append(a.elements, &object)
+	var value any = b
+	a.elements = append(a.elements, &value)
 }
 
 // AddStringArray appends the []string s to the JsonArray.
 func (a *JsonArray) AddStringArray(s []string) {
-	var object any = s
-	a.elements = append(a.elements, &object)
+	var value any = s
+	a.elements = append(a.elements, &value)
 }
 
 // AddIntArray appends the []int i to the JsonArray.
 func (a *JsonArray) AddIntArray(i []int) {
-	var object any = i
-	a.elements = append(a.elements, &object)
+	var value any = i
+	a.elements = append(a.elements, &value)
 }
 
 // AddFloatArray appends the []float f to the JsonArray.
 func (a *JsonArray) AddFloatArray(f []float64) {
-	var object any = f
-	a.elements = append(a.elements, &object)
+	var value any = f
+	a.elements = append(a.elements, &value)
 }
 
 // AddNull appends nil to the JsonArray.
