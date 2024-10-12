@@ -83,9 +83,6 @@ var keyExists bool = object.Has("children")
 // Check if the object is empty
 var objectEmpty bool = object.IsEmpty()
 
-// Check if a key contains a null value
-var valueNull bool = object.IsNull("children")
-
 // Get the object's size
 var objectLen int = object.Length()
 

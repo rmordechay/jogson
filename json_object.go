@@ -67,10 +67,9 @@ func (o *JsonObject) IsEmpty() bool {
 	return len(o.object) == 0
 }
 
-// IsNull checks if the value associated with the key is null
-func (o *JsonObject) IsNull(key string) bool {
-	v := o.object[key]
-	return v == nil
+// IsNull checks if the JSON object is null
+func (o *JsonObject) IsNull() bool {
+	return o.object == nil
 }
 
 // Keys returns a slice of all keys in the JsonObject.

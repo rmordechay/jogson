@@ -8,6 +8,7 @@ type jsonI interface {
 	String() string
 	PrettyString() string
 	Length() int
+	IsNull() bool
 	IsEmpty() bool
 	setLastError(err error)
 }

@@ -53,10 +53,9 @@ func (a *JsonArray) IsEmpty() bool {
 	return len(a.elements) == 0
 }
 
-// IsNull checks if element at index i is null
-func (a *JsonArray) IsNull(i int) bool {
-	v := a.elements[i]
-	return v == nil
+// IsNull checks if the JSON array is null
+func (a *JsonArray) IsNull() bool {
+	return a.elements == nil
 }
 
 // Elements returns all elements in the JsonArray as a slice of JsonMapper objects.
