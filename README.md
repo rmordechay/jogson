@@ -288,11 +288,14 @@ returns a slice `[]JsonMapper` over which you can iterate or query specific elem
 you can use the various methods to read or write data to you object. There are multiple ways to get a `JsonObject`. You can parse 
 it directly, get it as an element of an array, or a value in a parent object.
 
-There are 2 sets of methods that you can use when 
+There are 3 sets of methods that you can use when working with `JsonObject`.
+* `GetX(key string)`: gets a value in the object as the requested type. For example, GetString("key") gets the value associated with `key` as type `string` 
+* `AsXMap()`: gets the value as the requested type. For example, AsStringMap("key") gets the value associated with `key` as type `map[string]string` 
+* `AddX(key string, value X)`: adds `value`, associated with `key`, to the object as the requested type. For example, `AddString("key", "string_value")` adds the string `string_value` associated with the `key`   
 
 #### JsonArray
 `JsonArray` is in many ways almost identical to `JsonObject`. It also contains the underlying array and methods to read and 
-write data, and both also keep the same names for the methods. However, they some minor differences. 
+write data, and both also keep the same names for the methods. However, they have some minor differences. 
 
 #### `JsonObject` and `JsonArray` Similarity
 The structs `JsonObject` and `JsonArray` have very similar methods, both in naming and semantics. However, they have 2 differences
@@ -305,8 +308,8 @@ The structs `JsonObject` and `JsonArray` have very similar methods, both in nami
 
 
 #### Methods and Variables Prefix
-The prefixes, `As`, `Is`, `Get` and `Add` have similar semantics across the library and can be found in
-`JsonMapper`,`JsonObject` and `JsonArray`
+The prefixes, `As`, `Is`, `Get` and `Add` have similar semantics across the library and can be found in `JsonMapper`, `JsonObject`
+and `JsonArray`.
 * `IsX`: checks for the value's type. For example `JsonMapper.IsBool`
 * `AsX`: converts the current data to other type representation. For example, `JsonArray.AsStringArray()` converts JsonArray to `[]string`.
 * `GetX`: Fetches the data, usually with some sort of search in the underlying data.
