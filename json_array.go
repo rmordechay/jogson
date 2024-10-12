@@ -1,7 +1,6 @@
 package jsonmapper
 
 import (
-	"fmt"
 	"os"
 	"time"
 )
@@ -211,32 +210,6 @@ func (a *JsonArray) GetArray(i int) *JsonArray {
 	default:
 		a.setLastError(createTypeConversionErr(*element, arrayTypeStr))
 		return EmptyArray()
-	}
-}
-
-// Add appends a new element to the JsonArray.
-// Note, this method is slightly slower than the specific AddX() methods, like AddInt(), AddString(), etc.,
-// and it's also not type safe. Use the specific methods rather than this one whenever you can.
-func (a *JsonArray) Add(element any) {
-	switch value := element.(type) {
-	case JsonObject:
-		var object any = value.object
-		a.elements = append(a.elements, &object)
-	case *JsonObject:
-		var object any = value.object
-		a.elements = append(a.elements, &object)
-	case JsonArray:
-		var valueElements any = value.elements
-		a.elements = append(a.elements, &valueElements)
-	case *JsonArray:
-		var valueElements any = value.elements
-		a.elements = append(a.elements, &valueElements)
-	case string, int, float64, bool, []string, []int, []float64, []bool:
-		a.elements = append(a.elements, &value)
-	case nil:
-		a.elements = append(a.elements, nil)
-	default:
-		a.setLastError(fmt.Errorf("could not add element of type %T", value))
 	}
 }
 

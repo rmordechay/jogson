@@ -1,7 +1,6 @@
 package jsonmapper
 
 import (
-	"fmt"
 	"os"
 	"time"
 )
@@ -225,30 +224,6 @@ func (o *JsonObject) Find(key string) JsonMapper {
 		}
 	}
 	return JsonMapper{}
-}
-
-// AddKeyValue adds a key-value pair to the JsonObject.
-// Note, this method is slightly slower than the specific AddX() methods, like AddInt(), AddString(), etc.,
-// and it's also not type safe. Use the specific methods rather than this one whenever you can.
-func (o *JsonObject) AddKeyValue(k string, value any) {
-	switch castedValue := value.(type) {
-	case JsonObject:
-		var object any = castedValue.object
-		o.object[k] = &object
-	case *JsonObject:
-		var object any = castedValue.object
-		o.object[k] = &object
-	case JsonArray:
-		var elements any = castedValue.elements
-		o.object[k] = &elements
-	case *JsonArray:
-		var elements any = castedValue.elements
-		o.object[k] = &elements
-	case nil, string, int, float64, bool, []string, []int, []float64, []bool:
-		o.object[k] = &castedValue
-	default:
-		o.setLastError(fmt.Errorf("could not add castedValue of type %T", castedValue))
-	}
 }
 
 // AddJsonObject adds a nested JsonObject to the JsonObject associated with the key.
