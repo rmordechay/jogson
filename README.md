@@ -103,16 +103,19 @@ for key, child := range children.Elements() {
 
 // Get the JsonObject as map of string and string
 var stringMap map[string]string = object.AsStringMap()
+
 // Get the JsonObject as map of string and nullable string
 var nullableStringMap map[string]*string = object.AsStringMapN()
 
 // Get the JsonObject as map of string and int
 var intMap map[string]int = object.AsIntMap()
+
 // Get the JsonObject as map of string and nullable int
 var nullableSntMap map[string]*int = object.AsIntMapN()
 
 // Get the JsonObject as map of string and float
 var floatMap map[string]float64 = object.AsFloatMap()
+
 // Get the JsonObject as map of string and nullable float
 var nullableSloatMap map[string]*float64 = object.AsFloatMapN()
 
@@ -142,16 +145,19 @@ for _, feature := range features.Elements() {
 
 // Get the JsonArray as a slice of string
 var stringArray []string = array.AsStringArray()
+
 // Get the JsonArray as a slice of nullable string
 var nullableStringArray []*string = array.AsStringArrayN()
 
 // Get the JsonArray as a slice of int
 var intArray []int = array.AsIntArray()
+
 // Get the JsonArray as a slice of nullable int
 var nullableSntArray []*int = array.AsIntArrayN()
 
 // Get the JsonArray as a slice of float
 var floatArray []float64 = array.AsFloatArray()
+
 // Get the JsonArray as a slice of nullable float
 var nullableSloatArray []*float64 = array.AsFloatArrayN()
 
@@ -168,30 +174,75 @@ Getting scalars - `string`, `int`, etc. - is similar both for object and array a
 in the parameter type (objects take `string` as key and arrays take `int` as index)
 
 #### From Object
+You can get scalars by value or by reference, where the latter allows JSON null values. Nullable methods have 
+the suffix 'N' in their names. 
+
+By value:
 
 ```go
 // string 
 var name string = object.GetString("name") // Jason
+
 // int 
 var age int = object.GetInt("age") // 15
+
 // float64 
 var height float64 = object.GetFloat("height") // 1.87
+
 // bool 
 var isFunny bool = object.GetBool("is_funny") // false
 ```
 
+By reference which allows JSON null values. Note the suffix 'N' at the end of the method names.
+
+```go
+// string
+var nameNullable *string = object.GetStringN("non-existent-key") // nil
+
+// int
+var ageNullable *int = object.GetIntN("non-existent-key") // nil
+
+// float64
+var heightNullable *float64 = object.GetFloatN("non-existent-key") // nil
+
+// bool
+var isFunnyNullable *bool = object.GetBoolN("non-existent-key") // nil
+```
+
 #### From Array
+
+By value:
 
 ```go
 // string 
 var s string = array.GetString(0)
+
 // int 
 var i int = array.GetInt(2)
+
 // float64 
 var f float64 = array.GetFloat(5)
+
 // bool 
 var b bool = array.GetBool(7)
 ```
+
+By reference which allows JSON null values. Note the suffix 'N' at the end of the method names.
+
+```go
+// string
+var nameNullable *string = array.GetStringN(100) // nil
+
+// int
+var ageNullable *int = array.GetIntN(100) // nil
+
+// float64
+var heightNullable *float64 = array.GetFloatN(100) // nil
+
+// bool
+var isFunnyNullable *bool = array.GetBoolN(100) // nil
+```
+
 
 #### Time
 
