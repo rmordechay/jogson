@@ -393,12 +393,11 @@ write data, and both also keep the same names for the methods. However, they hav
 #### `JsonObject` and `JsonArray` Similarity
 The structs `JsonObject` and `JsonArray` have very similar methods, both in naming and semantics. However, they have 2 differences
   * Input:
-    * `JsonObject`'s methods mostly asks for `string` as the key 
-    * `JsonArray`'s methods mostly asks for `int` as the index
+    * `JsonObject`'s methods mostly take a `string` as the key 
+    * `JsonArray`'s methods mostly take an `int` as the index
   * Output:
     * `JsonObject`'s methods mostly return a `map` or `JsonObject`
     * `JsonArray`'s methods mostly return a `slice` or `JsonArray`
-
 
 #### Methods and Variables Prefix
 The prefixes, `As`, `Is`, `Get` and `Add` have similar semantics across the library and can be found in `JsonMapper`, `JsonObject`

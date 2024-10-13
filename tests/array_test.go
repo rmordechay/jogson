@@ -8,47 +8,6 @@ import (
 	"time"
 )
 
-func TestArrayFilter(t *testing.T) {
-	mapper, err := jsonmapper.FromString(jsonObjectArrayTest)
-	assert.NoError(t, err)
-	filteredArr := mapper.AsArray.Filter(func(element jsonmapper.JsonMapper) bool {
-		return element.AsObject.GetString("name") == "Chris"
-	})
-	assert.Equal(t, 1, filteredArr.Length())
-	assert.Equal(t, "Chris", filteredArr.Elements()[0].AsObject.GetString("name"))
-}
-
-func TestArrayFilterNull(t *testing.T) {
-	mapper, err := jsonmapper.FromString(jsonAnyArrayTest)
-	assert.NoError(t, err)
-	filteredArr := mapper.AsArray.FilterNull()
-	assert.Equal(t, 5, mapper.AsArray.Length())
-	assert.Equal(t, 4, filteredArr.Length())
-	filteredArr.ForEach(func(j jsonmapper.JsonMapper) {
-		assert.True(t, !j.IsNull)
-	})
-}
-
-func TestArrayForEach(t *testing.T) {
-	mapper, err := jsonmapper.FromString(jsonObjectArrayTest)
-	assert.NoError(t, err)
-	wasVisited := false
-	mapper.AsArray.ForEach(func(mapper jsonmapper.JsonMapper) {
-		wasVisited = true
-		assert.NotNil(t, mapper)
-	})
-	assert.True(t, wasVisited)
-}
-
-func TestIndexOutOfBoundError(t *testing.T) {
-	array := jsonmapper.EmptyArray()
-	array.AddInt(1)
-	assert.Equal(t, 1, array.Length())
-	assert.Equal(t, 0, array.GetInt(3))
-	assert.Error(t, array.LastError)
-	assert.ErrorIs(t, array.LastError, jsonmapper.IndexOutOfRangeErr)
-}
-
 func TestArrayAsStringArray(t *testing.T) {
 	mapper, _ := jsonmapper.FromString(jsonStringArrayTest)
 	array := mapper.AsArray
@@ -67,6 +26,50 @@ func TestArrayAsFloatArray(t *testing.T) {
 	assert.ElementsMatch(t, []float64{15.13, 2, 45.3984, -1.81, 9.223372036854776}, array.AsFloatArray())
 }
 
+func TestArrayAsStringArrayNullable(t *testing.T) {
+	array, err := jsonmapper.NewArrayFromString(jsonStringArrayWithNullTest)
+	assert.NoError(t, err)
+	s := "Chris"
+	s2 := "Rachel"
+	assert.ElementsMatch(t, []*string{nil, &s, &s2}, array.AsStringArrayN())
+}
+
+func TestArrayAsIntArrayNullable(t *testing.T) {
+	array, err := jsonmapper.NewArrayFromString(jsonIntArrayWithNullTest)
+	assert.NoError(t, err)
+	i := 0
+	assert.ElementsMatch(t, []*int{&i, nil}, array.AsIntArrayN())
+}
+
+func TestArrayAsFloatArrayNullable(t *testing.T) {
+	array, err := jsonmapper.NewArrayFromString(jsonFloatArrayWithNullTest)
+	assert.NoError(t, err)
+	var i float64 = 2
+	f := 15.13
+	assert.ElementsMatch(t, []*float64{&f, &i, nil}, array.AsFloatArrayN())
+}
+
+func TestArrayContainsString(t *testing.T) {
+	array, err := jsonmapper.NewArrayFromString(jsonStringArrayWithNullTest)
+	assert.NoError(t, err)
+	assert.True(t, array.ContainsString("Chris"))
+	assert.True(t, array.ContainsString("Rachel"))
+}
+
+func TestArrayContainsInt(t *testing.T) {
+	array, err := jsonmapper.NewArrayFromString(jsonIntArrayTest)
+	assert.NoError(t, err)
+	assert.True(t, array.ContainsInt(9223372036854775807))
+	assert.True(t, array.ContainsInt(-346))
+}
+
+func TestArrayContainsFloat(t *testing.T) {
+	array, err := jsonmapper.NewArrayFromString(jsonFloatArrayWithNullTest)
+	assert.NoError(t, err)
+	assert.True(t, array.ContainsFloat(2))
+	assert.True(t, array.ContainsFloat(15.13))
+}
+
 func TestArrayAs2DArray(t *testing.T) {
 	mapper, _ := jsonmapper.FromString(json2DIntArrayTest)
 	array := mapper.AsArray
@@ -80,6 +83,38 @@ func TestArrayAsObjectArray(t *testing.T) {
 	array := mapper.AsArray
 	assert.Equal(t, "Jason", array.AsObjectArray()[0].GetString("name"))
 	assert.Equal(t, "Chris", array.AsObjectArray()[1].GetString("name"))
+}
+
+func TestArrayGetMapper(t *testing.T) {
+	mapper, _ := jsonmapper.FromString(jsonAnyArrayTest)
+	array := mapper.AsArray
+
+	elementMapper := array.Get(0)
+	assert.NoError(t, array.LastError)
+	assert.Equal(t, "Jason", elementMapper.AsString)
+
+	array.LastError = nil
+	elementMapper = array.Get(1)
+	assert.NoError(t, array.LastError)
+	assert.Equal(t, 15, elementMapper.AsInt)
+	assert.True(t, elementMapper.IsInt)
+
+	array.LastError = nil
+	elementMapper = array.Get(2)
+	assert.NoError(t, array.LastError)
+	assert.True(t, elementMapper.IsNull)
+
+	array.LastError = nil
+	elementMapper = array.Get(3)
+	assert.NoError(t, array.LastError)
+	assert.Equal(t, 1.81, elementMapper.AsFloat)
+	assert.True(t, elementMapper.IsFloat)
+
+	array.LastError = nil
+	elementMapper = array.Get(4)
+	assert.NoError(t, array.LastError)
+	assert.Equal(t, true, elementMapper.AsBool)
+	assert.True(t, elementMapper.IsBool)
 }
 
 func TestArrayGetString(t *testing.T) {
@@ -283,4 +318,71 @@ func TestArrayPrettyString(t *testing.T) {
 	assert.NoError(t, err)
 	expectedArrayStr := "[\n  {\n    \"name\": \"Jason\"\n  },\n  {\n    \"name\": \"Chris\"\n  }\n]"
 	assert.Equal(t, expectedArrayStr, mapper.AsArray.PrettyString())
+}
+
+func TestArrayFilter(t *testing.T) {
+	mapper, err := jsonmapper.FromString(jsonObjectArrayTest)
+	assert.NoError(t, err)
+	filteredArr := mapper.AsArray.Filter(func(element jsonmapper.JsonMapper) bool {
+		return element.AsObject.GetString("name") == "Chris"
+	})
+	assert.Equal(t, 1, filteredArr.Length())
+	assert.Equal(t, "Chris", filteredArr.Elements()[0].AsObject.GetString("name"))
+}
+
+func TestArrayFilterNull(t *testing.T) {
+	mapper, err := jsonmapper.FromString(jsonAnyArrayTest)
+	assert.NoError(t, err)
+	filteredArr := mapper.AsArray.FilterNull()
+	assert.Equal(t, 5, mapper.AsArray.Length())
+	assert.Equal(t, 4, filteredArr.Length())
+	filteredArr.ForEach(func(j jsonmapper.JsonMapper) {
+		assert.True(t, !j.IsNull)
+	})
+}
+
+func TestArrayForEach(t *testing.T) {
+	mapper, err := jsonmapper.FromString(jsonObjectArrayTest)
+	assert.NoError(t, err)
+	wasVisited := false
+	mapper.AsArray.ForEach(func(mapper jsonmapper.JsonMapper) {
+		wasVisited = true
+		assert.NotNil(t, mapper)
+	})
+	assert.True(t, wasVisited)
+}
+
+func TestArrayAnyAndAll(t *testing.T) {
+	arrayWithNull, err := jsonmapper.NewArrayFromString(jsonArrayWithNullTest)
+	assert.NoError(t, err)
+
+	arrayWithOnlyNull, err := jsonmapper.NewArrayFromString(jsonArrayWithOnlyNullTest)
+	assert.NoError(t, err)
+
+	arrayWithoutNull, err := jsonmapper.NewArrayFromString(jsonStringArrayTest)
+	assert.NoError(t, err)
+
+	arrayEmpty, err := jsonmapper.NewArrayFromString(jsonEmptyArrayTest)
+	assert.NoError(t, err)
+
+	assert.True(t, arrayEmpty.Any())
+	assert.True(t, arrayEmpty.All())
+
+	assert.False(t, arrayWithOnlyNull.Any())
+	assert.False(t, arrayWithOnlyNull.All())
+
+	assert.True(t, arrayWithNull.Any())
+	assert.False(t, arrayWithNull.All())
+
+	assert.True(t, arrayWithoutNull.Any())
+	assert.True(t, arrayWithoutNull.All())
+}
+
+func TestIndexOutOfBoundError(t *testing.T) {
+	array := jsonmapper.EmptyArray()
+	array.AddInt(1)
+	assert.Equal(t, 1, array.Length())
+	assert.Equal(t, 0, array.GetInt(3))
+	assert.Error(t, array.LastError)
+	assert.ErrorIs(t, array.LastError, jsonmapper.IndexOutOfRangeErr)
 }

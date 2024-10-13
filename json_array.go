@@ -135,7 +135,11 @@ func (a *JsonArray) ContainsInt(i int) bool {
 		if element == nil {
 			continue
 		}
-		if *element == i {
+		f, ok := (*element).(float64)
+		if !ok {
+			return false
+		}
+		if int(f) == i {
 			return true
 		}
 	}
@@ -387,7 +391,8 @@ func (a *JsonArray) FilterNull() JsonArray {
 	return *arr
 }
 
-// All returns true if all elements in the JsonArray are non-null.
+// All returns true if all elements in the JsonArray are not null. If the array is empty,
+// it returns true.
 func (a *JsonArray) All() bool {
 	for _, element := range a.elements {
 		field := getMapperFromField(element)
@@ -398,7 +403,8 @@ func (a *JsonArray) All() bool {
 	return true
 }
 
-// Any returns true if any element in the JsonArray is non-null.
+// Any returns true if any element in the JsonArray is non-null. If the array is empty,
+// it returns true.
 func (a *JsonArray) Any() bool {
 	if len(a.elements) == 0 {
 		return true

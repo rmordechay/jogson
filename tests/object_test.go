@@ -27,12 +27,106 @@ func TestObjectGetValues(t *testing.T) {
 	}
 }
 
-func TestElementNotFound(t *testing.T) {
-	mapper, err := jsonmapper.FromString(jsonObjectTest)
+func TestObjectAsStringMap(t *testing.T) {
+	object, _ := jsonmapper.NewObjectFromString(jsonObjectOnlyStringTest)
+	expectedMap := map[string]string{"first": "string1", "second": "string2", "third": "string3"}
+	assert.Equal(t, expectedMap, object.AsStringMap())
+	assert.Equal(t, 3, object.Length())
+}
+
+func TestObjectAsIntMap(t *testing.T) {
+	object, _ := jsonmapper.NewObjectFromString(jsonObjectOnlyIntTest)
+	expectedMap := map[string]int{"first": 1, "second": 3, "third": 54}
+	assert.Equal(t, expectedMap, object.AsIntMap())
+	assert.Equal(t, 3, object.Length())
+}
+
+func TestObjectAsFloatMap(t *testing.T) {
+	object, _ := jsonmapper.NewObjectFromString(jsonObjectOnlyFloatTest)
+	expectedMap := map[string]float64{"first": 5.3, "second": 1.4, "third": -0.3}
+	assert.Equal(t, expectedMap, object.AsFloatMap())
+	assert.Equal(t, 3, object.Length())
+}
+
+func TestObjectAsStringMapNullable(t *testing.T) {
+	object, err := jsonmapper.NewObjectFromString(jsonObjectOnlyStringWithNullTest)
 	assert.NoError(t, err)
-	_ = mapper.AsObject.GetFloat("not found")
-	assert.Error(t, mapper.AsObject.LastError)
-	assert.ErrorIs(t, mapper.AsObject.LastError, jsonmapper.KeyNotFoundErr)
+	string1 := "string1"
+	string2 := "string2"
+	string3 := "string3"
+	expectedMap := map[string]*string{
+		"first": &string1, "second": &string2, "third": &string3, "fourth": nil,
+	}
+	stringMap := object.AsStringMapN()
+	assert.Equal(t, expectedMap, stringMap)
+	assert.Equal(t, 4, len(stringMap))
+	assert.Equal(t, 4, object.Length())
+	assert.Equal(t, 3, len(object.AsStringMap()))
+}
+
+func TestObjectAsIntMapNullable(t *testing.T) {
+	object, err := jsonmapper.NewObjectFromString(jsonObjectOnlyIntWithNullTest)
+	assert.NoError(t, err)
+	i1 := 1
+	i2 := 3
+	i3 := 54
+	expectedMap := map[string]*int{
+		"first": &i1, "second": &i2, "third": &i3, "fourth": nil,
+	}
+	intMap := object.AsIntMapN()
+	assert.Equal(t, expectedMap, intMap)
+	assert.Equal(t, 4, len(intMap))
+	assert.Equal(t, 4, object.Length())
+	assert.Equal(t, 3, len(object.AsIntMap()))
+}
+
+func TestObjectAsFloatMapNullable(t *testing.T) {
+	object, err := jsonmapper.NewObjectFromString(jsonObjectOnlyFloatWithNullTest)
+	assert.NoError(t, err)
+	f1 := 5.3
+	f2 := 1.4
+	f3 := -0.3
+	expectedMap := map[string]*float64{
+		"first": &f1, "second": &f2, "third": &f3, "fourth": nil,
+	}
+	floatMap := object.AsFloatMapN()
+	assert.Equal(t, expectedMap, floatMap)
+	assert.Equal(t, 4, len(floatMap))
+	assert.Equal(t, 4, object.Length())
+	assert.Equal(t, 3, len(object.AsFloatMap()))
+}
+
+func TestObjectGetMapper(t *testing.T) {
+	mapper, _ := jsonmapper.FromString(jsonObjectTest)
+	array := mapper.AsObject
+
+	elementMapper := array.Get("name")
+	assert.NoError(t, array.LastError)
+	assert.Equal(t, "Jason", elementMapper.AsString)
+
+	array.LastError = nil
+	elementMapper = array.Get("age")
+	assert.NoError(t, array.LastError)
+	assert.Equal(t, 15, elementMapper.AsInt)
+	assert.True(t, elementMapper.IsInt)
+
+	array.LastError = nil
+	elementMapper = array.Get("address")
+	assert.NoError(t, array.LastError)
+	assert.True(t, elementMapper.IsNull)
+
+	array.LastError = nil
+	elementMapper = array.Get("is_funny")
+	assert.NoError(t, array.LastError)
+	assert.Equal(t, true, elementMapper.AsBool)
+	assert.True(t, elementMapper.IsBool)
+
+	array.LastError = nil
+	elementMapper = array.Get("height")
+	assert.NoError(t, array.LastError)
+	assert.Equal(t, 1.81, elementMapper.AsFloat)
+	assert.True(t, elementMapper.IsFloat)
+
 }
 
 func TestObjectGetString(t *testing.T) {
@@ -243,6 +337,14 @@ func TestObjectPrettyString(t *testing.T) {
 	assert.NoError(t, err)
 	expectedStr := "{\n  \"address\": null,\n  \"age\": 15,\n  \"height\": 1.81,\n  \"is_funny\": true,\n  \"name\": \"Jason\"\n}"
 	assert.Equal(t, expectedStr, mapper.AsObject.PrettyString())
+}
+
+func TestElementNotFound(t *testing.T) {
+	mapper, err := jsonmapper.FromString(jsonObjectTest)
+	assert.NoError(t, err)
+	_ = mapper.AsObject.GetFloat("not found")
+	assert.Error(t, mapper.AsObject.LastError)
+	assert.ErrorIs(t, mapper.AsObject.LastError, jsonmapper.KeyNotFoundErr)
 }
 
 func TestConvertKeysToSnakeCase(t *testing.T) {
