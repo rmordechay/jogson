@@ -135,31 +135,31 @@ func (o *JsonObject) Get(key string) JsonMapper {
 // will be converted to "3".
 // If the key does not exist, the value is invalid or is null, an error will be set to LastError.
 func (o *JsonObject) GetString(key string) string {
-	return getObjectScalar(o, convertAnyToString, key, stringTypeStr)
+	return getObjectScalar(o, convertAnyToString, key)
 }
 
 // GetInt retrieves the int value associated with the specified key.
 // If the key does not exist, the value is invalid or is null, an error will be set to LastError.
 func (o *JsonObject) GetInt(key string) int {
-	return getObjectScalar(o, convertAnyToInt, key, intTypeStr)
+	return getObjectScalar(o, convertAnyToInt, key)
 }
 
 // GetFloat retrieves the float64 value associated with the specified key.
 // If the key does not exist, the value is invalid or is null, an error will be set to LastError.
 func (o *JsonObject) GetFloat(key string) float64 {
-	return getObjectScalar(o, convertAnyToFloat, key, floatTypeStr)
+	return getObjectScalar(o, convertAnyToFloat, key)
 }
 
 // GetBool retrieves the bool value associated with the specified key.
 // If the key does not exist, the value is invalid or is null, an error will be set to LastError.
 func (o *JsonObject) GetBool(key string) bool {
-	return getObjectScalar(o, convertAnyToBool, key, boolTypeStr)
+	return getObjectScalar(o, convertAnyToBool, key)
 }
 
 // GetTime retrieves the time.Time value associated with the specified key.
 // If the key does not exist, the value is invalid or is null, an error will be set to LastError.
 func (o *JsonObject) GetTime(key string) time.Time {
-	return getObjectScalar(o, parseTime, key, timeTypeStr)
+	return getObjectScalar(o, parseTime, key)
 }
 
 // GetObject retrieves a nested JsonObject associated with the specified key.
@@ -171,7 +171,7 @@ func (o *JsonObject) GetObject(key string) *JsonObject {
 		return EmptyObject()
 	}
 	if v == nil {
-		o.setLastError(createNullConversionErr(objectTypeStr))
+		o.setLastError(createTypeConversionErr(nil, JsonObject{}))
 		return EmptyObject()
 	}
 	switch (*v).(type) {
@@ -182,7 +182,7 @@ func (o *JsonObject) GetObject(key string) *JsonObject {
 		dataPtr := convertToMapValuesPtr((*v).(map[string]any))
 		return newObjectFromMap(dataPtr)
 	default:
-		o.setLastError(createTypeConversionErr(*v, objectTypeStr))
+		o.setLastError(createTypeConversionErr(*v, JsonObject{}))
 		return EmptyObject()
 	}
 }
@@ -196,7 +196,7 @@ func (o *JsonObject) GetArray(key string) *JsonArray {
 		return EmptyArray()
 	}
 	if v == nil {
-		o.setLastError(createNullConversionErr(arrayTypeStr))
+		o.setLastError(createTypeConversionErr(nil, JsonArray{}))
 		return EmptyArray()
 	}
 	switch castedValue := (*v).(type) {
@@ -205,7 +205,7 @@ func (o *JsonObject) GetArray(key string) *JsonArray {
 	case []*any:
 		return newArrayFromSlice(castedValue)
 	default:
-		o.setLastError(createTypeConversionErr(*v, arrayTypeStr))
+		o.setLastError(createTypeConversionErr(*v, JsonArray{}))
 		return EmptyArray()
 	}
 }

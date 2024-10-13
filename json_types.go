@@ -13,16 +13,6 @@ type jsonI interface {
 	setLastError(err error)
 }
 
-const (
-	boolTypeStr   = "bool"
-	intTypeStr    = "int"
-	floatTypeStr  = "float64"
-	stringTypeStr = "string"
-	objectTypeStr = "JsonObject"
-	arrayTypeStr  = "JsonArray"
-	timeTypeStr   = "time.Time"
-)
-
 var timeLayouts = []string{
 	time.RFC3339,
 	time.RFC850,

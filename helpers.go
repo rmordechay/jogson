@@ -11,6 +11,9 @@ import (
 
 var jsonIter = jsoniter.ConfigCompatibleWithStandardLibrary
 
+// jc is JSON converter function type that convert any to T
+type jc[T any] func(data *any, j jsonI) T
+
 func getMapperFromField(data *any) JsonMapper {
 	if data == nil {
 		return JsonMapper{IsNull: true}
@@ -97,7 +100,7 @@ func dataStartsWith(data []byte, brackOrParen byte) bool {
 
 func parseTime(t *any, j jsonI) time.Time {
 	if t == nil {
-		j.setLastError(createNullConversionErr(stringTypeStr))
+		j.setLastError(createTypeConversionErr(nil, ""))
 		return time.Time{}
 	}
 	timeAsString, ok := (*t).(string)
@@ -151,8 +154,6 @@ func toSnakeCase(str string) string {
 	return string(result)
 }
 
-type jc[T any] func(data *any, j jsonI) T
-
 func getGenericMap[T any](f jc[T], o JsonObject) map[string]T {
 	genericMap := make(map[string]T)
 	for k, v := range o.object {
@@ -169,37 +170,37 @@ func getGenericArray[T any](f jc[T], o JsonArray) []T {
 	return arr
 }
 
-func getObjectScalar[T any](o *JsonObject, f jc[T], key string, typeString string) T {
-	var zero T
+func getObjectScalar[T any](o *JsonObject, f jc[T], key string) T {
+	var t T
 	v, ok := o.object[key]
 	if !ok {
 		o.setLastError(createKeyNotFoundErr(key))
-		return zero
+		return t
 	}
 	if v == nil {
-		o.setLastError(createNullConversionErr(typeString))
-		return zero
+		o.setLastError(createTypeConversionErr(nil, t))
+		return t
 	}
 	return f(v, o)
 }
 
-func getArrayScalar[T any](a *JsonArray, f jc[T], i int, typeString string) T {
-	var zero T
+func getArrayScalar[T any](a *JsonArray, f jc[T], i int) T {
+	var t T
 	if i >= a.Length() {
 		a.setLastError(createIndexOutOfRangeErr(i, a.Length()))
-		return zero
+		return t
 	}
 	data := a.elements[i]
 	if data == nil {
-		a.setLastError(createNullConversionErr(typeString))
-		return zero
+		a.setLastError(createTypeConversionErr(nil, t))
+		return t
 	}
 	return f(data, a)
 }
 
 func convertAnyToString(data *any, j jsonI) string {
 	if data == nil {
-		j.setLastError(createNullConversionErr(stringTypeStr))
+		j.setLastError(createTypeConversionErr(nil, ""))
 		return ""
 	}
 	switch (*data).(type) {
@@ -212,14 +213,14 @@ func convertAnyToString(data *any, j jsonI) string {
 	case bool:
 		return strconv.FormatBool((*data).(bool))
 	default:
-		j.setLastError(createTypeConversionErr(*data, stringTypeStr))
+		j.setLastError(createTypeConversionErr(*data, ""))
 		return ""
 	}
 }
 
 func convertAnyToInt(data *any, j jsonI) int {
 	if data == nil {
-		j.setLastError(createNullConversionErr(intTypeStr))
+		j.setLastError(createTypeConversionErr(nil, 0))
 		return 0
 	}
 	switch (*data).(type) {
@@ -228,19 +229,19 @@ func convertAnyToInt(data *any, j jsonI) int {
 	case int:
 		return (*data).(int)
 	default:
-		j.setLastError(createTypeConversionErr(*data, intTypeStr))
+		j.setLastError(createTypeConversionErr(*data, 0))
 		return 0
 	}
 }
 
 func convertAnyToFloat(data *any, j jsonI) float64 {
 	if data == nil {
-		j.setLastError(createNullConversionErr(floatTypeStr))
+		j.setLastError(createTypeConversionErr(nil, 0.0))
 		return 0
 	}
 	v, ok := (*data).(float64)
 	if !ok {
-		j.setLastError(createTypeConversionErr(*data, floatTypeStr))
+		j.setLastError(createTypeConversionErr(*data, 0.0))
 		return 0
 	}
 	return v
@@ -248,12 +249,12 @@ func convertAnyToFloat(data *any, j jsonI) float64 {
 
 func convertAnyToBool(data *any, j jsonI) bool {
 	if data == nil {
-		j.setLastError(createNullConversionErr(boolTypeStr))
+		j.setLastError(createTypeConversionErr(nil, false))
 		return false
 	}
 	v, ok := (*data).(bool)
 	if !ok {
-		j.setLastError(createTypeConversionErr(*data, boolTypeStr))
+		j.setLastError(createTypeConversionErr(*data, false))
 		return false
 	}
 	return v
@@ -261,15 +262,14 @@ func convertAnyToBool(data *any, j jsonI) bool {
 
 func convertAnyToObject(data *any, j jsonI) JsonObject {
 	if data == nil {
-		j.setLastError(createNullConversionErr(objectTypeStr))
+		j.setLastError(createTypeConversionErr(nil, JsonObject{}))
 		return *EmptyObject()
 	}
 	v, ok := (*data).(map[string]any)
 	if !ok {
-		j.setLastError(createTypeConversionErr(data, objectTypeStr))
+		j.setLastError(createTypeConversionErr(data, JsonObject{}))
 		return *EmptyObject()
 	}
-
 	obj := EmptyObject()
 	var object = make(map[string]*any)
 	for key, value := range v {
@@ -281,12 +281,12 @@ func convertAnyToObject(data *any, j jsonI) JsonObject {
 
 func convertAnyToArray(data *any, j jsonI) JsonArray {
 	if data == nil {
-		j.setLastError(createNullConversionErr(arrayTypeStr))
+		j.setLastError(createTypeConversionErr(nil, JsonArray{}))
 		return *EmptyArray()
 	}
 	v, ok := (*data).([]any)
 	if !ok {
-		j.setLastError(createTypeConversionErr(data, arrayTypeStr))
+		j.setLastError(createTypeConversionErr(data, JsonArray{}))
 		return *EmptyArray()
 	}
 

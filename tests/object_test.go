@@ -65,7 +65,7 @@ func TestObjectGetStringFails(t *testing.T) {
 	assert.Equal(t, "", s)
 
 	s = object.GetString("address")
-	assert.ErrorIs(t, object.LastError, jsonmapper.NullConversionErr)
+	assert.ErrorIs(t, object.LastError, jsonmapper.TypeConversionErr)
 	assert.Equal(t, "", s)
 }
 
@@ -95,7 +95,7 @@ func TestObjectGetIntFails(t *testing.T) {
 	assert.Equal(t, 0, i)
 
 	i = object.GetInt("address")
-	assert.ErrorIs(t, object.LastError, jsonmapper.NullConversionErr)
+	assert.ErrorIs(t, object.LastError, jsonmapper.TypeConversionErr)
 	assert.Equal(t, 0, i)
 }
 
@@ -125,7 +125,7 @@ func TestObjectGetFloatFails(t *testing.T) {
 	assert.Equal(t, float64(0), f)
 
 	f = object.GetFloat("address")
-	assert.ErrorIs(t, object.LastError, jsonmapper.NullConversionErr)
+	assert.ErrorIs(t, object.LastError, jsonmapper.TypeConversionErr)
 	assert.Equal(t, float64(0), f)
 }
 
@@ -151,7 +151,7 @@ func TestObjectGetBoolFails(t *testing.T) {
 	assert.Equal(t, false, b)
 
 	b = object.GetBool("address")
-	assert.ErrorIs(t, object.LastError, jsonmapper.NullConversionErr)
+	assert.ErrorIs(t, object.LastError, jsonmapper.TypeConversionErr)
 	assert.Equal(t, false, b)
 }
 
@@ -176,7 +176,7 @@ func TestObjectGetArrayFails(t *testing.T) {
 	assert.Equal(t, jsonmapper.EmptyArray(), arr)
 
 	arr = object.GetArray("address")
-	assert.ErrorIs(t, object.LastError, jsonmapper.NullConversionErr)
+	assert.ErrorIs(t, object.LastError, jsonmapper.TypeConversionErr)
 	assert.Equal(t, jsonmapper.EmptyArray(), arr)
 }
 
@@ -201,7 +201,7 @@ func TestObjectGetObjectFails(t *testing.T) {
 	assert.Equal(t, jsonmapper.EmptyObject(), obj)
 
 	obj = object.GetObject("address")
-	assert.ErrorIs(t, object.LastError, jsonmapper.NullConversionErr)
+	assert.ErrorIs(t, object.LastError, jsonmapper.TypeConversionErr)
 	assert.Equal(t, jsonmapper.EmptyObject(), obj)
 }
 

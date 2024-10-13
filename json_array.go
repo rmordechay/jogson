@@ -137,31 +137,31 @@ func (a *JsonArray) Get(i int) JsonMapper {
 // proper JSON string values, i.e. numbers or booleans, will still be converted to string.
 // If the index is out of range, the value is invalid or is null, an error will be set to LastError.
 func (a *JsonArray) GetString(i int) string {
-	return getArrayScalar(a, convertAnyToString, i, stringTypeStr)
+	return getArrayScalar(a, convertAnyToString, i)
 }
 
 // GetInt retrieves the integer value from the element at the specified index.
 // If the index is out of range, the value is invalid or is null, an error will be set to LastError.
 func (a *JsonArray) GetInt(i int) int {
-	return getArrayScalar(a, convertAnyToInt, i, intTypeStr)
+	return getArrayScalar(a, convertAnyToInt, i)
 }
 
 // GetFloat retrieves the float value from the element at the specified index.
 // If the index is out of range, the value is invalid or is null, an error will be set to LastError.
 func (a *JsonArray) GetFloat(i int) float64 {
-	return getArrayScalar(a, convertAnyToFloat, i, floatTypeStr)
+	return getArrayScalar(a, convertAnyToFloat, i)
 }
 
 // GetBool retrieves the boolean value from the element at the specified index.
 // If the index is out of range, the value is invalid or is null, an error will be set to LastError.
 func (a *JsonArray) GetBool(i int) bool {
-	return getArrayScalar(a, convertAnyToBool, i, boolTypeStr)
+	return getArrayScalar(a, convertAnyToBool, i)
 }
 
 // GetTime retrieves the time value from the element at the specified index, returning an error if conversion fails.
 // If the index is out of range, the value is invalid or is null, an error will be set to LastError.
 func (a *JsonArray) GetTime(i int) time.Time {
-	return getArrayScalar(a, parseTime, i, timeTypeStr)
+	return getArrayScalar(a, parseTime, i)
 }
 
 // GetObject retrieves the JsonObject from the element at the specified index.
@@ -173,7 +173,7 @@ func (a *JsonArray) GetObject(i int) *JsonObject {
 	}
 	element := a.elements[i]
 	if element == nil {
-		a.setLastError(createNullConversionErr(objectTypeStr))
+		a.setLastError(createTypeConversionErr(nil, ""))
 		return EmptyObject()
 	}
 	switch (*element).(type) {
@@ -184,7 +184,7 @@ func (a *JsonArray) GetObject(i int) *JsonObject {
 		data := convertToMapValuesPtr((*element).(map[string]any))
 		return newObjectFromMap(data)
 	default:
-		a.setLastError(createTypeConversionErr(*element, objectTypeStr))
+		a.setLastError(createTypeConversionErr(*element, JsonObject{}))
 		return EmptyObject()
 	}
 }
@@ -198,7 +198,7 @@ func (a *JsonArray) GetArray(i int) *JsonArray {
 	}
 	element := a.elements[i]
 	if element == nil {
-		a.setLastError(createNullConversionErr(arrayTypeStr))
+		a.setLastError(createTypeConversionErr(nil, JsonArray{}))
 		return EmptyArray()
 	}
 	switch v := (*element).(type) {
@@ -207,7 +207,7 @@ func (a *JsonArray) GetArray(i int) *JsonArray {
 	case []any:
 		return newArrayFromSlice(convertToSlicePtr(v))
 	default:
-		a.setLastError(createTypeConversionErr(*element, arrayTypeStr))
+		a.setLastError(createTypeConversionErr(*element, JsonArray{}))
 		return EmptyArray()
 	}
 }
