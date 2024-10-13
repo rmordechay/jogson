@@ -65,7 +65,7 @@ jsonString := `{
     "age": 43,
     "height": 1.87,
     "is_funny": false,
-    "education": null,
+    "address": null,
     "birthday": "1981-10-08",
     "features": ["tall", "blue eyes", null],
     "children": {
@@ -333,16 +333,24 @@ fmt.Println(arr.String()) // [15,19]
 
 ## Error Handling
 Error handling is designed in such a way to not break the flow and to allow a cleaner code. In most cases
-errors are not returned, but instead, they are kept in an exported field, `LastError`, which you can use 
-to check for the type of error after an operation on your `JsonObject` or `JsonArray` instance.
+errors are not returned, but instead, they are stored in an exported field, `LastError`, which can be found in 
+both `JsonObject` and `JsonArray` and can be used to check for the type of error after an operation is made.
+
+```go
+_ = object.GetString("non-existent-key")
+if object.LastError != nil {
+    fmt.Println(object.LastError) // output: key was not found: 'non-existent-key'
+}
+```
+
 Note, `LastError` is reset at the beginning of every operation, so if you need a reference to an old
 error, you will have to store it in a variable. For example:
 
 ```go
-_ = object.GetString("non-existent-key")
-fmt.Println(object.LastError) // key was not found: 'non-existent-key'
+_ = object.GetString("address")
+fmt.Println(object.LastError) // output: type conversion error: <nil> could not be converted to string
 _ = object.GetString("name")
-fmt.Println(object.LastError) // nil
+fmt.Println(object.LastError) // output: <nil>
 ```
 
 ## Design
