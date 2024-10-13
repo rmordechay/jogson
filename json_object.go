@@ -291,13 +291,13 @@ func (o *JsonObject) AddJsonArray(key string, jsonArray *JsonArray) {
 	o.object[key] = &elements
 }
 
-// AddString adds a float to the JsonObject associated with the key.
+// AddString adds a string to the JsonObject associated with the key.
 func (o *JsonObject) AddString(key string, s string) {
 	var value any = s
 	o.object[key] = &value
 }
 
-// AddInt adds a float to the JsonObject associated with the key.
+// AddInt adds an int to the JsonObject associated with the key.
 func (o *JsonObject) AddInt(key string, i int) {
 	var value any = i
 	o.object[key] = &value
@@ -309,25 +309,25 @@ func (o *JsonObject) AddFloat(key string, f float64) {
 	o.object[key] = &value
 }
 
-// AddBool adds a float to the JsonObject associated with the key.
+// AddBool adds a bool to the JsonObject associated with the key.
 func (o *JsonObject) AddBool(key string, b bool) {
 	var value any = b
 	o.object[key] = &value
 }
 
-// AddStringArray adds a float to the JsonObject associated with the key.
+// AddStringArray adds a string array to the JsonObject associated with the key.
 func (o *JsonObject) AddStringArray(key string, s []string) {
 	var value any = s
 	o.object[key] = &value
 }
 
-// AddIntArray adds a float to the JsonObject associated with the key.
+// AddIntArray adds an int array to the JsonObject associated with the key.
 func (o *JsonObject) AddIntArray(key string, i []int) {
 	var value any = i
 	o.object[key] = &value
 }
 
-// AddFloatArray adds a float to the JsonObject associated with the key.
+// AddFloatArray adds a float array to the JsonObject associated with the key.
 func (o *JsonObject) AddFloatArray(key string, f []float64) {
 	var value any = f
 	o.object[key] = &value
