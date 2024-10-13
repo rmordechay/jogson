@@ -3,6 +3,7 @@ package jsonmapper
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/google/uuid"
 	jsoniter "github.com/json-iterator/go"
 	"strconv"
 	"time"
@@ -397,6 +398,25 @@ func parseTime(t *any, j jsonI) time.Time {
 	}
 	j.setLastError(fmt.Errorf("'%v' could not be parsed as time.Time", timeAsString))
 	return time.Time{}
+}
+
+func parseUUID(t *any, j jsonI) uuid.UUID {
+	j.setLastError(nil)
+	if t == nil {
+		j.setLastError(createTypeConversionErr(nil, ""))
+		return uuid.UUID{}
+	}
+	uuidAsString, ok := (*t).(string)
+	if !ok {
+		j.setLastError(createTypeConversionErr(t, time.Time{}))
+		return uuid.UUID{}
+	}
+	uuidValue, err := uuid.Parse(uuidAsString)
+	if err != nil {
+		j.setLastError(fmt.Errorf("'%v' could not be parsed as uuid.UUID. %w", uuidAsString, err))
+		return uuid.UUID{}
+	}
+	return uuidValue
 }
 
 func marshal(v any) ([]byte, error) {

@@ -317,6 +317,15 @@ func TestObjectGetTime(t *testing.T) {
 	assert.Equal(t, expectedTime3, actualTime3)
 }
 
+func TestObjectGetUUID(t *testing.T) {
+	mapper, err := jsonmapper.FromString(jsonUUIDTest)
+	assert.NoError(t, err)
+	uuid, err := mapper.AsObject.Get("uuid").AsUUID()
+	assert.NoError(t, err)
+	assert.Equal(t, "870fb3fd-d177-4ac4-a648-a33afd5ab288", uuid.String())
+
+}
+
 func TestObjectIsNull(t *testing.T) {
 	mapper, _ := jsonmapper.FromString(jsonObjectTest)
 	object := mapper.AsObject

@@ -172,9 +172,9 @@ func (m *JsonMapper) ProcessObjectsWithArgs(numberOfWorkers int, f func(o JsonOb
 		wg.Add(1)
 		sem <- struct{}{}
 		go func(o JsonObject) {
+			defer wg.Done()
 			defer func() { <-sem }()
 			f(o, args...)
-			wg.Done()
 		}(*obj)
 	}
 

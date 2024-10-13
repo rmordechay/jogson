@@ -1,6 +1,7 @@
 package jsonmapper
 
 import (
+	"github.com/google/uuid"
 	"os"
 	"time"
 )
@@ -170,9 +171,12 @@ func (a *JsonArray) Get(i int) JsonMapper {
 	return getMapperFromField(a.elements[i])
 }
 
-// GetString retrieves the string value from the element at the specified index. Values that are not
-// proper JSON string values, i.e. numbers or booleans, will still be converted to string.
+// GetString retrieves the string value from the element at the specified index. JSON values that are not
+// proper string values, i.e. numbers or booleans, will still be converted to string. For example, the value 3
+// will be converted to "3".
 // If the index is out of range, the value is invalid or is null, an error will be set to LastError.
+// In case of an error, the zero value will be returned. If you want to regard null values as well,
+// use GetStringN()
 func (a *JsonArray) GetString(i int) string {
 	return getArrayScalar(a, convertAnyToString, i)
 }
@@ -186,6 +190,8 @@ func (a *JsonArray) GetStringN(i int) *string {
 
 // GetInt retrieves the integer value from the element at the specified index.
 // If the index is out of range, the value is invalid or is null, an error will be set to LastError.
+// In case of an error, the zero value will be returned. If you want to regard null values as well,
+// use GetIntN()
 func (a *JsonArray) GetInt(i int) int {
 	return getArrayScalar(a, convertAnyToInt, i)
 }
@@ -199,6 +205,8 @@ func (a *JsonArray) GetIntN(i int) *int {
 
 // GetFloat retrieves the float value from the element at the specified index.
 // If the index is out of range, the value is invalid or is null, an error will be set to LastError.
+// In case of an error, the zero value will be returned. If you want to regard null values as well,
+// use GetFloatN()
 func (a *JsonArray) GetFloat(i int) float64 {
 	return getArrayScalar(a, convertAnyToFloat, i)
 }
@@ -212,6 +220,8 @@ func (a *JsonArray) GetFloatN(i int) *float64 {
 
 // GetBool retrieves the boolean value from the element at the specified index.
 // If the index is out of range, the value is invalid or is null, an error will be set to LastError.
+// In case of an error, the zero value will be returned. If you want to regard null values as well,
+// use GetBoolN()
 func (a *JsonArray) GetBool(i int) bool {
 	return getArrayScalar(a, convertAnyToBool, i)
 }
@@ -223,10 +233,18 @@ func (a *JsonArray) GetBoolN(i int) *bool {
 	return getArrayScalarN(a, convertAnyToBoolN, i)
 }
 
-// GetTime retrieves the time value from the element at the specified index, returning an error if conversion fails.
-// If the index is out of range, the value is invalid or is null, an error will be set to LastError.
+// GetTime retrieves the value as time.Time at the specified index.
+// If the index is out of range, the value is invalid, null or not a string, an error will be set to LastError.
+// In case of an error, the zero value will be returned.
 func (a *JsonArray) GetTime(i int) time.Time {
 	return getArrayScalar(a, parseTime, i)
+}
+
+// GetUUID retrieves the value as uuid.UUID at the specified index.
+// If the key does not exist, the value is invalid, null or not a string, an error will be set to LastError.
+// In case of an error, the zero value will be returned.
+func (a *JsonArray) GetUUID(i int) uuid.UUID {
+	return getArrayScalar(a, parseUUID, i)
 }
 
 // GetObject retrieves the JsonObject from the element at the specified index.

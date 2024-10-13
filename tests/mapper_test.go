@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/rmordechay/jsonmapper"
-	"github.com/rmordechay/jsonmapper/sandbox"
 	"github.com/stretchr/testify/assert"
 	"math/rand"
 	"strings"
@@ -58,10 +57,36 @@ func TestProcessObjects(t *testing.T) {
 		mu.Unlock()
 	})
 	assert.NoError(t, err)
+	assert.Equal(t, n, c)
+}
+
+func worker(o jsonmapper.JsonObject, args ...any) {
+	c, ok := args[0].(*int)
+	if !ok {
+		return
+	}
+	mu, ok := args[1].(*sync.Mutex)
+	if !ok {
+		return
+	}
+	mu.Lock()
+	*c += 1
+	mu.Unlock()
+}
+
+func TestProcessObjectsWithArgs(t *testing.T) {
+	n := 1000
+	array, _ := generateJSONArray(n)
+	mapper, _ := jsonmapper.FromBuffer(strings.NewReader(array))
+	c := 0
+	var mu sync.Mutex
+	err := mapper.ProcessObjectsWithArgs(10, worker, &c, &mu)
+	assert.NoError(t, err)
+	assert.Equal(t, n, c)
 }
 
 func TestExample(t *testing.T) {
-	sandbox.RunExample()
+	//sandbox.RunExample()
 }
 
 // Function to generate a random JSON array with n elements
@@ -88,17 +113,4 @@ func generateJSONArray(n int) (string, error) {
 	}
 
 	return string(jsonData), nil
-}
-
-func humanReadableSize(bytes int) string {
-	const unit = 1024
-	if bytes < unit {
-		return fmt.Sprintf("%d B", bytes)
-	}
-	div, exp := int64(unit), 0
-	for n := bytes / unit; n >= unit; n /= unit {
-		div *= unit
-		exp++
-	}
-	return fmt.Sprintf("%.1f %cB", float64(bytes)/float64(div), "KMGTPE"[exp])
 }

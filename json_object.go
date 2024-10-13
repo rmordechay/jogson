@@ -1,6 +1,7 @@
 package jsonmapper
 
 import (
+	"github.com/google/uuid"
 	"os"
 	"time"
 )
@@ -150,14 +151,18 @@ func (o *JsonObject) AsObjectMap() map[string]JsonObject {
 
 // Get retrieves the value associated with the key and returns it as a JsonMapper
 // If the key does not exist, the value is invalid or is null, an error will be set to LastError.
-func (o *JsonObject) Get(key string) JsonMapper {
-	return getMapperFromField(o.object[key])
+// In case of an error, the zero value will be returned.
+func (o *JsonObject) Get(key string) *JsonMapper {
+	v := getMapperFromField(o.object[key])
+	return &v
 }
 
 // GetString retrieves the value associated with the specified key as string. JSON values that are not
 // proper string values, i.e. numbers or booleans, will still be converted to string. For example, the value 3
 // will be converted to "3".
 // If the key does not exist, the value is invalid or is null, an error will be set to LastError.
+// In case of an error, the zero value will be returned. If you want to regard null values as well,
+// use GetStringN()
 func (o *JsonObject) GetString(key string) string {
 	return getObjectScalar(o, convertAnyToString, key)
 }
@@ -171,6 +176,8 @@ func (o *JsonObject) GetStringN(key string) *string {
 
 // GetInt retrieves the int value associated with the specified key.
 // If the key does not exist, the value is invalid or is null, an error will be set to LastError.
+// In case of an error, the zero value will be returned. If you want to regard null values as well,
+// use GetIntN()
 func (o *JsonObject) GetInt(key string) int {
 	return getObjectScalar(o, convertAnyToInt, key)
 }
@@ -184,6 +191,8 @@ func (o *JsonObject) GetIntN(key string) *int {
 
 // GetFloat retrieves the float64 value associated with the specified key.
 // If the key does not exist, the value is invalid or is null, an error will be set to LastError.
+// In case of an error, the zero value will be returned. If you want to regard null values as well,
+// use GetFloatN()
 func (o *JsonObject) GetFloat(key string) float64 {
 	return getObjectScalar(o, convertAnyToFloat, key)
 }
@@ -197,6 +206,8 @@ func (o *JsonObject) GetFloatN(key string) *float64 {
 
 // GetBool retrieves the bool value associated with the specified key.
 // If the key does not exist, the value is invalid or is null, an error will be set to LastError.
+// In case of an error, the zero value will be returned. If you want to regard null values as well,
+// use GetBoolN()
 func (o *JsonObject) GetBool(key string) bool {
 	return getObjectScalar(o, convertAnyToBool, key)
 }
@@ -208,10 +219,18 @@ func (o *JsonObject) GetBoolN(key string) *bool {
 	return getObjectScalarN(o, convertAnyToBoolN, key)
 }
 
-// GetTime retrieves the time.Time value associated with the specified key.
-// If the key does not exist, the value is invalid or is null, an error will be set to LastError.
+// GetTime retrieves the value as time.Time associated with the specified key.
+// If the key does not exist, the value is invalid, null or not a string, an error will be set to LastError.
+// In case of an error, the zero value will be returned.
 func (o *JsonObject) GetTime(key string) time.Time {
 	return getObjectScalar(o, parseTime, key)
+}
+
+// GetUUID retrieves the value as uuid.UUID associated with the specified key.
+// If the key does not exist, the value is invalid, null or not a string, an error will be set to LastError.
+// In case of an error, the zero value will be returned.
+func (o *JsonObject) GetUUID(key string) uuid.UUID {
+	return getObjectScalar(o, parseUUID, key)
 }
 
 // GetObject retrieves a nested JsonObject associated with the specified key.
