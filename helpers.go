@@ -376,6 +376,7 @@ func convertToMapValuesPtr(data map[string]any) map[string]*any {
 }
 
 func parseTime(t *any, j jsonI) time.Time {
+	j.setLastError(nil)
 	if t == nil {
 		j.setLastError(createTypeConversionErr(nil, ""))
 		return time.Time{}

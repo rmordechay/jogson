@@ -48,6 +48,7 @@ func FromBytes(data []byte) (JsonMapper, error) {
 		}
 		return JsonMapper{IsArray: true, AsArray: *arrayBytes}, nil
 	}
+
 	if dataStartsWith(data, '{') {
 		objBytes, err := NewObjectFromBytes(data)
 		if err != nil {
@@ -55,6 +56,7 @@ func FromBytes(data []byte) (JsonMapper, error) {
 		}
 		return JsonMapper{IsObject: true, AsObject: *objBytes}, nil
 	}
+
 	asString := string(data)
 	var mapper JsonMapper
 

@@ -217,6 +217,7 @@ func (o *JsonObject) GetTime(key string) time.Time {
 // GetObject retrieves a nested JsonObject associated with the specified key.
 // If the key does not exist, the value is invalid or is null, an error will be set to LastError.
 func (o *JsonObject) GetObject(key string) *JsonObject {
+	o.setLastError(nil)
 	v, ok := o.object[key]
 	if !ok {
 		o.setLastError(createKeyNotFoundErr(key))
@@ -242,6 +243,7 @@ func (o *JsonObject) GetObject(key string) *JsonObject {
 // GetArray retrieves an array of JsonArray associated with the specified key.
 // If the key does not exist, the value is invalid or is null, an error will be set to LastError.
 func (o *JsonObject) GetArray(key string) *JsonArray {
+	o.setLastError(nil)
 	v, ok := o.object[key]
 	if !ok {
 		o.setLastError(createKeyNotFoundErr(key))

@@ -158,6 +158,7 @@ func (a *JsonArray) ContainsFloat(f float64) bool {
 // Get retrieves the value at index i and returns it as a JsonMapper
 // If the index is out of range, the value is invalid or is null, an error will be set to LastError.
 func (a *JsonArray) Get(i int) JsonMapper {
+	a.setLastError(nil)
 	if i >= a.Length() {
 		a.setLastError(createIndexOutOfRangeErr(i, a.Length()))
 		return JsonMapper{}
@@ -227,6 +228,7 @@ func (a *JsonArray) GetTime(i int) time.Time {
 // GetObject retrieves the JsonObject from the element at the specified index.
 // If the index is out of range, the value is invalid or is null, an error will be set to LastError.
 func (a *JsonArray) GetObject(i int) *JsonObject {
+	a.setLastError(nil)
 	if i >= a.Length() {
 		a.setLastError(createIndexOutOfRangeErr(i, a.Length()))
 		return nullObject()
@@ -252,6 +254,7 @@ func (a *JsonArray) GetObject(i int) *JsonObject {
 // GetArray retrieves the JsonArray from the element at the specified index.
 // If the index is out of range, the value is invalid or is null, an error will be set to LastError.
 func (a *JsonArray) GetArray(i int) *JsonArray {
+	a.setLastError(nil)
 	if i >= a.Length() {
 		a.setLastError(createIndexOutOfRangeErr(i, a.Length()))
 		return EmptyArray()
