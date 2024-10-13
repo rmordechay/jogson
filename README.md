@@ -171,11 +171,10 @@ var objectArray []JsonObject = array.AsObjectArray()
 ### Scalars
 
 Getting scalars - `string`, `int`, etc. - is similar both for object and array and only differ
-in the parameter type (objects take `string` as key and arrays take `int` as index)
+in the parameter type (objects take `string` as key and arrays take `int` as index). You can get scalars by value or by reference, where the latter allows JSON null values. Nullable methods have 
+the suffix 'N' in their names. 
 
 #### From Object
-You can get scalars by value or by reference, where the latter allows JSON null values. Nullable methods have 
-the suffix 'N' in their names. 
 
 By value:
 
@@ -193,7 +192,7 @@ var height float64 = object.GetFloat("height") // 1.87
 var isFunny bool = object.GetBool("is_funny") // false
 ```
 
-By reference which allows JSON null values. Note the suffix 'N' at the end of the method names.
+By reference, which allows JSON null values (Note the suffix 'N' at the end of the method names):
 
 ```go
 // string
@@ -227,7 +226,7 @@ var f float64 = array.GetFloat(5)
 var b bool = array.GetBool(7)
 ```
 
-By reference which allows JSON null values. Note the suffix 'N' at the end of the method names.
+By reference, which allows JSON null values (Note the suffix 'N' at the end of the method names):
 
 ```go
 // string
