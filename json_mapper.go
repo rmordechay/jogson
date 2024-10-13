@@ -37,7 +37,6 @@ type JsonMapper struct {
 	offset   int
 	lastRead int
 	reader   io.Reader
-	data     []byte
 }
 
 // FromBytes parses JSON data from a byte slice.

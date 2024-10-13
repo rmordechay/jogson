@@ -96,6 +96,9 @@ func (a *JsonArray) AsObjectArray() []JsonObject {
 // ContainsString checks if the JSON array contains the string s
 func (a *JsonArray) ContainsString(s string) bool {
 	for _, element := range a.elements {
+		if element == nil {
+			continue
+		}
 		if *element == s {
 			return true
 		}
@@ -106,6 +109,9 @@ func (a *JsonArray) ContainsString(s string) bool {
 // ContainsInt checks if the JSON array contains the int i
 func (a *JsonArray) ContainsInt(i int) bool {
 	for _, element := range a.elements {
+		if element == nil {
+			continue
+		}
 		if *element == i {
 			return true
 		}
@@ -116,6 +122,9 @@ func (a *JsonArray) ContainsInt(i int) bool {
 // ContainsFloat checks if the JSON array contains the float f
 func (a *JsonArray) ContainsFloat(f float64) bool {
 	for _, element := range a.elements {
+		if element == nil {
+			continue
+		}
 		if *element == f {
 			return true
 		}
@@ -278,6 +287,17 @@ func (a *JsonArray) ForEach(f func(j JsonMapper)) {
 	}
 }
 
+// Filter returns a new JsonArray containing only the elements that satisfy the given filter function.
+func (a *JsonArray) Filter(f func(j JsonMapper) bool) JsonArray {
+	var arr = EmptyArray()
+	for _, element := range a.elements {
+		if f(getMapperFromField(element)) {
+			arr.elements = append(arr.elements, element)
+		}
+	}
+	return *arr
+}
+
 // Map returns a slice of the mapped the values of the array
 func Map[T any](jsonArray *JsonArray, f func(j JsonMapper) T) []T {
 	arr := make([]T, 0, len(jsonArray.elements))
@@ -299,17 +319,6 @@ func MapNotNull[T any](jsonArray *JsonArray, f func(j JsonMapper) T) []T {
 		arr = append(arr, mapper)
 	}
 	return arr
-}
-
-// Filter returns a new JsonArray containing only the elements that satisfy the given filter function.
-func (a *JsonArray) Filter(f func(j JsonMapper) bool) JsonArray {
-	var arr = EmptyArray()
-	for _, element := range a.elements {
-		if f(getMapperFromField(element)) {
-			arr.elements = append(arr.elements, element)
-		}
-	}
-	return *arr
 }
 
 // FilterNull returns a new JsonArray excluding any elements that are null.

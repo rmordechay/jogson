@@ -11,7 +11,7 @@ import (
 
 var jsonIter = jsoniter.ConfigCompatibleWithStandardLibrary
 
-// jc is JSON converter function type that convert any to T
+// jc is JSON converter function type that convert type any to generic type T
 type jc[T any] func(data *any, j jsonI) T
 
 func getMapperFromField(data *any) JsonMapper {
@@ -139,21 +139,6 @@ func unmarshal(data []byte, v any) error {
 	return jsonIter.Unmarshal(data, &v)
 }
 
-func toSnakeCase(str string) string {
-	var result []rune
-	for i, r := range str {
-		if unicode.IsUpper(r) {
-			if i > 0 {
-				result = append(result, '_')
-			}
-			result = append(result, unicode.ToLower(r))
-		} else {
-			result = append(result, r)
-		}
-	}
-	return string(result)
-}
-
 func getGenericMap[T any](f jc[T], o JsonObject) map[string]T {
 	genericMap := make(map[string]T)
 	for k, v := range o.object {
@@ -203,15 +188,15 @@ func convertAnyToString(data *any, j jsonI) string {
 		j.setLastError(createTypeConversionErr(nil, ""))
 		return ""
 	}
-	switch (*data).(type) {
+	switch v := (*data).(type) {
 	case string:
-		return (*data).(string)
+		return v
 	case float64:
-		return strconv.FormatFloat((*data).(float64), 'f', -1, 64)
+		return strconv.FormatFloat(v, 'f', -1, 64)
 	case int:
-		return strconv.Itoa((*data).(int))
+		return strconv.Itoa(v)
 	case bool:
-		return strconv.FormatBool((*data).(bool))
+		return strconv.FormatBool(v)
 	default:
 		j.setLastError(createTypeConversionErr(*data, ""))
 		return ""
@@ -311,22 +296,37 @@ func convertSliceToJsonArray[T any](data []T) JsonArray {
 	return jsonArray
 }
 
-func transformKeys(m map[string]*any) map[string]*any {
-	newMap := make(map[string]*any)
-	for key, value := range m {
-		newKey := toSnakeCase(key)
-		if value == nil {
-			newMap[newKey] = nil
-			continue
-		}
-		nestedMap, ok := (*value).(map[string]any)
-		if ok {
-			nestedResult := transformKeys(convertToMapValuesPtr(nestedMap))
-			var nestedInterface any = nestedResult
-			newMap[newKey] = &nestedInterface
-		} else {
-			newMap[newKey] = value
-		}
-	}
-	return newMap
-}
+//func transformKeys(m map[string]*any) map[string]*any {
+//	newMap := make(map[string]*any)
+//	for key, value := range m {
+//		newKey := toSnakeCase(key)
+//		if value == nil {
+//			newMap[newKey] = nil
+//			continue
+//		}
+//		nestedMap, ok := (*value).(map[string]any)
+//		if ok {
+//			nestedResult := transformKeys(convertToMapValuesPtr(nestedMap))
+//			var nestedInterface any = nestedResult
+//			newMap[newKey] = &nestedInterface
+//		} else {
+//			newMap[newKey] = value
+//		}
+//	}
+//	return newMap
+//}
+
+//func toSnakeCase(str string) string {
+//	var result []rune
+//	for i, r := range str {
+//		if unicode.IsUpper(r) {
+//			if i > 0 {
+//				result = append(result, '_')
+//			}
+//			result = append(result, unicode.ToLower(r))
+//		} else {
+//			result = append(result, r)
+//		}
+//	}
+//	return string(result)
+//}

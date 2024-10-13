@@ -172,7 +172,7 @@ func (o *JsonObject) GetObject(key string) *JsonObject {
 	}
 	if v == nil {
 		o.setLastError(createTypeConversionErr(nil, JsonObject{}))
-		return EmptyObject()
+		return &JsonObject{}
 	}
 	switch (*v).(type) {
 	case map[string]*any:
@@ -197,7 +197,7 @@ func (o *JsonObject) GetArray(key string) *JsonArray {
 	}
 	if v == nil {
 		o.setLastError(createTypeConversionErr(nil, JsonArray{}))
-		return EmptyArray()
+		return &JsonArray{}
 	}
 	switch castedValue := (*v).(type) {
 	case []any:
@@ -320,10 +320,10 @@ func (o *JsonObject) setLastError(err error) {
 	o.LastError = err
 }
 
-// transformObjectKeys returns a new JsonObject with transformed keys, where keys are converted to snake_case.
-func (o *JsonObject) transformObjectKeys() JsonObject {
-	return *newObjectFromMap(transformKeys(o.object))
-}
+//// transformObjectKeys returns a new JsonObject with transformed keys, where keys are converted to snake_case.
+//func (o *JsonObject) transformObjectKeys() JsonObject {
+//	return *newObjectFromMap(transformKeys(o.object))
+//}
 
 // newObjectFromMap initializes and returns a new instance of JsonObject.
 func newObjectFromMap(data map[string]*any) *JsonObject {
