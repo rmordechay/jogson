@@ -72,6 +72,7 @@ func getGenericMap[T any](f jc[T], o JsonObject) map[string]T {
 	o.setLastError(nil)
 	genericMap := make(map[string]T)
 	for k, v := range o.object {
+		v := v
 		if v == nil {
 			continue
 		}
@@ -84,6 +85,7 @@ func getGenericMapN[T any](f jcn[T], o JsonObject) map[string]*T {
 	o.setLastError(nil)
 	genericMap := make(map[string]*T)
 	for k, v := range o.object {
+		v := v
 		if v == nil {
 			genericMap[k] = nil
 		} else {
@@ -97,6 +99,7 @@ func getGenericArray[T any](f jc[T], a JsonArray) []T {
 	a.setLastError(nil)
 	arr := make([]T, 0, len(a.elements))
 	for _, v := range a.elements {
+		v := v
 		if v == nil {
 			continue
 		}
@@ -109,6 +112,7 @@ func getGenericArrayN[T any](f jcn[T], a JsonArray) []*T {
 	a.setLastError(nil)
 	arr := make([]*T, 0, len(a.elements))
 	for _, v := range a.elements {
+		v := v
 		if v == nil {
 			arr = append(arr, nil)
 		} else {
@@ -317,11 +321,10 @@ func convertAnyToObject(data *any, j jsonI) JsonObject {
 		return *nullObject()
 	}
 	obj := EmptyObject()
-	var object = make(map[string]*any)
 	for key, value := range v {
-		object[key] = &value
+		value := value
+		obj.object[key] = &value
 	}
-	obj.object = object
 	return *obj
 }
 

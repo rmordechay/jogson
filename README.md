@@ -281,7 +281,8 @@ fmt.Println(element.Contains("is_funny")) // true
 
 ### Get JSON String
 
-You can get a string from every JSON element which is a valid JSON
+You can get a string from every JSON element with `String()`. The string will be printed as 
+a valid JSON
 
 ```go
 fmt.Println(mapper.AsObject.String())
@@ -291,7 +292,7 @@ fmt.Println(mapper.AsObject.Get("children").String())
 // output: {"Rachel":{"age":15,"is_funny":false},"Sara":{"age":19,"is_funny":true}}
 ```
 
-or with pretty string
+or with `PrettyString()`
 
 ```go
 fmt.Println(mapper.AsObject.Get("children").PrettyString())
