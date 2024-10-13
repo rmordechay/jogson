@@ -402,16 +402,23 @@ There are 3 sets of methods that you can use when working with `JsonObject`.
 
 #### JsonArray
 `JsonArray` is in many ways almost identical to `JsonObject`. It also contains the underlying array and methods to read and 
-write data, and both also keep the same names for the methods. However, they have some minor differences. 
+write data, and both also keep the same names for the methods. However, they have some minor differences. You can read more about them 
+in the next section.
 
-#### `JsonObject` and `JsonArray` Similarity
-The structs `JsonObject` and `JsonArray` have very similar methods, both in naming and semantics. However, they have 2 differences
-  * Input:
-    * `JsonObject`'s methods mostly take a `string` as the key 
-    * `JsonArray`'s methods mostly take an `int` as the index
-  * Output:
-    * `JsonObject`'s methods mostly return a `map` or `JsonObject`
-    * `JsonArray`'s methods mostly return a `slice` or `JsonArray`
+#### `JsonObject` and `JsonArray` Similarities and Differences
+The structs `JsonObject` and `JsonArray` have very similar methods, both in naming and semantics. For example, both structs
+have `GetString()`, `GetInt()`, `GetFloat()`, `IsNull()`, `IsEmpty()` and other methods that are identical in names. Additionally, 
+they both have similar method names with the similar semantics. For example, `JsonObject.AsStringMap` will return `map[string]string`,
+whereas `JsonArray.AsStringArray` will return `[]string`.
+
+
+As a rule of thumb, they have 2 differences:
+  * **Input**:
+    * `JsonObject`'s methods mostly take a `string` as the key, e.g. `GetInt("age")`.
+    * `JsonArray`'s methods mostly take an `int` as the index, e.g. `GetBool(1)`.
+  * **Output**:
+    * `JsonObject`'s methods mostly return a `map` or `JsonObject`, e.g. `GetFloatMap() -> map[string]string`. 
+    * `JsonArray`'s methods mostly return a `slice` or `JsonArray`, e.g. `GetFloatArray(1)  -> []float`.
 
 #### Methods and Variables Prefix
 The prefixes, `As`, `Is`, `Get` and `Add` have similar semantics across the library and can be found in `JsonMapper`, `JsonObject`
