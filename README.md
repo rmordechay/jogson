@@ -298,14 +298,27 @@ or with `PrettyString()`
 fmt.Println(mapper.AsObject.Get("children").PrettyString())
 // output:
 // {
-//    "Rachel": {
-//        "age": 15,
-//        "is_funny": false
-//    },
-//    "Sara": {
-//        "age": 19,
-//        "is_funny": true
-//    }
+//   "address": null,
+//   "age": 43,
+//   "birthday": "1981-10-08",
+//   "children": {
+//     "Rachel": {
+//       "age": 15,
+//       "is_funny": false
+//     },
+//     "Sara": {
+//       "age": 19,
+//       "is_funny": true
+//     }
+//   },
+//   "features": [
+//     "tall",
+//     "blue eyes",
+//     null
+//   ],
+//   "height": 1.87,
+//   "is_funny": false,
+//   "name": "Jason"
 // }
 ```
 
