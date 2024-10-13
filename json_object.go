@@ -166,7 +166,7 @@ func (o *JsonObject) GetString(key string) string {
 // imitates JSON's null as Go's nil. A nil pointer is returned if the key was not found, it is null or
 // could not be converted to string. The type of error will be stored in LastError.
 func (o *JsonObject) GetStringN(key string) *string {
-	return getObjectScalarNullable(o, convertAnyToStringN, key)
+	return getObjectScalarN(o, convertAnyToStringN, key)
 }
 
 // GetInt retrieves the int value associated with the specified key.
@@ -179,7 +179,7 @@ func (o *JsonObject) GetInt(key string) int {
 // imitates JSON's null as Go's nil. A nil pointer is returned if the key was not found, it is null or
 // could not be converted to int. The type of error will be stored in LastError.
 func (o *JsonObject) GetIntN(key string) *int {
-	return getObjectScalarNullable(o, convertAnyToIntN, key)
+	return getObjectScalarN(o, convertAnyToIntN, key)
 }
 
 // GetFloat retrieves the float64 value associated with the specified key.
@@ -192,7 +192,7 @@ func (o *JsonObject) GetFloat(key string) float64 {
 // imitates JSON's null as Go's nil. A nil pointer is returned if the key was not found, it is null or
 // could not be converted to float64. The type of error will be stored in LastError.
 func (o *JsonObject) GetFloatN(key string) *float64 {
-	return getObjectScalarNullable(o, convertAnyToFloatN, key)
+	return getObjectScalarN(o, convertAnyToFloatN, key)
 }
 
 // GetBool retrieves the bool value associated with the specified key.
@@ -205,7 +205,7 @@ func (o *JsonObject) GetBool(key string) bool {
 // imitates JSON's null as Go's nil. A nil pointer is returned if the key was not found, it is null or
 // could not be converted to bool. The type of error will be stored in LastError.
 func (o *JsonObject) GetBoolN(key string) *bool {
-	return getObjectScalarNullable(o, convertAnyToBoolN, key)
+	return getObjectScalarN(o, convertAnyToBoolN, key)
 }
 
 // GetTime retrieves the time.Time value associated with the specified key.

@@ -177,7 +177,7 @@ func (a *JsonArray) GetString(i int) string {
 // imitates JSON's null as Go's nil. A nil pointer is returned if the index is out of bounds, it is null or
 // could not be converted to string. The type of error will be stored in LastError.
 func (a *JsonArray) GetStringN(i int) *string {
-	return getArrayScalarNullable(a, convertAnyToStringN, i)
+	return getArrayScalarN(a, convertAnyToStringN, i)
 }
 
 // GetInt retrieves the integer value from the element at the specified index.
@@ -190,7 +190,7 @@ func (a *JsonArray) GetInt(i int) int {
 // imitates JSON's null as Go's nil. A nil pointer is returned if the index is out of bounds found, it is null or
 // could not be converted to int. The type of error will be stored in LastError.
 func (a *JsonArray) GetIntN(i int) *int {
-	return getArrayScalarNullable(a, convertAnyToIntN, i)
+	return getArrayScalarN(a, convertAnyToIntN, i)
 }
 
 // GetFloat retrieves the float value from the element at the specified index.
@@ -203,7 +203,7 @@ func (a *JsonArray) GetFloat(i int) float64 {
 // imitates JSON's null as Go's nil. A nil pointer is returned if the index is out of bounds it is null or
 // could not be converted to float64. The type of error will be stored in LastError.
 func (a *JsonArray) GetFloatN(i int) *float64 {
-	return getArrayScalarNullable(a, convertAnyToFloatN, i)
+	return getArrayScalarN(a, convertAnyToFloatN, i)
 }
 
 // GetBool retrieves the boolean value from the element at the specified index.
@@ -216,7 +216,7 @@ func (a *JsonArray) GetBool(i int) bool {
 // imitates JSON's null as Go's nil. A nil pointer is returned index is out of bounds found, it is null or
 // could not be converted to bool. The type of error will be stored in LastError.
 func (a *JsonArray) GetBoolN(i int) *bool {
-	return getArrayScalarNullable(a, convertAnyToBoolN, i)
+	return getArrayScalarN(a, convertAnyToBoolN, i)
 }
 
 // GetTime retrieves the time value from the element at the specified index, returning an error if conversion fails.

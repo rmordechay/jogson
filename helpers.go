@@ -133,7 +133,7 @@ func getObjectScalar[T any](o *JsonObject, f jc[T], key string) T {
 	return f(v, o)
 }
 
-func getObjectScalarNullable[T any](o *JsonObject, f jcn[T], key string) *T {
+func getObjectScalarN[T any](o *JsonObject, f jcn[T], key string) *T {
 	o.setLastError(nil)
 	var t T
 	v, ok := o.object[key]
@@ -163,7 +163,7 @@ func getArrayScalar[T any](a *JsonArray, f jc[T], i int) T {
 	return f(data, a)
 }
 
-func getArrayScalarNullable[T any](a *JsonArray, f jcn[T], i int) *T {
+func getArrayScalarN[T any](a *JsonArray, f jcn[T], i int) *T {
 	a.setLastError(nil)
 	var t T
 	if i >= a.Length() {

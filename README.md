@@ -5,7 +5,7 @@
 A simple Go library to simplify working with JSON without the need to define structs.
 
 * [Installation](#Installation)
-* [Create a Mapper](#create-a-jsonmapper-jsonobject-or-jsonarray)
+* [Create a Mapper](#create-jsonmapper-jsonobject-or-jsonarray)
 * [Read from JSON](#Read-from-JSON)
     * [Objects](#Objects)
     * [Arrays](#Arrays)
@@ -34,15 +34,15 @@ go get github.com/rmordechay/jsonmapper
 For more information, see [design](#Design).
 
 ```go
-// From bytes
-mapper, err := jsonmapper.FromBytes([]byte(jsonBytes))
-object, err := jsonmapper.NewObjectFromBytes([]byte(jsonBytes))
-array, err := jsonmapper.NewArrayFromBytes([]byte(jsonBytes))
-
 // From string
 mapper, err := jsonmapper.FromString(jsonString)
 object, err := jsonmapper.NewObjectFromString(jsonString)
 array, err := jsonmapper.NewArrayFromString(jsonString)
+
+// From bytes
+mapper, err := jsonmapper.FromBytes([]byte(jsonString))
+object, err := jsonmapper.NewObjectFromBytes([]byte(jsonString))
+array, err := jsonmapper.NewArrayFromBytes([]byte(jsonString))
 
 // From struct
 mapper, err := jsonmapper.FromStruct(jsonStruct)
@@ -65,8 +65,9 @@ jsonString := `{
     "age": 43,
     "height": 1.87,
     "is_funny": false,
+    "education": null,
     "birthday": "1981-10-08",
-    "features": ["tall", "blue eyes"],
+    "features": ["tall", "blue eyes", null],
     "children": {
         "Rachel": {"age": 15, "is_funny": false}, 
         "Sara":   {"age": 19, "is_funny": true}
@@ -99,6 +100,27 @@ for key, child := range children.Elements() {
     fmt.Println(child.AsObject.GetInt("age"))         // 15, 19
     fmt.Println(child.AsObject.GetBool("is_funny"))   // false, true
 }
+
+// Get the JsonObject as map of string and string
+var stringMap map[string]string = object.AsStringMap()
+// Get the JsonObject as map of string and nullable string
+var nullableStringMap map[string]*string = object.AsStringMapN()
+
+// Get the JsonObject as map of string and int
+var intMap map[string]int = object.AsIntMap()
+// Get the JsonObject as map of string and nullable int
+var nullableSntMap map[string]*int = object.AsIntMapN()
+
+// Get the JsonObject as map of string and float
+var floatMap map[string]float64 = object.AsFloatMap()
+// Get the JsonObject as map of string and nullable float
+var nullableSloatMap map[string]*float64 = object.AsFloatMapN()
+
+// Get as a slice of JsonArray
+var nestedArray map[string]JsonArray = object.AsArrayMap()
+
+// Get as a slice of JsonObject
+var objectArray map[string]JsonObject = object.AsObjectMap()
 ```
 
 ### Arrays
@@ -118,20 +140,26 @@ for _, feature := range features.Elements() {
     fmt.Println(feature.AsString) // tall, ...
 }
 
-// Get as a slice of string
-var stringArray []string = features.AsStringArray()
+// Get the JsonArray as a slice of string
+var stringArray []string = array.AsStringArray()
+// Get the JsonArray as a slice of nullable string
+var nullableStringArray []*string = array.AsStringArrayN()
 
-// Get as a slice of int
-var intArray []int = features.AsIntArray()
+// Get the JsonArray as a slice of int
+var intArray []int = array.AsIntArray()
+// Get the JsonArray as a slice of nullable int
+var nullableSntArray []*int = array.AsIntArrayN()
 
-// Get as a slice of float
-var floatArray []float64 = features.AsFloatArray()
+// Get the JsonArray as a slice of float
+var floatArray []float64 = array.AsFloatArray()
+// Get the JsonArray as a slice of nullable float
+var nullableSloatArray []*float64 = array.AsFloatArrayN()
 
-// Get as a slice of JsonArray
-var nestedArray []JsonArray = features.As2DArray()
+// Get the JsonArray as a slice of JsonArray
+var nestedArray []JsonArray = array.As2DArray()
 
-// Get as a slice of JsonObject
-var objectArray []JsonObject = features.AsObjectArray()
+// Get the JsonArray as a slice of JsonObject
+var objectArray []JsonObject = array.AsObjectArray()
 ```
 
 ### Scalars
