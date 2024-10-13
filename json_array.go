@@ -38,8 +38,13 @@ func NewArrayFromString(data string) (*JsonArray, error) {
 // EmptyArray initializes and returns an empty new instance of JsonArray.
 func EmptyArray() *JsonArray {
 	var arr JsonArray
-	elements := make([]*any, 0)
-	arr.elements = elements
+	arr.elements = make([]*any, 0)
+	return &arr
+}
+
+// nullArray initializes and returns a null JsonArray.
+func nullArray() *JsonArray {
+	var arr JsonArray
 	return &arr
 }
 
@@ -80,6 +85,24 @@ func (a *JsonArray) AsIntArray() []int {
 // AsFloatArray converts the elements of the JsonArray into a slice of floats.
 func (a *JsonArray) AsFloatArray() []float64 {
 	return getGenericArray(convertAnyToFloat, *a)
+}
+
+// AsStringArrayN is the nullable version of AsStringArray, and returns a slice of string pointers instead values which
+// imitates JSON's null as Go's nil.
+func (a *JsonArray) AsStringArrayN() []*string {
+	return getGenericArrayN(convertAnyToStringN, *a)
+}
+
+// AsIntArrayN is the nullable version of AsIntArray, and returns a slice of int pointers instead values which
+// imitates JSON's null as Go's nil.
+func (a *JsonArray) AsIntArrayN() []*int {
+	return getGenericArrayN(convertAnyToIntN, *a)
+}
+
+// AsFloatArrayN is the nullable version of AsFloatArray, and returns a slice of float64 pointers instead values which
+// imitates JSON's null as Go's nil.
+func (a *JsonArray) AsFloatArrayN() []*float64 {
+	return getGenericArrayN(convertAnyToFloatN, *a)
 }
 
 // As2DArray converts the elements of the JsonArray into a two-dimensional array, returning
@@ -149,10 +172,24 @@ func (a *JsonArray) GetString(i int) string {
 	return getArrayScalar(a, convertAnyToString, i)
 }
 
+// GetStringN is the nullable version of GetString, and returns a pointer instead value which
+// imitates JSON's null as Go's nil. A nil pointer is returned if the index is out of bounds, it is null or
+// could not be converted to string. The type of error will be stored in LastError.
+func (a *JsonArray) GetStringN(i int) *string {
+	return getArrayScalarNullable(a, convertAnyToStringN, i)
+}
+
 // GetInt retrieves the integer value from the element at the specified index.
 // If the index is out of range, the value is invalid or is null, an error will be set to LastError.
 func (a *JsonArray) GetInt(i int) int {
 	return getArrayScalar(a, convertAnyToInt, i)
+}
+
+// GetIntN is the nullable version of GetInt, and returns a pointer instead value which
+// imitates JSON's null as Go's nil. A nil pointer is returned if the index is out of bounds found, it is null or
+// could not be converted to int. The type of error will be stored in LastError.
+func (a *JsonArray) GetIntN(i int) *int {
+	return getArrayScalarNullable(a, convertAnyToIntN, i)
 }
 
 // GetFloat retrieves the float value from the element at the specified index.
@@ -161,10 +198,24 @@ func (a *JsonArray) GetFloat(i int) float64 {
 	return getArrayScalar(a, convertAnyToFloat, i)
 }
 
+// GetFloatN is the nullable version of GetFloat, and returns a pointer instead value which
+// imitates JSON's null as Go's nil. A nil pointer is returned if the index is out of bounds it is null or
+// could not be converted to float64. The type of error will be stored in LastError.
+func (a *JsonArray) GetFloatN(i int) *float64 {
+	return getArrayScalarNullable(a, convertAnyToFloatN, i)
+}
+
 // GetBool retrieves the boolean value from the element at the specified index.
 // If the index is out of range, the value is invalid or is null, an error will be set to LastError.
 func (a *JsonArray) GetBool(i int) bool {
 	return getArrayScalar(a, convertAnyToBool, i)
+}
+
+// GetBoolN is the nullable version of GetBool, and returns a pointer instead value which
+// imitates JSON's null as Go's nil. A nil pointer is returned index is out of bounds found, it is null or
+// could not be converted to bool. The type of error will be stored in LastError.
+func (a *JsonArray) GetBoolN(i int) *bool {
+	return getArrayScalarNullable(a, convertAnyToBoolN, i)
 }
 
 // GetTime retrieves the time value from the element at the specified index, returning an error if conversion fails.
@@ -178,12 +229,12 @@ func (a *JsonArray) GetTime(i int) time.Time {
 func (a *JsonArray) GetObject(i int) *JsonObject {
 	if i >= a.Length() {
 		a.setLastError(createIndexOutOfRangeErr(i, a.Length()))
-		return EmptyObject()
+		return nullObject()
 	}
 	element := a.elements[i]
 	if element == nil {
 		a.setLastError(createTypeConversionErr(nil, ""))
-		return EmptyObject()
+		return nullObject()
 	}
 	switch (*element).(type) {
 	case map[string]*any:
@@ -194,7 +245,7 @@ func (a *JsonArray) GetObject(i int) *JsonObject {
 		return newObjectFromMap(data)
 	default:
 		a.setLastError(createTypeConversionErr(*element, JsonObject{}))
-		return EmptyObject()
+		return nullObject()
 	}
 }
 

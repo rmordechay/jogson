@@ -78,7 +78,7 @@ jsonString := `{
 
 ```go
 // Check if a key exists
-var keyExists bool = object.Has("children")
+var keyExists bool = object.Contains("children")
 
 // Check if the object is empty
 var objectEmpty bool = object.IsEmpty()
@@ -198,7 +198,7 @@ You can search for a nested element.
 ```go
 element := mapper.AsObject.Find("Rachel")
 fmt.Println(element.IsObject) // true 
-fmt.Println(element.Has("is_funny")) // true 
+fmt.Println(element.Contains("is_funny")) // true 
 ```
 
 ### Get JSON String

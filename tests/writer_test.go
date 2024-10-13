@@ -19,7 +19,7 @@ func TestWriteArrayToObject(t *testing.T) {
 	obj.AddJsonArray("children", arr)
 
 	assert.NoError(t, obj.LastError)
-	assert.True(t, obj.Has("children"))
+	assert.True(t, obj.Contains("children"))
 	array := obj.GetArray("children")
 	assert.NoError(t, obj.LastError)
 	assert.Equal(t, 3, array.Length())

@@ -243,15 +243,15 @@ func TestArrayGetObjectFails(t *testing.T) {
 
 	obj := array.GetObject(10)
 	assert.ErrorIs(t, array.LastError, jsonmapper.IndexOutOfRangeErr)
-	assert.Equal(t, jsonmapper.EmptyObject(), obj)
+	assert.True(t, obj.IsNull())
 
 	obj = array.GetObject(2)
 	assert.ErrorIs(t, array.LastError, jsonmapper.TypeConversionErr)
-	assert.Equal(t, jsonmapper.EmptyObject(), obj)
+	assert.True(t, obj.IsNull())
 
 	obj = array.GetObject(3)
 	assert.ErrorIs(t, array.LastError, jsonmapper.TypeConversionErr)
-	assert.Equal(t, jsonmapper.EmptyObject(), obj)
+	assert.True(t, obj.IsNull())
 }
 
 func TestArrayGetTime(t *testing.T) {

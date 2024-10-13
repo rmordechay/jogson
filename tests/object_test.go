@@ -194,15 +194,15 @@ func TestObjectGetObjectFails(t *testing.T) {
 
 	obj := object.GetObject("not found")
 	assert.ErrorIs(t, object.LastError, jsonmapper.KeyNotFoundErr)
-	assert.Equal(t, jsonmapper.EmptyObject(), obj)
+	assert.True(t, obj.IsNull())
 
 	obj = object.GetObject("name")
 	assert.ErrorIs(t, object.LastError, jsonmapper.TypeConversionErr)
-	assert.Equal(t, jsonmapper.EmptyObject(), obj)
+	assert.True(t, obj.IsNull())
 
 	obj = object.GetObject("address")
 	assert.ErrorIs(t, object.LastError, jsonmapper.TypeConversionErr)
-	assert.Equal(t, jsonmapper.EmptyObject(), obj)
+	assert.True(t, obj.IsNull())
 }
 
 func TestObjectGetTime(t *testing.T) {

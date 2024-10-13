@@ -16,7 +16,7 @@ func NewObjectFromBytes(data []byte) (*JsonObject, error) {
 	jsonObject := EmptyObject()
 	err := unmarshal(data, &jsonObject.object)
 	if err != nil {
-		return EmptyObject(), err
+		return nil, err
 	}
 	return jsonObject, nil
 }
@@ -25,7 +25,7 @@ func NewObjectFromBytes(data []byte) (*JsonObject, error) {
 func NewObjectFromFile(path string) (*JsonObject, error) {
 	file, err := os.ReadFile(path)
 	if err != nil {
-		return EmptyObject(), err
+		return nil, err
 	}
 	return NewObjectFromBytes(file)
 }
@@ -34,7 +34,7 @@ func NewObjectFromFile(path string) (*JsonObject, error) {
 func NewObjectFromStruct[T any](s T) (*JsonObject, error) {
 	jsonBytes, err := marshal(s)
 	if err != nil {
-		return EmptyObject(), err
+		return nil, err
 	}
 	return NewObjectFromBytes(jsonBytes)
 }
@@ -51,13 +51,19 @@ func EmptyObject() *JsonObject {
 	return &obj
 }
 
+// nullObject initializes and returns a null JsonObject.
+func nullObject() *JsonObject {
+	var obj JsonObject
+	return &obj
+}
+
 // Length returns the number of elements in the JsonObject.
 func (o *JsonObject) Length() int {
 	return len(o.object)
 }
 
-// Has checks if the specified key exists in the JsonObject.
-func (o *JsonObject) Has(key string) bool {
+// Contains checks if the specified key exists in the JsonObject.
+func (o *JsonObject) Contains(key string) bool {
 	_, ok := o.object[key]
 	return ok
 }
@@ -99,19 +105,37 @@ func (o *JsonObject) Elements() map[string]JsonMapper {
 	return jsons
 }
 
-// AsStringMap returns the object as map of string, string
+// AsStringMap returns the object as map[string]string
 func (o *JsonObject) AsStringMap() map[string]string {
 	return getGenericMap(convertAnyToString, *o)
 }
 
-// AsIntMap returns the object as map of (string, int)
+// AsIntMap returns the object as map[string]int
 func (o *JsonObject) AsIntMap() map[string]int {
 	return getGenericMap(convertAnyToInt, *o)
 }
 
-// AsFloatMap returns the object as map of (string, float64)
+// AsFloatMap returns the object as map[string]float64
 func (o *JsonObject) AsFloatMap() map[string]float64 {
 	return getGenericMap(convertAnyToFloat, *o)
+}
+
+// AsStringMapN is the nullable version of AsStringMap, and returns a map of string and string pointers instead values which
+// imitates JSON's null as Go's nil.
+func (o *JsonObject) AsStringMapN() map[string]*string {
+	return getGenericMapN(convertAnyToStringN, *o)
+}
+
+// AsIntMapN is the nullable version of AsIntMap, and returns a map of string and pointers int instead values which
+// imitates JSON's null as Go's nil.
+func (o *JsonObject) AsIntMapN() map[string]*int {
+	return getGenericMapN(convertAnyToIntN, *o)
+}
+
+// AsFloatMapN is the nullable version of AsFloatMap, and returns a map of string and float64 pointers instead values which
+// imitates JSON's null as Go's nil.
+func (o *JsonObject) AsFloatMapN() map[string]*float64 {
+	return getGenericMapN(convertAnyToFloatN, *o)
 }
 
 // AsArrayMap returns the object as map of (string, JsonArray)
@@ -138,10 +162,24 @@ func (o *JsonObject) GetString(key string) string {
 	return getObjectScalar(o, convertAnyToString, key)
 }
 
+// GetStringN is the nullable version of GetString, and returns a pointer instead of a zero value which
+// imitates JSON's null as Go's nil. A nil pointer is returned if the key was not found, it is null or
+// could not be converted to string. The type of error will be stored in LastError.
+func (o *JsonObject) GetStringN(key string) *string {
+	return getObjectScalarNullable(o, convertAnyToStringN, key)
+}
+
 // GetInt retrieves the int value associated with the specified key.
 // If the key does not exist, the value is invalid or is null, an error will be set to LastError.
 func (o *JsonObject) GetInt(key string) int {
 	return getObjectScalar(o, convertAnyToInt, key)
+}
+
+// GetIntN is the nullable version of GetInt, and returns a pointer instead of a zero value which
+// imitates JSON's null as Go's nil. A nil pointer is returned if the key was not found, it is null or
+// could not be converted to int. The type of error will be stored in LastError.
+func (o *JsonObject) GetIntN(key string) *int {
+	return getObjectScalarNullable(o, convertAnyToIntN, key)
 }
 
 // GetFloat retrieves the float64 value associated with the specified key.
@@ -150,10 +188,24 @@ func (o *JsonObject) GetFloat(key string) float64 {
 	return getObjectScalar(o, convertAnyToFloat, key)
 }
 
+// GetFloatN is the nullable version of GetFloat, and returns a pointer instead of a zero value which
+// imitates JSON's null as Go's nil. A nil pointer is returned if the key was not found, it is null or
+// could not be converted to float64. The type of error will be stored in LastError.
+func (o *JsonObject) GetFloatN(key string) *float64 {
+	return getObjectScalarNullable(o, convertAnyToFloatN, key)
+}
+
 // GetBool retrieves the bool value associated with the specified key.
 // If the key does not exist, the value is invalid or is null, an error will be set to LastError.
 func (o *JsonObject) GetBool(key string) bool {
 	return getObjectScalar(o, convertAnyToBool, key)
+}
+
+// GetBoolN is the nullable version of GetBool, and returns a pointer instead of a zero value which
+// imitates JSON's null as Go's nil. A nil pointer is returned if the key was not found, it is null or
+// could not be converted to bool. The type of error will be stored in LastError.
+func (o *JsonObject) GetBoolN(key string) *bool {
+	return getObjectScalarNullable(o, convertAnyToBoolN, key)
 }
 
 // GetTime retrieves the time.Time value associated with the specified key.
@@ -168,11 +220,11 @@ func (o *JsonObject) GetObject(key string) *JsonObject {
 	v, ok := o.object[key]
 	if !ok {
 		o.setLastError(createKeyNotFoundErr(key))
-		return EmptyObject()
+		return nullObject()
 	}
 	if v == nil {
 		o.setLastError(createTypeConversionErr(nil, JsonObject{}))
-		return &JsonObject{}
+		return nullObject()
 	}
 	switch (*v).(type) {
 	case map[string]*any:
@@ -183,7 +235,7 @@ func (o *JsonObject) GetObject(key string) *JsonObject {
 		return newObjectFromMap(dataPtr)
 	default:
 		o.setLastError(createTypeConversionErr(*v, JsonObject{}))
-		return EmptyObject()
+		return nullObject()
 	}
 }
 
@@ -197,7 +249,7 @@ func (o *JsonObject) GetArray(key string) *JsonArray {
 	}
 	if v == nil {
 		o.setLastError(createTypeConversionErr(nil, JsonArray{}))
-		return &JsonArray{}
+		return EmptyArray()
 	}
 	switch castedValue := (*v).(type) {
 	case []any:
