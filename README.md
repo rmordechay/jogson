@@ -192,7 +192,7 @@ var height float64 = object.GetFloat("height") // 1.87
 var isFunny bool = object.GetBool("is_funny") // false
 ```
 
-By reference, which allows JSON null values (Note the suffix 'N' at the end of the method names):
+By reference, which allows JSON null values (note the suffix 'N' at the end of the method names):
 
 ```go
 // string
