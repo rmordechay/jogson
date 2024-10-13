@@ -332,8 +332,18 @@ fmt.Println(arr.String()) // [15,19]
 ```
 
 ## Error Handling
-Error handling is designed in such a way to not break the flow of the code and pollute it with
-errors 
+Error handling is designed in such a way to not break the flow and to allow a cleaner code. In most cases
+errors are not returned, but instead, they are kept in an exported field, `LastError`, which you can use 
+to check for the type of error after an operation on your `JsonObject` or `JsonArray` instance.
+Note, `LastError` is reset at the beginning of every operation, so if you need a reference to an old
+error, you will have to store it in a variable. For example:
+
+```go
+_ = object.GetString("non-existent-key")
+fmt.Println(object.LastError) // key was not found: 'non-existent-key'
+_ = object.GetString("name")
+fmt.Println(object.LastError) // nil
+```
 
 ## Design
 

@@ -2,6 +2,7 @@ package tests
 
 import (
 	"github.com/rmordechay/jsonmapper"
+	"github.com/rmordechay/jsonmapper/sandbox"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
@@ -13,10 +14,6 @@ func TestParseTimeInvalid(t *testing.T) {
 		_, err = v.AsTime()
 		assert.Error(t, err)
 	}
-}
-
-func TestExample(t *testing.T) {
-	//docs.RunExample()
 }
 
 func TestMapperString(t *testing.T) {
@@ -41,4 +38,8 @@ func TestMapperPrettyString(t *testing.T) {
 	assert.NoError(t, err)
 	expectedArrayStr := "[\n  {\n    \"name\": \"Jason\"\n  },\n  {\n    \"name\": \"Chris\"\n  }\n]"
 	assert.Equal(t, expectedArrayStr, mapper.PrettyString())
+}
+
+func TestExample(t *testing.T) {
+	sandbox.RunExample()
 }
