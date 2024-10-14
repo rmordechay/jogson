@@ -5,12 +5,12 @@ import (
 	"time"
 	"unicode"
 
-	"github.com/rmordechay/jsonmapper"
+	"github.com/rmordechay/jogson"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestObjectGetKeys(t *testing.T) {
-	mapper, err := jsonmapper.FromString(jsonObjectTest)
+	mapper, err := jogson.FromString(jsonObjectTest)
 	assert.NoError(t, err)
 	keys := mapper.AsObject.Keys()
 	assert.Equal(t, 5, len(keys))
@@ -20,7 +20,7 @@ func TestObjectGetKeys(t *testing.T) {
 }
 
 func TestObjectGetValues(t *testing.T) {
-	mapper, err := jsonmapper.FromString(jsonObjectTest)
+	mapper, err := jogson.FromString(jsonObjectTest)
 	assert.NoError(t, err)
 	values := mapper.AsObject.Values()
 	assert.Equal(t, 5, len(values))
@@ -30,28 +30,28 @@ func TestObjectGetValues(t *testing.T) {
 }
 
 func TestObjectAsStringMap(t *testing.T) {
-	object, _ := jsonmapper.NewObjectFromString(jsonObjectOnlyStringTest)
+	object, _ := jogson.NewObjectFromString(jsonObjectOnlyStringTest)
 	expectedMap := map[string]string{"first": "string1", "second": "string2", "third": "string3"}
 	assert.Equal(t, expectedMap, object.AsStringMap())
 	assert.Equal(t, 3, object.Length())
 }
 
 func TestObjectAsIntMap(t *testing.T) {
-	object, _ := jsonmapper.NewObjectFromString(jsonObjectOnlyIntTest)
+	object, _ := jogson.NewObjectFromString(jsonObjectOnlyIntTest)
 	expectedMap := map[string]int{"first": 1, "second": 3, "third": 54}
 	assert.Equal(t, expectedMap, object.AsIntMap())
 	assert.Equal(t, 3, object.Length())
 }
 
 func TestObjectAsFloatMap(t *testing.T) {
-	object, _ := jsonmapper.NewObjectFromString(jsonObjectOnlyFloatTest)
+	object, _ := jogson.NewObjectFromString(jsonObjectOnlyFloatTest)
 	expectedMap := map[string]float64{"first": 5.3, "second": 1.4, "third": -0.3}
 	assert.Equal(t, expectedMap, object.AsFloatMap())
 	assert.Equal(t, 3, object.Length())
 }
 
 func TestObjectAsStringMapNullable(t *testing.T) {
-	object, err := jsonmapper.NewObjectFromString(jsonObjectOnlyStringWithNullTest)
+	object, err := jogson.NewObjectFromString(jsonObjectOnlyStringWithNullTest)
 	assert.NoError(t, err)
 	string1 := "string1"
 	string2 := "string2"
@@ -67,7 +67,7 @@ func TestObjectAsStringMapNullable(t *testing.T) {
 }
 
 func TestObjectAsIntMapNullable(t *testing.T) {
-	object, err := jsonmapper.NewObjectFromString(jsonObjectOnlyIntWithNullTest)
+	object, err := jogson.NewObjectFromString(jsonObjectOnlyIntWithNullTest)
 	assert.NoError(t, err)
 	i1 := 1
 	i2 := 3
@@ -83,7 +83,7 @@ func TestObjectAsIntMapNullable(t *testing.T) {
 }
 
 func TestObjectAsFloatMapNullable(t *testing.T) {
-	object, err := jsonmapper.NewObjectFromString(jsonObjectOnlyFloatWithNullTest)
+	object, err := jogson.NewObjectFromString(jsonObjectOnlyFloatWithNullTest)
 	assert.NoError(t, err)
 	f1 := 5.3
 	f2 := 1.4
@@ -99,7 +99,7 @@ func TestObjectAsFloatMapNullable(t *testing.T) {
 }
 
 func TestObjectGetMapper(t *testing.T) {
-	mapper, _ := jsonmapper.FromString(jsonObjectTest)
+	mapper, _ := jogson.FromString(jsonObjectTest)
 	array := mapper.AsObject
 
 	elementMapper := array.Get("name")
@@ -132,7 +132,7 @@ func TestObjectGetMapper(t *testing.T) {
 }
 
 func TestObjectGetString(t *testing.T) {
-	mapper, _ := jsonmapper.FromString(jsonObjectTest)
+	mapper, _ := jogson.FromString(jsonObjectTest)
 	object := mapper.AsObject
 
 	s := object.GetString("name")
@@ -153,20 +153,20 @@ func TestObjectGetString(t *testing.T) {
 }
 
 func TestObjectGetStringFails(t *testing.T) {
-	mapper, _ := jsonmapper.FromString(jsonObjectTest)
+	mapper, _ := jogson.FromString(jsonObjectTest)
 	object := mapper.AsObject
 
 	s := object.GetString("not found")
-	assert.ErrorIs(t, object.LastError, jsonmapper.KeyNotFoundErr)
+	assert.ErrorIs(t, object.LastError, jogson.KeyNotFoundErr)
 	assert.Equal(t, "", s)
 
 	s = object.GetString("address")
-	assert.ErrorIs(t, object.LastError, jsonmapper.TypeConversionErr)
+	assert.ErrorIs(t, object.LastError, jogson.TypeConversionErr)
 	assert.Equal(t, "", s)
 }
 
 func TestObjectGetInt(t *testing.T) {
-	mapper, _ := jsonmapper.FromString(jsonObjectTest)
+	mapper, _ := jogson.FromString(jsonObjectTest)
 	object := mapper.AsObject
 
 	i := object.GetInt("age")
@@ -179,24 +179,24 @@ func TestObjectGetInt(t *testing.T) {
 }
 
 func TestObjectGetIntFails(t *testing.T) {
-	mapper, _ := jsonmapper.FromString(jsonObjectTest)
+	mapper, _ := jogson.FromString(jsonObjectTest)
 	object := mapper.AsObject
 
 	i := object.GetInt("not found")
-	assert.ErrorIs(t, object.LastError, jsonmapper.KeyNotFoundErr)
+	assert.ErrorIs(t, object.LastError, jogson.KeyNotFoundErr)
 	assert.Equal(t, 0, i)
 
 	i = object.GetInt("name")
-	assert.ErrorIs(t, object.LastError, jsonmapper.TypeConversionErr)
+	assert.ErrorIs(t, object.LastError, jogson.TypeConversionErr)
 	assert.Equal(t, 0, i)
 
 	i = object.GetInt("address")
-	assert.ErrorIs(t, object.LastError, jsonmapper.TypeConversionErr)
+	assert.ErrorIs(t, object.LastError, jogson.TypeConversionErr)
 	assert.Equal(t, 0, i)
 }
 
 func TestObjectGetFloat(t *testing.T) {
-	mapper, _ := jsonmapper.FromString(jsonObjectTest)
+	mapper, _ := jogson.FromString(jsonObjectTest)
 	object := mapper.AsObject
 
 	f := object.GetFloat("age")
@@ -209,24 +209,24 @@ func TestObjectGetFloat(t *testing.T) {
 }
 
 func TestObjectGetFloatFails(t *testing.T) {
-	mapper, _ := jsonmapper.FromString(jsonObjectTest)
+	mapper, _ := jogson.FromString(jsonObjectTest)
 	object := mapper.AsObject
 
 	f := object.GetFloat("not found")
-	assert.ErrorIs(t, object.LastError, jsonmapper.KeyNotFoundErr)
+	assert.ErrorIs(t, object.LastError, jogson.KeyNotFoundErr)
 	assert.Equal(t, float64(0), f)
 
 	f = object.GetFloat("name")
-	assert.ErrorIs(t, object.LastError, jsonmapper.TypeConversionErr)
+	assert.ErrorIs(t, object.LastError, jogson.TypeConversionErr)
 	assert.Equal(t, float64(0), f)
 
 	f = object.GetFloat("address")
-	assert.ErrorIs(t, object.LastError, jsonmapper.TypeConversionErr)
+	assert.ErrorIs(t, object.LastError, jogson.TypeConversionErr)
 	assert.Equal(t, float64(0), f)
 }
 
 func TestObjectGetBool(t *testing.T) {
-	mapper, _ := jsonmapper.FromString(jsonObjectTest)
+	mapper, _ := jogson.FromString(jsonObjectTest)
 	object := mapper.AsObject
 
 	b := object.GetBool("is_funny")
@@ -235,24 +235,24 @@ func TestObjectGetBool(t *testing.T) {
 }
 
 func TestObjectGetBoolFails(t *testing.T) {
-	mapper, _ := jsonmapper.FromString(jsonObjectTest)
+	mapper, _ := jogson.FromString(jsonObjectTest)
 	object := mapper.AsObject
 
 	b := object.GetBool("not found")
-	assert.ErrorIs(t, object.LastError, jsonmapper.KeyNotFoundErr)
+	assert.ErrorIs(t, object.LastError, jogson.KeyNotFoundErr)
 	assert.Equal(t, false, b)
 
 	b = object.GetBool("age")
-	assert.ErrorIs(t, object.LastError, jsonmapper.TypeConversionErr)
+	assert.ErrorIs(t, object.LastError, jogson.TypeConversionErr)
 	assert.Equal(t, false, b)
 
 	b = object.GetBool("address")
-	assert.ErrorIs(t, object.LastError, jsonmapper.TypeConversionErr)
+	assert.ErrorIs(t, object.LastError, jogson.TypeConversionErr)
 	assert.Equal(t, false, b)
 }
 
 func TestObjectGetArray(t *testing.T) {
-	mapper, _ := jsonmapper.FromString(jsonObjectWithArrayTest)
+	mapper, _ := jogson.FromString(jsonObjectWithArrayTest)
 	object := mapper.AsObject
 
 	array := object.GetArray("names")
@@ -260,24 +260,24 @@ func TestObjectGetArray(t *testing.T) {
 }
 
 func TestObjectGetArrayFails(t *testing.T) {
-	mapper, _ := jsonmapper.FromString(jsonObjectWithArrayTest)
+	mapper, _ := jogson.FromString(jsonObjectWithArrayTest)
 	object := mapper.AsObject
 
 	arr := object.GetArray("not found")
-	assert.ErrorIs(t, object.LastError, jsonmapper.KeyNotFoundErr)
-	assert.Equal(t, jsonmapper.EmptyArray(), arr)
+	assert.ErrorIs(t, object.LastError, jogson.KeyNotFoundErr)
+	assert.Equal(t, jogson.EmptyArray(), arr)
 
 	arr = object.GetArray("name")
-	assert.ErrorIs(t, object.LastError, jsonmapper.TypeConversionErr)
-	assert.Equal(t, jsonmapper.EmptyArray(), arr)
+	assert.ErrorIs(t, object.LastError, jogson.TypeConversionErr)
+	assert.Equal(t, jogson.EmptyArray(), arr)
 
 	arr = object.GetArray("address")
-	assert.ErrorIs(t, object.LastError, jsonmapper.TypeConversionErr)
-	assert.Equal(t, jsonmapper.EmptyArray(), arr)
+	assert.ErrorIs(t, object.LastError, jogson.TypeConversionErr)
+	assert.Equal(t, jogson.EmptyArray(), arr)
 }
 
 func TestObjectGetObject(t *testing.T) {
-	mapper, _ := jsonmapper.FromString(jsonObjectNestedArrayTest)
+	mapper, _ := jogson.FromString(jsonObjectNestedArrayTest)
 	object := mapper.AsObject
 
 	obj := object.GetObject("personTest")
@@ -285,24 +285,24 @@ func TestObjectGetObject(t *testing.T) {
 }
 
 func TestObjectGetObjectFails(t *testing.T) {
-	mapper, _ := jsonmapper.FromString(jsonObjectTest)
+	mapper, _ := jogson.FromString(jsonObjectTest)
 	object := mapper.AsObject
 
 	obj := object.GetObject("not found")
-	assert.ErrorIs(t, object.LastError, jsonmapper.KeyNotFoundErr)
+	assert.ErrorIs(t, object.LastError, jogson.KeyNotFoundErr)
 	assert.True(t, obj.IsNull())
 
 	obj = object.GetObject("name")
-	assert.ErrorIs(t, object.LastError, jsonmapper.TypeConversionErr)
+	assert.ErrorIs(t, object.LastError, jogson.TypeConversionErr)
 	assert.True(t, obj.IsNull())
 
 	obj = object.GetObject("address")
-	assert.ErrorIs(t, object.LastError, jsonmapper.TypeConversionErr)
+	assert.ErrorIs(t, object.LastError, jogson.TypeConversionErr)
 	assert.True(t, obj.IsNull())
 }
 
 func TestObjectGetTime(t *testing.T) {
-	mapper, err := jsonmapper.FromString(jsonObjectTimeTest)
+	mapper, err := jogson.FromString(jsonObjectTimeTest)
 	assert.NoError(t, err)
 	object := mapper.AsObject
 	actualTime1 := object.GetTime("time1")
@@ -320,7 +320,7 @@ func TestObjectGetTime(t *testing.T) {
 }
 
 func TestObjectGetUUID(t *testing.T) {
-	mapper, err := jsonmapper.FromString(jsonUUIDTest)
+	mapper, err := jogson.FromString(jsonUUIDTest)
 	assert.NoError(t, err)
 	uuid, err := mapper.AsObject.Get("uuid").AsUUID()
 	assert.NoError(t, err)
@@ -329,7 +329,7 @@ func TestObjectGetUUID(t *testing.T) {
 
 func TestObjectToStruct(t *testing.T) {
 	expectedPerson := getTestPerson()
-	obj, err := jsonmapper.NewObjectFromStruct(expectedPerson)
+	obj, err := jogson.NewObjectFromStruct(expectedPerson)
 	assert.NoError(t, err)
 	actualPerson := personTest{}
 	assert.NotEqual(t, expectedPerson, actualPerson)
@@ -338,7 +338,7 @@ func TestObjectToStruct(t *testing.T) {
 }
 
 func TestObjectIsNull(t *testing.T) {
-	mapper, _ := jsonmapper.FromString(jsonObjectTest)
+	mapper, _ := jogson.FromString(jsonObjectTest)
 	object := mapper.AsObject
 
 	obj := object.GetObject("address")
@@ -346,29 +346,29 @@ func TestObjectIsNull(t *testing.T) {
 }
 
 func TestObjectPrintString(t *testing.T) {
-	mapper, err := jsonmapper.FromString(jsonObjectTest)
+	mapper, err := jogson.FromString(jsonObjectTest)
 	assert.NoError(t, err)
 	s := mapper.AsObject.String()
 	assert.Equal(t, `{"address":null,"age":15,"height":1.81,"is_funny":true,"name":"Jason"}`, s)
 }
 
 func TestObjectPrettyString(t *testing.T) {
-	mapper, err := jsonmapper.FromString(jsonObjectTest)
+	mapper, err := jogson.FromString(jsonObjectTest)
 	assert.NoError(t, err)
 	expectedStr := "{\n  \"address\": null,\n  \"age\": 15,\n  \"height\": 1.81,\n  \"is_funny\": true,\n  \"name\": \"Jason\"\n}"
 	assert.Equal(t, expectedStr, mapper.AsObject.PrettyString())
 }
 
 func TestElementNotFound(t *testing.T) {
-	mapper, err := jsonmapper.FromString(jsonObjectTest)
+	mapper, err := jogson.FromString(jsonObjectTest)
 	assert.NoError(t, err)
 	_ = mapper.AsObject.GetFloat("not found")
 	assert.Error(t, mapper.AsObject.LastError)
-	assert.ErrorIs(t, mapper.AsObject.LastError, jsonmapper.KeyNotFoundErr)
+	assert.ErrorIs(t, mapper.AsObject.LastError, jogson.KeyNotFoundErr)
 }
 
 func TestConvertKeysToSnakeCase(t *testing.T) {
-	mapper, err := jsonmapper.FromString(jsonObjectKeysPascalCaseTest)
+	mapper, err := jogson.FromString(jsonObjectKeysPascalCaseTest)
 	assert.NoError(t, err)
 	object := mapper.AsObject
 	snakeCase := object.TransformKeys(func(s string) string {

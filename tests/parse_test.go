@@ -6,12 +6,12 @@ import (
 	"testing"
 	"time"
 
-	"github.com/rmordechay/jsonmapper"
+	"github.com/rmordechay/jogson"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestParseJsonObjectFromString(t *testing.T) {
-	mapper, err := jsonmapper.FromString(jsonObjectTest)
+	mapper, err := jogson.FromString(jsonObjectTest)
 	assert.NoError(t, err)
 
 	actual := removeWhiteSpaces(mapper.AsObject.String())
@@ -20,14 +20,14 @@ func TestParseJsonObjectFromString(t *testing.T) {
 	assert.Contains(t, actual, `"age":15`)
 	assert.Contains(t, actual, `"name":"Jason"`)
 
-	obj, err := jsonmapper.NewObjectFromString(jsonObjectTest)
+	obj, err := jogson.NewObjectFromString(jsonObjectTest)
 	assert.NoError(t, err)
 	assert.Equal(t, 15, obj.GetInt("age"))
 	assert.Equal(t, "Jason", obj.GetString("name"))
 }
 
 func TestParseJsonArrayFromString(t *testing.T) {
-	mapper, err := jsonmapper.FromString(jsonObjectArrayTest)
+	mapper, err := jogson.FromString(jsonObjectArrayTest)
 	assert.NoError(t, err)
 
 	actual := removeWhiteSpaces(mapper.AsArray.String())
@@ -37,14 +37,14 @@ func TestParseJsonArrayFromString(t *testing.T) {
 	assert.Equal(t, expected, actual)
 	assert.Equal(t, mapper.AsArray.Length(), 2)
 
-	array, err := jsonmapper.NewArrayFromString(jsonObjectArrayTest)
+	array, err := jogson.NewArrayFromString(jsonObjectArrayTest)
 	assert.NoError(t, err)
 	assert.Equal(t, 2, array.Length())
 	assert.Equal(t, "Jason", array.GetObject(0).GetString("name"))
 }
 
 func TestParseJsonArrayFromStringWithNulls(t *testing.T) {
-	mapper, err := jsonmapper.FromString(jsonArrayWithNullTest)
+	mapper, err := jogson.FromString(jsonArrayWithNullTest)
 	assert.NoError(t, err)
 
 	actual := removeWhiteSpaces(mapper.AsArray.String())
@@ -54,14 +54,14 @@ func TestParseJsonArrayFromStringWithNulls(t *testing.T) {
 	assert.Equal(t, expected, actual)
 	assert.Equal(t, 4, mapper.AsArray.Length())
 
-	array, err := jsonmapper.NewArrayFromString(jsonArrayWithNullTest)
+	array, err := jogson.NewArrayFromString(jsonArrayWithNullTest)
 	assert.NoError(t, err)
 	assert.Equal(t, 4, array.Length())
 	assert.Equal(t, "string", array.GetString(2))
 }
 
 func TestParseJsonObjectFromBytes(t *testing.T) {
-	mapper, err := jsonmapper.FromBytes([]byte(jsonObjectTest))
+	mapper, err := jogson.FromBytes([]byte(jsonObjectTest))
 	assert.NoError(t, err)
 
 	actual := removeWhiteSpaces(mapper.AsObject.String())
@@ -70,14 +70,14 @@ func TestParseJsonObjectFromBytes(t *testing.T) {
 	assert.Contains(t, actual, `"age":15`)
 	assert.Contains(t, actual, `"name":"Jason"`)
 
-	obj, err := jsonmapper.NewObjectFromBytes([]byte(jsonObjectTest))
+	obj, err := jogson.NewObjectFromBytes([]byte(jsonObjectTest))
 	assert.NoError(t, err)
 	assert.Equal(t, 15, obj.GetInt("age"))
 	assert.Equal(t, "Jason", obj.GetString("name"))
 }
 
 func TestParseJsonArrayFromBytes(t *testing.T) {
-	mapper, err := jsonmapper.FromBytes([]byte(jsonObjectArrayTest))
+	mapper, err := jogson.FromBytes([]byte(jsonObjectArrayTest))
 	assert.NoError(t, err)
 
 	actual := removeWhiteSpaces(mapper.AsArray.String())
@@ -87,7 +87,7 @@ func TestParseJsonArrayFromBytes(t *testing.T) {
 	assert.Equal(t, expected, actual)
 	assert.Equal(t, mapper.AsArray.Length(), 2)
 
-	array, err := jsonmapper.NewArrayFromBytes([]byte(jsonObjectArrayTest))
+	array, err := jogson.NewArrayFromBytes([]byte(jsonObjectArrayTest))
 	assert.NoError(t, err)
 	assert.Equal(t, 2, array.Length())
 	assert.Equal(t, "Jason", array.GetObject(0).GetString("name"))
@@ -98,13 +98,13 @@ func TestParseJsonArrayFromStruct(t *testing.T) {
 		Name string `json:"name"`
 		Age  int    `json:"Age"`
 	}{"John", 15}
-	mapper, err := jsonmapper.FromStruct(testStruct)
+	mapper, err := jogson.FromStruct(testStruct)
 	assert.NoError(t, err)
 	assert.True(t, mapper.IsObject)
 	assert.Equal(t, "John", mapper.AsObject.GetString("name"))
 	assert.Equal(t, 15, mapper.AsObject.GetInt("Age"))
 
-	obj, err := jsonmapper.NewObjectFromStruct(testStruct)
+	obj, err := jogson.NewObjectFromStruct(testStruct)
 	assert.NoError(t, err)
 	assert.Equal(t, 15, obj.GetInt("Age"))
 	assert.Equal(t, "John", obj.GetString("name"))
@@ -127,7 +127,7 @@ type personTest struct {
 
 func TestParseJsonArrayFromStruct2(t *testing.T) {
 	person := getTestPerson()
-	mapper, err := jsonmapper.FromStruct(person)
+	mapper, err := jogson.FromStruct(person)
 	assert.NoError(t, err)
 	getTime := mapper.AsObject.GetTime("Birthday")
 	expectedBirthday, _ := time.Parse(time.DateOnly, "1981-05-30")
@@ -139,7 +139,7 @@ func TestParseJsonArrayFromStruct2(t *testing.T) {
 	assert.Equal(t, 1.85, mapper.AsObject.GetFloat("Height"))
 	assert.Equal(t, true, mapper.AsObject.GetBool("IsFunny"))
 
-	obj, err := jsonmapper.NewObjectFromStruct(person)
+	obj, err := jogson.NewObjectFromStruct(person)
 	assert.NoError(t, err)
 
 	assert.Equal(t, 45, obj.GetInt("Age"))
@@ -152,7 +152,7 @@ func TestParseJsonArrayFromStruct2(t *testing.T) {
 
 func TestParseJsonObjectFromFile(t *testing.T) {
 	path := "files/test_object.json"
-	mapper, err := jsonmapper.FromFile(path)
+	mapper, err := jogson.FromFile(path)
 	assert.NoError(t, err)
 
 	actual := removeWhiteSpaces(mapper.AsObject.String())
@@ -164,7 +164,7 @@ func TestParseJsonObjectFromFile(t *testing.T) {
 	assert.Equal(t, expected, actual)
 	assert.Equal(t, 43, mapper.AsObject.GetInt("age"))
 
-	obj, err := jsonmapper.NewObjectFromFile(path)
+	obj, err := jogson.NewObjectFromFile(path)
 	assert.NoError(t, err)
 	assert.True(t, mapper.IsObject)
 	assert.Equal(t, expected, removeWhiteSpaces(obj.String()))
@@ -173,7 +173,7 @@ func TestParseJsonObjectFromFile(t *testing.T) {
 
 func TestParseJsonArrayFromFile(t *testing.T) {
 	path := "files/test_array.json"
-	mapper, err := jsonmapper.FromFile(path)
+	mapper, err := jogson.FromFile(path)
 	assert.NoError(t, err)
 
 	actual := removeWhiteSpaces(mapper.AsArray.String())
@@ -185,42 +185,42 @@ func TestParseJsonArrayFromFile(t *testing.T) {
 	assert.Equal(t, expected, actual)
 	assert.Equal(t, mapper.AsArray.Length(), 2)
 
-	array, err := jsonmapper.NewArrayFromFile(path)
+	array, err := jogson.NewArrayFromFile(path)
 	assert.NoError(t, err)
 	assert.Equal(t, expected, removeWhiteSpaces(array.String()))
 	assert.Equal(t, array.Length(), 2)
 }
 
 func TestParseOnlyString(t *testing.T) {
-	mapper, err := jsonmapper.FromString(jsonOnlyStringTest)
+	mapper, err := jogson.FromString(jsonOnlyStringTest)
 	assert.NoError(t, err)
 	assert.True(t, mapper.IsString)
 	assert.Equal(t, "test", mapper.AsString)
 }
 
 func TestParseOnlyInt(t *testing.T) {
-	mapper, err := jsonmapper.FromString(jsonOnlyIntTest)
+	mapper, err := jogson.FromString(jsonOnlyIntTest)
 	assert.NoError(t, err)
 	assert.True(t, mapper.IsInt)
 	assert.Equal(t, 56, mapper.AsInt)
 }
 
 func TestParseOnlyFloat(t *testing.T) {
-	mapper, err := jsonmapper.FromString(jsonOnlyFloatTest)
+	mapper, err := jogson.FromString(jsonOnlyFloatTest)
 	assert.NoError(t, err)
 	assert.True(t, mapper.IsFloat)
 	assert.Equal(t, 1.2, mapper.AsFloat)
 }
 
 func TestParseOnlyBool(t *testing.T) {
-	mapper, err := jsonmapper.FromString(jsonOnlyBoolTest)
+	mapper, err := jogson.FromString(jsonOnlyBoolTest)
 	assert.NoError(t, err)
 	assert.True(t, mapper.IsBool)
 	assert.Equal(t, true, mapper.AsBool)
 }
 
 func TestParseOnlyNull(t *testing.T) {
-	mapper, err := jsonmapper.FromString(jsonOnlyNullTest)
+	mapper, err := jogson.FromString(jsonOnlyNullTest)
 	assert.NoError(t, err)
 	assert.True(t, mapper.IsNull)
 }

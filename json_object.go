@@ -1,4 +1,4 @@
-package jsonmapper
+package jogson
 
 import (
 	"os"

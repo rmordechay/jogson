@@ -1,4 +1,4 @@
-module github.com/rmordechay/jsonmapper
+module github.com/rmordechay/jogson
 
 require (
 	github.com/google/uuid v1.6.0
