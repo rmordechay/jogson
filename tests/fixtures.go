@@ -32,3 +32,5 @@ const jsonObjectOnlyStringWithNullTest = `{"first": "string1", "second": "string
 const jsonObjectOnlyIntWithNullTest = `{"first": 1, "second": 3, "third": 54, "fourth": null}`
 const jsonObjectOnlyFloatWithNullTest = `{"first": 5.3, "second": 1.4, "third": -0.3, "fourth": null}`
 const jsonUUIDTest = `{"uuid": "870fb3fd-d177-4ac4-a648-a33afd5ab288"}`
+const jsonInvalidObjectTest = `{"uuid: "870fb3fd-d177-4ac4-a648-a33afd5ab288"}`
+const jsonInvalidArrayTest = `["uuid, "870fb3fd-d177-4ac4-a648-a33afd5ab288"]`

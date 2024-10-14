@@ -4,13 +4,14 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/google/uuid"
 	"io"
 	"os"
 	"strconv"
 	"strings"
 	"sync"
 	"time"
+
+	"github.com/google/uuid"
 )
 
 const bufferSize = 4096
@@ -122,8 +123,7 @@ func FromBuffer(reader io.Reader) (JsonMapper, error) {
 	return m, nil
 }
 
-// AsTime attempts to convert the JSON value to a time.Time object.
-// Only works if the JSON value is a string and can be parsed as a valid time.
+// AsTime retrieves the value as uuid.UUID. Works only if the JSON value is a string.
 func (m *JsonMapper) AsTime() (time.Time, error) {
 	if !m.IsString {
 		return time.Time{}, TimeTypeConversionErr
@@ -137,6 +137,7 @@ func (m *JsonMapper) AsTime() (time.Time, error) {
 	return time.Time{}, createNewInvalidTimeErr(m.AsString)
 }
 
+// AsUUID retrieves the value as uuid.UUID. Works only if the JSON value is a string.
 func (m *JsonMapper) AsUUID() (uuid.UUID, error) {
 	if !m.IsString {
 		return uuid.Nil, nil
@@ -191,26 +192,6 @@ func (m *JsonMapper) ProcessObjects(numberOfWorkers int, f func(o JsonObject)) e
 	return m.ProcessObjectsWithArgs(numberOfWorkers, func(o JsonObject, args ...any) {
 		f(o)
 	})
-}
-
-func (m *JsonMapper) Read(p []byte) (n int, err error) {
-	m.lastRead = 0
-	if len(m.buffer) <= m.offset {
-		// Buffer is empty, resetBuffer to recover space.
-		m.buffer = m.buffer[:0]
-		m.offset = 0
-		m.lastRead = 0
-		if len(p) == 0 {
-			return 0, nil
-		}
-		return 0, io.EOF
-	}
-	n = copy(p, m.buffer[m.offset:])
-	m.offset += n
-	if n > 0 {
-		m.lastRead = -1
-	}
-	return n, nil
 }
 
 // PrettyString returns a valid, pretty JSON string representation of the JsonMapper underlying value.

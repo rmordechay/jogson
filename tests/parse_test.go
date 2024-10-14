@@ -1,12 +1,13 @@
 package tests
 
 import (
-	"github.com/rmordechay/jsonmapper"
-	"github.com/stretchr/testify/assert"
 	"os"
 	"strings"
 	"testing"
 	"time"
+
+	"github.com/rmordechay/jsonmapper"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestParseJsonObjectFromString(t *testing.T) {
@@ -109,45 +110,32 @@ func TestParseJsonArrayFromStruct(t *testing.T) {
 	assert.Equal(t, "John", obj.GetString("name"))
 }
 
-func TestParseJsonArrayFromStruct2(t *testing.T) {
-	type childTest struct {
-		Age     int
-		IsFunny bool
-	}
+type childTest struct {
+	Age     int
+	IsFunny bool
+}
 
-	type personTest struct {
-		Name     string
-		Age      int
-		Height   float64
-		IsFunny  bool
-		Birthday time.Time
-		Features []string
-		Children map[string]childTest
-	}
-	child1 := childTest{Age: 17, IsFunny: false}
-	child2 := childTest{Age: 23, IsFunny: true}
-	children := make(map[string]childTest)
-	children["Rachel"] = child1
-	children["Sara"] = child2
-	birthday, _ := time.Parse(time.DateOnly, "1981-05-30")
-	person := personTest{
-		Name:     "Chris",
-		Age:      45,
-		Height:   1.85,
-		IsFunny:  true,
-		Birthday: birthday,
-		Features: []string{"tall", "blue eyes"},
-		Children: children,
-	}
+type personTest struct {
+	Name     string
+	Age      int
+	Height   float64
+	IsFunny  bool
+	Birthday time.Time
+	Features []string
+	Children map[string]childTest
+}
+
+func TestParseJsonArrayFromStruct2(t *testing.T) {
+	person := getTestPerson()
 	mapper, err := jsonmapper.FromStruct(person)
 	assert.NoError(t, err)
-	assert.NotNil(t, mapper)
 	getTime := mapper.AsObject.GetTime("Birthday")
+	expectedBirthday, _ := time.Parse(time.DateOnly, "1981-05-30")
 
 	assert.Equal(t, 45, mapper.AsObject.GetInt("Age"))
 	assert.Equal(t, "1981-05-30T00:00:00Z", mapper.AsObject.GetString("Birthday"))
 	assert.NoError(t, mapper.AsObject.LastError)
-	assert.Equal(t, birthday, getTime)
+	assert.Equal(t, expectedBirthday, getTime)
 	assert.Equal(t, 1.85, mapper.AsObject.GetFloat("Height"))
 	assert.Equal(t, true, mapper.AsObject.GetBool("IsFunny"))
 
@@ -157,7 +145,7 @@ func TestParseJsonArrayFromStruct2(t *testing.T) {
 	assert.Equal(t, 45, obj.GetInt("Age"))
 	assert.Equal(t, "1981-05-30T00:00:00Z", obj.GetString("Birthday"))
 	assert.NoError(t, obj.LastError)
-	assert.Equal(t, birthday, getTime)
+	assert.Equal(t, expectedBirthday, getTime)
 	assert.Equal(t, 1.85, obj.GetFloat("Height"))
 	assert.Equal(t, true, obj.GetBool("IsFunny"))
 }
@@ -241,4 +229,22 @@ func removeWhiteSpaces(data string) string {
 	s := strings.ReplaceAll(data, " ", "")
 	s = strings.ReplaceAll(s, "\n", "")
 	return s
+}
+
+func getTestPerson() personTest {
+	child1 := childTest{Age: 17, IsFunny: false}
+	child2 := childTest{Age: 23, IsFunny: true}
+	children := make(map[string]childTest)
+	children["Rachel"] = child1
+	children["Sara"] = child2
+	birthday, _ := time.Parse(time.DateOnly, "1981-05-30")
+	return personTest{
+		Name:     "Chris",
+		Age:      45,
+		Height:   1.85,
+		IsFunny:  true,
+		Birthday: birthday,
+		Features: []string{"tall", "blue eyes"},
+		Children: children,
+	}
 }

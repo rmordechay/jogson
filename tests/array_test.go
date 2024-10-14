@@ -1,11 +1,12 @@
 package tests
 
 import (
-	"github.com/rmordechay/jsonmapper"
-	"github.com/stretchr/testify/assert"
 	"math"
 	"testing"
 	"time"
+
+	"github.com/rmordechay/jsonmapper"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestArrayAsStringArray(t *testing.T) {
@@ -306,7 +307,7 @@ func TestArrayGetTime(t *testing.T) {
 	assert.Equal(t, expectedTime3, actualTime3)
 }
 
-func TestArrayString(t *testing.T) {
+func TestArrayPrintString(t *testing.T) {
 	mapper, err := jsonmapper.FromString(jsonObjectArrayTest)
 	assert.NoError(t, err)
 	s := mapper.AsArray.String()

@@ -1,6 +1,7 @@
 # JSON Mapper Library for Go
 
 [![GoDoc](https://pkg.go.dev/badge/badge)](https://pkg.go.dev/github.com/rmordechay/jsonmapper)
+[![Go Report Card](https://goreportcard.com/badge/github.com/rmordechay/jsonmapper)](https://goreportcard.com/report/github.com/rmordechay/jsonmapper)
 
 A simple Go library to simplify working with JSON without the need to define structs.
 

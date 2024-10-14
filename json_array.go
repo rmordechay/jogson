@@ -1,9 +1,10 @@
 package jsonmapper
 
 import (
-	"github.com/google/uuid"
 	"os"
 	"time"
+
+	"github.com/google/uuid"
 )
 
 // JsonArray represents a JSON array
@@ -17,7 +18,7 @@ func NewArrayFromBytes(data []byte) (*JsonArray, error) {
 	jsonArray := EmptyArray()
 	err := unmarshal(data, &jsonArray.elements)
 	if err != nil {
-		return EmptyArray(), err
+		return &JsonArray{}, err
 	}
 	return jsonArray, nil
 }
@@ -26,7 +27,7 @@ func NewArrayFromBytes(data []byte) (*JsonArray, error) {
 func NewArrayFromFile(path string) (*JsonArray, error) {
 	file, err := os.ReadFile(path)
 	if err != nil {
-		return EmptyArray(), err
+		return &JsonArray{}, err
 	}
 	return NewArrayFromBytes(file)
 }
@@ -181,9 +182,9 @@ func (a *JsonArray) GetString(i int) string {
 	return getArrayScalar(a, convertAnyToString, i)
 }
 
-// GetStringN is the nullable version of GetString, and returns a pointer instead value which
-// imitates JSON's null as Go's nil. A nil pointer is returned if the index is out of bounds, it is null or
-// could not be converted to string. The type of error will be stored in LastError.
+// GetStringN is the nullable version of GetString, and returns a pointer instead of a zero value which
+// imitates JSON's null as Go's nil. A nil pointer is returned if the index is out of bounds,
+// it is null or could not be converted to string. The type of the error will be stored in LastError.
 func (a *JsonArray) GetStringN(i int) *string {
 	return getArrayScalarN(a, convertAnyToStringN, i)
 }
@@ -196,9 +197,9 @@ func (a *JsonArray) GetInt(i int) int {
 	return getArrayScalar(a, convertAnyToInt, i)
 }
 
-// GetIntN is the nullable version of GetInt, and returns a pointer instead value which
-// imitates JSON's null as Go's nil. A nil pointer is returned if the index is out of bounds found, it is null or
-// could not be converted to int. The type of error will be stored in LastError.
+// GetIntN is the nullable version of GetInt, and returns a pointer instead of a zero value which
+// imitates JSON's null as Go's nil. A nil pointer is returned if the index is out of bounds found,
+// it is null or could not be converted to int. The type of the error will be stored in LastError.
 func (a *JsonArray) GetIntN(i int) *int {
 	return getArrayScalarN(a, convertAnyToIntN, i)
 }
@@ -211,9 +212,9 @@ func (a *JsonArray) GetFloat(i int) float64 {
 	return getArrayScalar(a, convertAnyToFloat, i)
 }
 
-// GetFloatN is the nullable version of GetFloat, and returns a pointer instead value which
-// imitates JSON's null as Go's nil. A nil pointer is returned if the index is out of bounds it is null or
-// could not be converted to float64. The type of error will be stored in LastError.
+// GetFloatN is the nullable version of GetFloat, and returns a pointer instead of a zero value which
+// imitates JSON's null as Go's nil. A nil pointer is returned if the index is out of bounds
+// it is null or could not be converted to float64. The type of the error will be stored in LastError.
 func (a *JsonArray) GetFloatN(i int) *float64 {
 	return getArrayScalarN(a, convertAnyToFloatN, i)
 }
@@ -226,9 +227,9 @@ func (a *JsonArray) GetBool(i int) bool {
 	return getArrayScalar(a, convertAnyToBool, i)
 }
 
-// GetBoolN is the nullable version of GetBool, and returns a pointer instead value which
-// imitates JSON's null as Go's nil. A nil pointer is returned index is out of bounds found, it is null or
-// could not be converted to bool. The type of error will be stored in LastError.
+// GetBoolN is the nullable version of GetBool, and returns a pointer instead of a zero value which
+// imitates JSON's null as Go's nil. A nil pointer is returned index is out of bounds found,
+// it is null or could not be converted to bool. The type of the error will be stored in LastError.
 func (a *JsonArray) GetBoolN(i int) *bool {
 	return getArrayScalarN(a, convertAnyToBoolN, i)
 }
@@ -436,11 +437,6 @@ func (a *JsonArray) Any() bool {
 	return false
 }
 
-// SetLastError sets the last error encountered in the JsonArray.
-func (a *JsonArray) setLastError(err error) {
-	a.LastError = err
-}
-
 // PrettyString returns a pretty-printed string representation of the JsonArray.
 func (a *JsonArray) PrettyString() string {
 	jsonBytes, _ := marshalIndent(a.elements)
@@ -451,6 +447,11 @@ func (a *JsonArray) PrettyString() string {
 func (a *JsonArray) String() string {
 	jsonBytes, _ := marshal(a.elements)
 	return string(jsonBytes)
+}
+
+// SetLastError sets the last error encountered in the JsonArray.
+func (a *JsonArray) setLastError(err error) {
+	a.LastError = err
 }
 
 // newArrayFromSlice initializes and returns a new instance of JsonArray.

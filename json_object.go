@@ -1,9 +1,10 @@
 package jsonmapper
 
 import (
-	"github.com/google/uuid"
 	"os"
 	"time"
+
+	"github.com/google/uuid"
 )
 
 // JsonObject represents a JSON object
@@ -169,7 +170,7 @@ func (o *JsonObject) GetString(key string) string {
 
 // GetStringN is the nullable version of GetString, and returns a pointer instead of a zero value which
 // imitates JSON's null as Go's nil. A nil pointer is returned if the key was not found, it is null or
-// could not be converted to string. The type of error will be stored in LastError.
+// could not be converted to string. The type of the error will be stored in LastError.
 func (o *JsonObject) GetStringN(key string) *string {
 	return getObjectScalarN(o, convertAnyToStringN, key)
 }
@@ -184,7 +185,7 @@ func (o *JsonObject) GetInt(key string) int {
 
 // GetIntN is the nullable version of GetInt, and returns a pointer instead of a zero value which
 // imitates JSON's null as Go's nil. A nil pointer is returned if the key was not found, it is null or
-// could not be converted to int. The type of error will be stored in LastError.
+// could not be converted to int. The type of the error will be stored in LastError.
 func (o *JsonObject) GetIntN(key string) *int {
 	return getObjectScalarN(o, convertAnyToIntN, key)
 }
@@ -199,7 +200,7 @@ func (o *JsonObject) GetFloat(key string) float64 {
 
 // GetFloatN is the nullable version of GetFloat, and returns a pointer instead of a zero value which
 // imitates JSON's null as Go's nil. A nil pointer is returned if the key was not found, it is null or
-// could not be converted to float64. The type of error will be stored in LastError.
+// could not be converted to float64. The type of the error will be stored in LastError.
 func (o *JsonObject) GetFloatN(key string) *float64 {
 	return getObjectScalarN(o, convertAnyToFloatN, key)
 }
@@ -214,7 +215,7 @@ func (o *JsonObject) GetBool(key string) bool {
 
 // GetBoolN is the nullable version of GetBool, and returns a pointer instead of a zero value which
 // imitates JSON's null as Go's nil. A nil pointer is returned if the key was not found, it is null or
-// could not be converted to bool. The type of error will be stored in LastError.
+// could not be converted to bool. The type of the error will be stored in LastError.
 func (o *JsonObject) GetBoolN(key string) *bool {
 	return getObjectScalarN(o, convertAnyToBoolN, key)
 }
@@ -231,6 +232,20 @@ func (o *JsonObject) GetTime(key string) time.Time {
 // In case of an error, the zero value will be returned.
 func (o *JsonObject) GetUUID(key string) uuid.UUID {
 	return getObjectScalar(o, parseUUID, key)
+}
+
+// ToStruct converts the JsonObject to the type v.
+func (o *JsonObject) ToStruct(v any) {
+	bytes, err := marshal(o.object)
+	if err != nil {
+		o.setLastError(err)
+		return
+	}
+	err = unmarshal(bytes, &v)
+	if err != nil {
+		o.setLastError(err)
+		return
+	}
 }
 
 // GetObject retrieves a nested JsonObject associated with the specified key.

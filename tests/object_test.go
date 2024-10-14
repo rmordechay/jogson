@@ -1,10 +1,11 @@
 package tests
 
 import (
-	"github.com/rmordechay/jsonmapper"
-	"github.com/stretchr/testify/assert"
 	"testing"
 	"time"
+
+	"github.com/rmordechay/jsonmapper"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestObjectGetKeys(t *testing.T) {
@@ -323,7 +324,16 @@ func TestObjectGetUUID(t *testing.T) {
 	uuid, err := mapper.AsObject.Get("uuid").AsUUID()
 	assert.NoError(t, err)
 	assert.Equal(t, "870fb3fd-d177-4ac4-a648-a33afd5ab288", uuid.String())
+}
 
+func TestObjectToStruct(t *testing.T) {
+	expectedPerson := getTestPerson()
+	obj, err := jsonmapper.NewObjectFromStruct(expectedPerson)
+	assert.NoError(t, err)
+	actualPerson := personTest{}
+	assert.NotEqual(t, expectedPerson, actualPerson)
+	obj.ToStruct(&actualPerson)
+	assert.Equal(t, expectedPerson, actualPerson)
 }
 
 func TestObjectIsNull(t *testing.T) {
@@ -334,7 +344,7 @@ func TestObjectIsNull(t *testing.T) {
 	assert.True(t, obj.IsNull())
 }
 
-func TestObjectString(t *testing.T) {
+func TestObjectPrintString(t *testing.T) {
 	mapper, err := jsonmapper.FromString(jsonObjectTest)
 	assert.NoError(t, err)
 	s := mapper.AsObject.String()

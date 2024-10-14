@@ -3,13 +3,14 @@ package tests
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/rmordechay/jsonmapper"
-	"github.com/stretchr/testify/assert"
 	"math/rand"
 	"strings"
 	"sync"
 	"testing"
 	"time"
+
+	"github.com/rmordechay/jsonmapper"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestParseTimeInvalid(t *testing.T) {
@@ -31,6 +32,26 @@ func TestMapperString(t *testing.T) {
 	assert.NoError(t, err)
 	expectedArray := `[{"name":"Jason"},{"name":"Chris"}]`
 	assert.Equal(t, expectedArray, mapper.String())
+
+	mapper, err = jsonmapper.FromString(jsonOnlyStringTest)
+	assert.NoError(t, err)
+	assert.Equal(t, "test", mapper.String())
+
+	mapper, err = jsonmapper.FromString(jsonOnlyIntTest)
+	assert.NoError(t, err)
+	assert.Equal(t, "56", mapper.String())
+
+	mapper, err = jsonmapper.FromString(jsonOnlyFloatTest)
+	assert.NoError(t, err)
+	assert.Equal(t, "1.2", mapper.String())
+
+	mapper, err = jsonmapper.FromString(jsonOnlyBoolTest)
+	assert.NoError(t, err)
+	assert.Equal(t, "true", mapper.String())
+
+	mapper, err = jsonmapper.FromString(jsonOnlyNullTest)
+	assert.NoError(t, err)
+	assert.True(t, mapper.IsNull)
 }
 
 func TestMapperPrettyString(t *testing.T) {
@@ -43,6 +64,26 @@ func TestMapperPrettyString(t *testing.T) {
 	assert.NoError(t, err)
 	expectedArrayStr := "[\n  {\n    \"name\": \"Jason\"\n  },\n  {\n    \"name\": \"Chris\"\n  }\n]"
 	assert.Equal(t, expectedArrayStr, mapper.PrettyString())
+
+	mapper, err = jsonmapper.FromString(jsonOnlyStringTest)
+	assert.NoError(t, err)
+	assert.Equal(t, "test", mapper.PrettyString())
+
+	mapper, err = jsonmapper.FromString(jsonOnlyIntTest)
+	assert.NoError(t, err)
+	assert.Equal(t, "56", mapper.PrettyString())
+
+	mapper, err = jsonmapper.FromString(jsonOnlyFloatTest)
+	assert.NoError(t, err)
+	assert.Equal(t, "1.2", mapper.PrettyString())
+
+	mapper, err = jsonmapper.FromString(jsonOnlyBoolTest)
+	assert.NoError(t, err)
+	assert.Equal(t, "true", mapper.PrettyString())
+
+	mapper, err = jsonmapper.FromString(jsonOnlyNullTest)
+	assert.NoError(t, err)
+	assert.True(t, mapper.IsNull)
 }
 
 func TestProcessObjects(t *testing.T) {
@@ -60,20 +101,6 @@ func TestProcessObjects(t *testing.T) {
 	assert.Equal(t, n, c)
 }
 
-func worker(o jsonmapper.JsonObject, args ...any) {
-	c, ok := args[0].(*int)
-	if !ok {
-		return
-	}
-	mu, ok := args[1].(*sync.Mutex)
-	if !ok {
-		return
-	}
-	mu.Lock()
-	*c += 1
-	mu.Unlock()
-}
-
 func TestProcessObjectsWithArgs(t *testing.T) {
 	n := 1000
 	array, _ := generateJSONArray(n)
@@ -83,6 +110,20 @@ func TestProcessObjectsWithArgs(t *testing.T) {
 	err := mapper.ProcessObjectsWithArgs(10, worker, &c, &mu)
 	assert.NoError(t, err)
 	assert.Equal(t, n, c)
+}
+
+func TestJsonInvalid(t *testing.T) {
+	mapper, err := jsonmapper.FromString(jsonInvalidObjectTest)
+	assert.Zero(t, mapper)
+	assert.Error(t, err)
+
+	obj, err := jsonmapper.NewObjectFromString(jsonInvalidObjectTest)
+	assert.Zero(t, obj)
+	assert.Error(t, err)
+
+	arr, err := jsonmapper.NewArrayFromString(jsonInvalidArrayTest)
+	assert.Empty(t, arr)
+	assert.Error(t, err)
 }
 
 func TestExample(t *testing.T) {
@@ -113,4 +154,18 @@ func generateJSONArray(n int) (string, error) {
 	}
 
 	return string(jsonData), nil
+}
+
+func worker(o jsonmapper.JsonObject, args ...any) {
+	c, ok := args[0].(*int)
+	if !ok {
+		return
+	}
+	mu, ok := args[1].(*sync.Mutex)
+	if !ok {
+		return
+	}
+	mu.Lock()
+	*c += 1
+	mu.Unlock()
 }
