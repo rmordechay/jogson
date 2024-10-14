@@ -10,7 +10,7 @@ import (
 )
 
 func TestObjectGetKeys(t *testing.T) {
-	mapper, err := jogson.FromString(jsonObjectTest)
+	mapper, err := jogson.NewMapperFromString(jsonObjectTest)
 	assert.NoError(t, err)
 	keys := mapper.AsObject.Keys()
 	assert.Equal(t, 5, len(keys))
@@ -20,7 +20,7 @@ func TestObjectGetKeys(t *testing.T) {
 }
 
 func TestObjectGetValues(t *testing.T) {
-	mapper, err := jogson.FromString(jsonObjectTest)
+	mapper, err := jogson.NewMapperFromString(jsonObjectTest)
 	assert.NoError(t, err)
 	values := mapper.AsObject.Values()
 	assert.Equal(t, 5, len(values))
@@ -99,7 +99,7 @@ func TestObjectAsFloatMapNullable(t *testing.T) {
 }
 
 func TestObjectGetMapper(t *testing.T) {
-	mapper, _ := jogson.FromString(jsonObjectTest)
+	mapper, _ := jogson.NewMapperFromString(jsonObjectTest)
 	array := mapper.AsObject
 
 	elementMapper := array.Get("name")
@@ -132,7 +132,7 @@ func TestObjectGetMapper(t *testing.T) {
 }
 
 func TestObjectGetString(t *testing.T) {
-	mapper, _ := jogson.FromString(jsonObjectTest)
+	mapper, _ := jogson.NewMapperFromString(jsonObjectTest)
 	object := mapper.AsObject
 
 	s := object.GetString("name")
@@ -153,7 +153,7 @@ func TestObjectGetString(t *testing.T) {
 }
 
 func TestObjectGetStringFails(t *testing.T) {
-	mapper, _ := jogson.FromString(jsonObjectTest)
+	mapper, _ := jogson.NewMapperFromString(jsonObjectTest)
 	object := mapper.AsObject
 
 	s := object.GetString("not found")
@@ -166,7 +166,7 @@ func TestObjectGetStringFails(t *testing.T) {
 }
 
 func TestObjectGetInt(t *testing.T) {
-	mapper, _ := jogson.FromString(jsonObjectTest)
+	mapper, _ := jogson.NewMapperFromString(jsonObjectTest)
 	object := mapper.AsObject
 
 	i := object.GetInt("age")
@@ -179,7 +179,7 @@ func TestObjectGetInt(t *testing.T) {
 }
 
 func TestObjectGetIntFails(t *testing.T) {
-	mapper, _ := jogson.FromString(jsonObjectTest)
+	mapper, _ := jogson.NewMapperFromString(jsonObjectTest)
 	object := mapper.AsObject
 
 	i := object.GetInt("not found")
@@ -196,7 +196,7 @@ func TestObjectGetIntFails(t *testing.T) {
 }
 
 func TestObjectGetFloat(t *testing.T) {
-	mapper, _ := jogson.FromString(jsonObjectTest)
+	mapper, _ := jogson.NewMapperFromString(jsonObjectTest)
 	object := mapper.AsObject
 
 	f := object.GetFloat("age")
@@ -209,7 +209,7 @@ func TestObjectGetFloat(t *testing.T) {
 }
 
 func TestObjectGetFloatFails(t *testing.T) {
-	mapper, _ := jogson.FromString(jsonObjectTest)
+	mapper, _ := jogson.NewMapperFromString(jsonObjectTest)
 	object := mapper.AsObject
 
 	f := object.GetFloat("not found")
@@ -226,7 +226,7 @@ func TestObjectGetFloatFails(t *testing.T) {
 }
 
 func TestObjectGetBool(t *testing.T) {
-	mapper, _ := jogson.FromString(jsonObjectTest)
+	mapper, _ := jogson.NewMapperFromString(jsonObjectTest)
 	object := mapper.AsObject
 
 	b := object.GetBool("is_funny")
@@ -235,7 +235,7 @@ func TestObjectGetBool(t *testing.T) {
 }
 
 func TestObjectGetBoolFails(t *testing.T) {
-	mapper, _ := jogson.FromString(jsonObjectTest)
+	mapper, _ := jogson.NewMapperFromString(jsonObjectTest)
 	object := mapper.AsObject
 
 	b := object.GetBool("not found")
@@ -252,7 +252,7 @@ func TestObjectGetBoolFails(t *testing.T) {
 }
 
 func TestObjectGetArray(t *testing.T) {
-	mapper, _ := jogson.FromString(jsonObjectWithArrayTest)
+	mapper, _ := jogson.NewMapperFromString(jsonObjectWithArrayTest)
 	object := mapper.AsObject
 
 	array := object.GetArray("names")
@@ -260,7 +260,7 @@ func TestObjectGetArray(t *testing.T) {
 }
 
 func TestObjectGetArrayFails(t *testing.T) {
-	mapper, _ := jogson.FromString(jsonObjectWithArrayTest)
+	mapper, _ := jogson.NewMapperFromString(jsonObjectWithArrayTest)
 	object := mapper.AsObject
 
 	arr := object.GetArray("not found")
@@ -277,7 +277,7 @@ func TestObjectGetArrayFails(t *testing.T) {
 }
 
 func TestObjectGetObject(t *testing.T) {
-	mapper, _ := jogson.FromString(jsonObjectNestedArrayTest)
+	mapper, _ := jogson.NewMapperFromString(jsonObjectNestedArrayTest)
 	object := mapper.AsObject
 
 	obj := object.GetObject("personTest")
@@ -285,7 +285,7 @@ func TestObjectGetObject(t *testing.T) {
 }
 
 func TestObjectGetObjectFails(t *testing.T) {
-	mapper, _ := jogson.FromString(jsonObjectTest)
+	mapper, _ := jogson.NewMapperFromString(jsonObjectTest)
 	object := mapper.AsObject
 
 	obj := object.GetObject("not found")
@@ -302,7 +302,7 @@ func TestObjectGetObjectFails(t *testing.T) {
 }
 
 func TestObjectGetTime(t *testing.T) {
-	mapper, err := jogson.FromString(jsonObjectTimeTest)
+	mapper, err := jogson.NewMapperFromString(jsonObjectTimeTest)
 	assert.NoError(t, err)
 	object := mapper.AsObject
 	actualTime1 := object.GetTime("time1")
@@ -320,7 +320,7 @@ func TestObjectGetTime(t *testing.T) {
 }
 
 func TestObjectGetUUID(t *testing.T) {
-	mapper, err := jogson.FromString(jsonUUIDTest)
+	mapper, err := jogson.NewMapperFromString(jsonUUIDTest)
 	assert.NoError(t, err)
 	uuid, err := mapper.AsObject.Get("uuid").AsUUID()
 	assert.NoError(t, err)
@@ -338,7 +338,7 @@ func TestObjectToStruct(t *testing.T) {
 }
 
 func TestObjectIsNull(t *testing.T) {
-	mapper, _ := jogson.FromString(jsonObjectTest)
+	mapper, _ := jogson.NewMapperFromString(jsonObjectTest)
 	object := mapper.AsObject
 
 	obj := object.GetObject("address")
@@ -346,21 +346,21 @@ func TestObjectIsNull(t *testing.T) {
 }
 
 func TestObjectPrintString(t *testing.T) {
-	mapper, err := jogson.FromString(jsonObjectTest)
+	mapper, err := jogson.NewMapperFromString(jsonObjectTest)
 	assert.NoError(t, err)
 	s := mapper.AsObject.String()
 	assert.Equal(t, `{"address":null,"age":15,"height":1.81,"is_funny":true,"name":"Jason"}`, s)
 }
 
 func TestObjectPrettyString(t *testing.T) {
-	mapper, err := jogson.FromString(jsonObjectTest)
+	mapper, err := jogson.NewMapperFromString(jsonObjectTest)
 	assert.NoError(t, err)
 	expectedStr := "{\n  \"address\": null,\n  \"age\": 15,\n  \"height\": 1.81,\n  \"is_funny\": true,\n  \"name\": \"Jason\"\n}"
 	assert.Equal(t, expectedStr, mapper.AsObject.PrettyString())
 }
 
 func TestElementNotFound(t *testing.T) {
-	mapper, err := jogson.FromString(jsonObjectTest)
+	mapper, err := jogson.NewMapperFromString(jsonObjectTest)
 	assert.NoError(t, err)
 	_ = mapper.AsObject.GetFloat("not found")
 	assert.Error(t, mapper.AsObject.LastError)
@@ -368,7 +368,7 @@ func TestElementNotFound(t *testing.T) {
 }
 
 func TestConvertKeysToSnakeCase(t *testing.T) {
-	mapper, err := jogson.FromString(jsonObjectKeysPascalCaseTest)
+	mapper, err := jogson.NewMapperFromString(jsonObjectKeysPascalCaseTest)
 	assert.NoError(t, err)
 	object := mapper.AsObject
 	snakeCase := object.TransformKeys(func(s string) string {

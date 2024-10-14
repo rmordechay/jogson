@@ -14,7 +14,7 @@ import (
 )
 
 func TestParseTimeInvalid(t *testing.T) {
-	mapper, err := jogson.FromString(jsonInvalidTimeTest)
+	mapper, err := jogson.NewMapperFromString(jsonInvalidTimeTest)
 	assert.NoError(t, err)
 	for _, v := range mapper.AsObject.Elements() {
 		_, err = v.AsTime()
@@ -23,65 +23,65 @@ func TestParseTimeInvalid(t *testing.T) {
 }
 
 func TestMapperString(t *testing.T) {
-	mapper, err := jogson.FromString(jsonObjectTest)
+	mapper, err := jogson.NewMapperFromString(jsonObjectTest)
 	assert.NoError(t, err)
 	expectedObj := `{"address":null,"age":15,"height":1.81,"is_funny":true,"name":"Jason"}`
 	assert.Equal(t, expectedObj, mapper.String())
 
-	mapper, err = jogson.FromString(jsonObjectArrayTest)
+	mapper, err = jogson.NewMapperFromString(jsonObjectArrayTest)
 	assert.NoError(t, err)
 	expectedArray := `[{"name":"Jason"},{"name":"Chris"}]`
 	assert.Equal(t, expectedArray, mapper.String())
 
-	mapper, err = jogson.FromString(jsonOnlyStringTest)
+	mapper, err = jogson.NewMapperFromString(jsonOnlyStringTest)
 	assert.NoError(t, err)
 	assert.Equal(t, "test", mapper.String())
 
-	mapper, err = jogson.FromString(jsonOnlyIntTest)
+	mapper, err = jogson.NewMapperFromString(jsonOnlyIntTest)
 	assert.NoError(t, err)
 	assert.Equal(t, "56", mapper.String())
 
-	mapper, err = jogson.FromString(jsonOnlyFloatTest)
+	mapper, err = jogson.NewMapperFromString(jsonOnlyFloatTest)
 	assert.NoError(t, err)
 	assert.Equal(t, "1.2", mapper.String())
 
-	mapper, err = jogson.FromString(jsonOnlyBoolTest)
+	mapper, err = jogson.NewMapperFromString(jsonOnlyBoolTest)
 	assert.NoError(t, err)
 	assert.Equal(t, "true", mapper.String())
 
-	mapper, err = jogson.FromString(jsonOnlyNullTest)
+	mapper, err = jogson.NewMapperFromString(jsonOnlyNullTest)
 	assert.NoError(t, err)
 	assert.True(t, mapper.IsNull)
 }
 
 func TestMapperPrettyString(t *testing.T) {
-	mapper, err := jogson.FromString(jsonObjectTest)
+	mapper, err := jogson.NewMapperFromString(jsonObjectTest)
 	assert.NoError(t, err)
 	expectedObjStr := "{\n  \"address\": null,\n  \"age\": 15,\n  \"height\": 1.81,\n  \"is_funny\": true,\n  \"name\": \"Jason\"\n}"
 	assert.Equal(t, expectedObjStr, mapper.PrettyString())
 
-	mapper, err = jogson.FromString(jsonObjectArrayTest)
+	mapper, err = jogson.NewMapperFromString(jsonObjectArrayTest)
 	assert.NoError(t, err)
 	expectedArrayStr := "[\n  {\n    \"name\": \"Jason\"\n  },\n  {\n    \"name\": \"Chris\"\n  }\n]"
 	assert.Equal(t, expectedArrayStr, mapper.PrettyString())
 
-	mapper, err = jogson.FromString(jsonOnlyStringTest)
+	mapper, err = jogson.NewMapperFromString(jsonOnlyStringTest)
 	assert.NoError(t, err)
 	assert.Equal(t, "test", mapper.PrettyString())
 
-	mapper, err = jogson.FromString(jsonOnlyIntTest)
+	mapper, err = jogson.NewMapperFromString(jsonOnlyIntTest)
 	assert.NoError(t, err)
 	assert.Equal(t, "56", mapper.PrettyString())
 
-	mapper, err = jogson.FromString(jsonOnlyFloatTest)
+	mapper, err = jogson.NewMapperFromString(jsonOnlyFloatTest)
 	assert.NoError(t, err)
 	assert.Equal(t, "1.2", mapper.PrettyString())
 
-	mapper, err = jogson.FromString(jsonOnlyBoolTest)
+	mapper, err = jogson.NewMapperFromString(jsonOnlyBoolTest)
 	assert.NoError(t, err)
 	assert.Equal(t, "true", mapper.PrettyString())
 
-	mapper, err = jogson.FromString(jsonOnlyNullTest)
+	mapper, err = jogson.NewMapperFromString(jsonOnlyNullTest)
 	assert.NoError(t, err)
 	assert.True(t, mapper.IsNull)
 }
@@ -89,7 +89,7 @@ func TestMapperPrettyString(t *testing.T) {
 func TestProcessObjects(t *testing.T) {
 	n := 1000
 	array, _ := generateJSONArray(n)
-	mapper, _ := jogson.FromBuffer(strings.NewReader(array))
+	mapper, _ := jogson.NewMapperFromBuffer(strings.NewReader(array))
 	c := 0
 	var mu sync.Mutex
 	err := mapper.ProcessObjects(10, func(o jogson.JsonObject) {
@@ -104,7 +104,7 @@ func TestProcessObjects(t *testing.T) {
 func TestProcessObjectsWithArgs(t *testing.T) {
 	n := 1000
 	array, _ := generateJSONArray(n)
-	mapper, _ := jogson.FromBuffer(strings.NewReader(array))
+	mapper, _ := jogson.NewMapperFromBuffer(strings.NewReader(array))
 	c := 0
 	var mu sync.Mutex
 	err := mapper.ProcessObjectsWithArgs(10, worker, &c, &mu)
@@ -113,7 +113,7 @@ func TestProcessObjectsWithArgs(t *testing.T) {
 }
 
 func TestJsonInvalid(t *testing.T) {
-	mapper, err := jogson.FromString(jsonInvalidObjectTest)
+	mapper, err := jogson.NewMapperFromString(jsonInvalidObjectTest)
 	assert.Zero(t, mapper)
 	assert.Error(t, err)
 

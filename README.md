@@ -1,12 +1,12 @@
-# JSON Mapper Library for Go
+# Jogson - JSON Mapper Library for Go
 
-[![GoDoc](https://pkg.go.dev/badge/badge)](https://pkg.go.dev/github.com/rmordechay/jsonmapper)
-[![Go Report Card](https://goreportcard.com/badge/github.com/rmordechay/jsonmapper)](https://goreportcard.com/report/github.com/rmordechay/jsonmapper)
+[![GoDoc](https://pkg.go.dev/badge/badge)](https://pkg.go.dev/github.com/rmordechay/jogson)
+[![Go Report Card](https://goreportcard.com/badge/github.com/rmordechay/jogson)](https://goreportcard.com/report/github.com/rmordechay/jogson)
 
 A simple Go library to simplify working with JSON without the need to define structs.
 
 * [Installation](#Installation)
-* [Create a Mapper](#create-jsonmapper-jsonobject-or-jsonarray)
+* [Create a Mapper](#create-jogson-jsonobject-or-jsonarray)
 * [Read from JSON](#Read-from-JSON)
     * [Objects](#Objects)
     * [Arrays](#Arrays)
@@ -19,7 +19,7 @@ A simple Go library to simplify working with JSON without the need to define str
     * [Write Array](#Write-array)
 * [Error Handling](#Error-handling)
 * [Design](#Design)
-  * [JsonMapper](#JsonMapper)
+  * [jogson](#jogson)
   * [JsonObject](#JsonObject)
   * [JsonArray](#JsonArray)
 
@@ -27,33 +27,33 @@ A simple Go library to simplify working with JSON without the need to define str
 
 To install the library, use:
 ```bash
-go get github.com/rmordechay/jsonmapper
+go get github.com/rmordechay/jogson
 ```
 
-## Create JsonMapper, JsonObject or JsonArray
+## Create jogson, JsonObject or JsonArray
 
 For more information, see [design](#Design).
 
 ```go
 // From string
-mapper, err := jsonmapper.FromString(jsonString)
-object, err := jsonmapper.NewObjectFromString(jsonString)
-array, err := jsonmapper.NewArrayFromString(jsonString)
+mapper, err := jogson.NewMapperFromString(jsonString)
+object, err := jogson.NewObjectFromString(jsonString)
+array, err := jogson.NewArrayFromString(jsonString)
 
 // From bytes
-mapper, err := jsonmapper.FromBytes([]byte(jsonString))
-object, err := jsonmapper.NewObjectFromBytes([]byte(jsonString))
-array, err := jsonmapper.NewArrayFromBytes([]byte(jsonString))
+mapper, err := jogson.NewMapperFromBytes([]byte(jsonString))
+object, err := jogson.NewObjectFromBytes([]byte(jsonString))
+array, err := jogson.NewArrayFromBytes([]byte(jsonString))
 
 // From struct
-mapper, err := jsonmapper.FromStruct(jsonStruct)
-object, err := jsonmapper.NewObjectFromStruct(jsonStruct)
-array, err := jsonmapper.NewArrayFromStruct(jsonStruct)
+mapper, err := jogson.NewMapperFromStruct(jsonStruct)
+object, err := jogson.NewObjectFromStruct(jsonStruct)
+array, err := jogson.NewArrayFromStruct(jsonStruct)
 
 // From file
-mapper, err := jsonmapper.FromFile(jsonFilePath)
-object, err := jsonmapper.NewObjectFromFile(jsonFilePath)
-array, err := jsonmapper.NewArrayFromFile(jsonFilePath)
+mapper, err := jogson.NewMapperFromFile(jsonFilePath)
+object, err := jogson.NewObjectFromFile(jsonFilePath)
+array, err := jogson.NewArrayFromFile(jsonFilePath)
 ```
 
 ## Read from JSON
@@ -357,7 +357,7 @@ To write a JSON object or array is as simple as reading from it.
 
 ```go
 // Create a new object
-obj := jsonmapper.NewObject()
+obj := jogson.NewObject()
 obj.AddKeyValue("name", "Chris")
 fmt.Println(obj.String()) // {"name":"Chris"}
 ```
@@ -366,7 +366,7 @@ fmt.Println(obj.String()) // {"name":"Chris"}
 
 ```go
 // Create a new array
-arr := jsonmapper.NewArray()
+arr := jogson.NewArray()
 arr.AddElement(15)
 arr.AddElement(19)
 fmt.Println(arr.String()) // [15,19]
@@ -397,23 +397,23 @@ fmt.Println(object.LastError) // output: <nil>
 ## Design
 
 There are 3 structs that are important to know when working with the library
-* `JsonMapper` struct for generic JSON.
+* `jogson` struct for generic JSON.
 * `JsonObject` represents JSON object.
 * `JsonArray`  represents JSON array.
 
-#### JsonMapper
+#### jogson
 
-`JsonMapper` is a struct that holds JSON data and serves as a generic type for all possible JSON types. It has `AsX` and `IsX` 
+`jogson` is a struct that holds JSON data and serves as a generic type for all possible JSON types. It has `AsX` and `IsX` 
 fields with which you can get the data and check the type, respectively. For example, if your data is a JSON object, 
-you can call `JsonMapper.AsObject`, or if it's a string, `JsonMapper.AsString`. This struct is best used when you don't 
-know the type at compile time and want to check it dynamically. In this case you can use `JsonMapper.IsArray`, 
-`JsonMapper.IsString`, `JsonMapper.IsFloat`, etc. 
+you can call `jogson.AsObject`, or if it's a string, `jogson.AsString`. This struct is best used when you don't 
+know the type at compile time and want to check it dynamically. In this case you can use `jogson.IsArray`, 
+`jogson.IsString`, `jogson.IsFloat`, etc. 
 
 Note, in any case, `AsX` never returns nil, but always the zero value. If the underlying data is null, then `IsNull` will 
 be set to true. 
 
-`JsonMapper` is also returned in cases where the return type can be any JSON type. For example, `JsonArray.Elements()` 
-returns a slice `[]JsonMapper` over which you can iterate or query specific elements. Other methods that return `JsonMapper` 
+`jogson` is also returned in cases where the return type can be any JSON type. For example, `JsonArray.Elements()` 
+returns a slice `[]jogson` over which you can iterate or query specific elements. Other methods that return `jogson` 
 (instead of `JsonObject` or `JsonArray`) are `JsonObject.Values()`, `JsonObject.Get()`, `JsonArray.Get()`, `JsonArray.Find()` and more. 
 
 #### JsonObject
@@ -448,9 +448,9 @@ As a rule of thumb, they have 2 differences:
     * `JsonArray`'s methods mostly return a `slice` or `JsonArray`, e.g. `GetFloatArray(1)  -> []float`.
 
 #### Methods and Variables Prefix
-The prefixes, `As`, `Is`, `Get` and `Add` have similar semantics across the library and can be found in `JsonMapper`, `JsonObject`
+The prefixes, `As`, `Is`, `Get` and `Add` have similar semantics across the library and can be found in `jogson`, `JsonObject`
 and `JsonArray`.
-* `IsX`: checks for the value's type. For example `JsonMapper.IsBool`
+* `IsX`: checks for the value's type. For example `jogson.IsBool`
 * `AsX`: converts the current data to other type representation. For example, `JsonArray.AsStringArray()` converts JsonArray to `[]string`.
 * `GetX`: Fetches the data, usually with some sort of search in the underlying data.
 * `AddX`: Adds the data to the JSON array or object

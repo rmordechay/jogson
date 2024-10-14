@@ -10,19 +10,19 @@ import (
 )
 
 func TestArrayAsStringArray(t *testing.T) {
-	mapper, _ := jogson.FromString(jsonStringArrayTest)
+	mapper, _ := jogson.NewMapperFromString(jsonStringArrayTest)
 	array := mapper.AsArray
 	assert.ElementsMatch(t, []string{"Jason", "Chris", "Rachel"}, array.AsStringArray())
 }
 
 func TestArrayAsIntArray(t *testing.T) {
-	mapper, _ := jogson.FromString(jsonIntArrayTest)
+	mapper, _ := jogson.NewMapperFromString(jsonIntArrayTest)
 	array := mapper.AsArray
 	assert.ElementsMatch(t, []int{0, 15, -54, -346, 9223372036854775807}, array.AsIntArray())
 }
 
 func TestArrayAsFloatArray(t *testing.T) {
-	mapper, _ := jogson.FromString(jsonFloatArrayTest)
+	mapper, _ := jogson.NewMapperFromString(jsonFloatArrayTest)
 	array := mapper.AsArray
 	assert.ElementsMatch(t, []float64{15.13, 2, 45.3984, -1.81, 9.223372036854776}, array.AsFloatArray())
 }
@@ -72,7 +72,7 @@ func TestArrayContainsFloat(t *testing.T) {
 }
 
 func TestArrayAs2DArray(t *testing.T) {
-	mapper, _ := jogson.FromString(json2DIntArrayTest)
+	mapper, _ := jogson.NewMapperFromString(json2DIntArrayTest)
 	array := mapper.AsArray
 	jsonArray := array.As2DArray()
 	assert.ElementsMatch(t, []int{1, 2}, jsonArray[0].AsIntArray())
@@ -80,14 +80,14 @@ func TestArrayAs2DArray(t *testing.T) {
 }
 
 func TestArrayAsObjectArray(t *testing.T) {
-	mapper, _ := jogson.FromString(jsonObjectArrayTest)
+	mapper, _ := jogson.NewMapperFromString(jsonObjectArrayTest)
 	array := mapper.AsArray
 	assert.Equal(t, "Jason", array.AsObjectArray()[0].GetString("name"))
 	assert.Equal(t, "Chris", array.AsObjectArray()[1].GetString("name"))
 }
 
 func TestArrayGetMapper(t *testing.T) {
-	mapper, _ := jogson.FromString(jsonAnyArrayTest)
+	mapper, _ := jogson.NewMapperFromString(jsonAnyArrayTest)
 	array := mapper.AsArray
 
 	elementMapper := array.Get(0)
@@ -119,7 +119,7 @@ func TestArrayGetMapper(t *testing.T) {
 }
 
 func TestArrayGetString(t *testing.T) {
-	mapper, _ := jogson.FromString(jsonAnyArrayTest)
+	mapper, _ := jogson.NewMapperFromString(jsonAnyArrayTest)
 	array := mapper.AsArray
 
 	s := array.GetString(0)
@@ -148,7 +148,7 @@ func TestArrayGetString(t *testing.T) {
 }
 
 func TestArrayGetStringFails(t *testing.T) {
-	mapper, _ := jogson.FromString(jsonAnyArrayTest)
+	mapper, _ := jogson.NewMapperFromString(jsonAnyArrayTest)
 	array := mapper.AsArray
 
 	s := array.GetString(10)
@@ -161,7 +161,7 @@ func TestArrayGetStringFails(t *testing.T) {
 }
 
 func TestArrayGetInt(t *testing.T) {
-	mapper, _ := jogson.FromString(jsonIntArrayTest)
+	mapper, _ := jogson.NewMapperFromString(jsonIntArrayTest)
 	array := mapper.AsArray
 
 	i := array.GetInt(0)
@@ -182,7 +182,7 @@ func TestArrayGetInt(t *testing.T) {
 }
 
 func TestArrayGetIntFails(t *testing.T) {
-	mapper, _ := jogson.FromString(jsonAnyArrayTest)
+	mapper, _ := jogson.NewMapperFromString(jsonAnyArrayTest)
 	array := mapper.AsArray
 
 	i := array.GetInt(10)
@@ -199,7 +199,7 @@ func TestArrayGetIntFails(t *testing.T) {
 }
 
 func TestArrayGetFloat(t *testing.T) {
-	mapper, _ := jogson.FromString(jsonFloatArrayTest)
+	mapper, _ := jogson.NewMapperFromString(jsonFloatArrayTest)
 	array := mapper.AsArray
 
 	f := array.GetFloat(0)
@@ -224,7 +224,7 @@ func TestArrayGetFloat(t *testing.T) {
 }
 
 func TestArrayGetFloatFails(t *testing.T) {
-	mapper, _ := jogson.FromString(jsonAnyArrayTest)
+	mapper, _ := jogson.NewMapperFromString(jsonAnyArrayTest)
 	array := mapper.AsArray
 
 	f := array.GetFloat(10)
@@ -241,7 +241,7 @@ func TestArrayGetFloatFails(t *testing.T) {
 }
 
 func TestArrayGetArray(t *testing.T) {
-	mapper, _ := jogson.FromString(json2DArrayTest)
+	mapper, _ := jogson.NewMapperFromString(json2DArrayTest)
 	array := mapper.AsArray
 
 	nestedArray := array.GetArray(0)
@@ -249,7 +249,7 @@ func TestArrayGetArray(t *testing.T) {
 }
 
 func TestArrayGetArrayFails(t *testing.T) {
-	mapper, _ := jogson.FromString(json2DArrayTest)
+	mapper, _ := jogson.NewMapperFromString(json2DArrayTest)
 	array := mapper.AsArray
 
 	innerArr := array.GetArray(5)
@@ -266,7 +266,7 @@ func TestArrayGetArrayFails(t *testing.T) {
 }
 
 func TestArrayGetObject(t *testing.T) {
-	mapper, _ := jogson.FromString(jsonObjectArrayTest)
+	mapper, _ := jogson.NewMapperFromString(jsonObjectArrayTest)
 	array := mapper.AsArray
 
 	obj := array.GetObject(1)
@@ -274,7 +274,7 @@ func TestArrayGetObject(t *testing.T) {
 }
 
 func TestArrayGetObjectFails(t *testing.T) {
-	mapper, _ := jogson.FromString(jsonArrayWithNullTest)
+	mapper, _ := jogson.NewMapperFromString(jsonArrayWithNullTest)
 	array := mapper.AsArray
 
 	obj := array.GetObject(10)
@@ -308,21 +308,21 @@ func TestArrayGetTime(t *testing.T) {
 }
 
 func TestArrayPrintString(t *testing.T) {
-	mapper, err := jogson.FromString(jsonObjectArrayTest)
+	mapper, err := jogson.NewMapperFromString(jsonObjectArrayTest)
 	assert.NoError(t, err)
 	s := mapper.AsArray.String()
 	assert.Equal(t, `[{"name":"Jason"},{"name":"Chris"}]`, s)
 }
 
 func TestArrayPrettyString(t *testing.T) {
-	mapper, err := jogson.FromString(jsonObjectArrayTest)
+	mapper, err := jogson.NewMapperFromString(jsonObjectArrayTest)
 	assert.NoError(t, err)
 	expectedArrayStr := "[\n  {\n    \"name\": \"Jason\"\n  },\n  {\n    \"name\": \"Chris\"\n  }\n]"
 	assert.Equal(t, expectedArrayStr, mapper.AsArray.PrettyString())
 }
 
 func TestArrayFilter(t *testing.T) {
-	mapper, err := jogson.FromString(jsonObjectArrayTest)
+	mapper, err := jogson.NewMapperFromString(jsonObjectArrayTest)
 	assert.NoError(t, err)
 	filteredArr := mapper.AsArray.Filter(func(element jogson.JsonMapper) bool {
 		return element.AsObject.GetString("name") == "Chris"
@@ -332,7 +332,7 @@ func TestArrayFilter(t *testing.T) {
 }
 
 func TestArrayFilterNull(t *testing.T) {
-	mapper, err := jogson.FromString(jsonAnyArrayTest)
+	mapper, err := jogson.NewMapperFromString(jsonAnyArrayTest)
 	assert.NoError(t, err)
 	filteredArr := mapper.AsArray.FilterNull()
 	assert.Equal(t, 5, mapper.AsArray.Length())
@@ -343,7 +343,7 @@ func TestArrayFilterNull(t *testing.T) {
 }
 
 func TestArrayForEach(t *testing.T) {
-	mapper, err := jogson.FromString(jsonObjectArrayTest)
+	mapper, err := jogson.NewMapperFromString(jsonObjectArrayTest)
 	assert.NoError(t, err)
 	wasVisited := false
 	mapper.AsArray.ForEach(func(mapper jogson.JsonMapper) {

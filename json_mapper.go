@@ -40,8 +40,8 @@ type JsonMapper struct {
 	reader   io.Reader
 }
 
-// FromBytes parses JSON data from a byte slice.
-func FromBytes(data []byte) (JsonMapper, error) {
+// NewMapperFromBytes parses JSON data from a byte slice.
+func NewMapperFromBytes(data []byte) (JsonMapper, error) {
 	if dataStartsWith(data, '[') {
 		arrayBytes, err := NewArrayFromBytes(data)
 		if err != nil {
@@ -93,30 +93,30 @@ func FromBytes(data []byte) (JsonMapper, error) {
 	return JsonMapper{IsString: true, AsString: asString}, nil
 }
 
-// FromStruct serializes a Go struct into JSON and parses it into a JsonMapper object.
-func FromStruct[T any](s T) (JsonMapper, error) {
+// NewMapperFromString parses JSON from a string into a JsonMapper object.
+func NewMapperFromString(data string) (JsonMapper, error) {
+	return NewMapperFromBytes([]byte(data))
+}
+
+// NewMapperFromStruct serializes a Go struct into JSON and parses it into a JsonMapper object.
+func NewMapperFromStruct[T any](s T) (JsonMapper, error) {
 	jsonBytes, err := marshal(s)
 	if err != nil {
 		return JsonMapper{}, err
 	}
-	return FromBytes(jsonBytes)
+	return NewMapperFromBytes(jsonBytes)
 }
 
-// FromFile reads a JSON file from the given path and parses it into a JsonMapper object.
-func FromFile(path string) (JsonMapper, error) {
+// NewMapperFromFile reads a JSON file from the given path and parses it into a JsonMapper object.
+func NewMapperFromFile(path string) (JsonMapper, error) {
 	file, err := os.ReadFile(path)
 	if err != nil {
 		return JsonMapper{}, err
 	}
-	return FromBytes(file)
+	return NewMapperFromBytes(file)
 }
 
-// FromString parses JSON from a string into a JsonMapper object.
-func FromString(data string) (JsonMapper, error) {
-	return FromBytes([]byte(data))
-}
-
-func FromBuffer(reader io.Reader) (JsonMapper, error) {
+func NewMapperFromBuffer(reader io.Reader) (JsonMapper, error) {
 	var m JsonMapper
 	m.reader = reader
 	m.buffer = make([]byte, bufferSize)
