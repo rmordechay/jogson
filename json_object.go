@@ -408,10 +408,12 @@ func (o *JsonObject) setLastError(err error) {
 	o.LastError = err
 }
 
-//// transformObjectKeys returns a new JsonObject with transformed keys, where keys are converted to snake_case.
-//func (o *JsonObject) transformObjectKeys() JsonObject {
-//	return *newObjectFromMap(transformKeys(o.object))
-//}
+// TransformKeys returns a new JsonObject with transformed keys. It takes a
+// transformation function as parameter f that takes a string, the original key,
+// and returns a new string, the new key.
+func (o *JsonObject) TransformKeys(f func(string) string) *JsonObject {
+	return newObjectFromMap(transformKeys(o.object, f))
+}
 
 // newObjectFromMap initializes and returns a new instance of JsonObject.
 func newObjectFromMap(data map[string]*any) *JsonObject {

@@ -3,11 +3,12 @@ package jsonmapper
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/google/uuid"
-	jsoniter "github.com/json-iterator/go"
 	"strconv"
 	"time"
 	"unicode"
+
+	"github.com/google/uuid"
+	jsoniter "github.com/json-iterator/go"
 )
 
 var jsonIter = jsoniter.ConfigCompatibleWithStandardLibrary
@@ -455,37 +456,22 @@ func dataStartsWith(data []byte, brackOrParen byte) bool {
 	return false
 }
 
-//func transformKeys(m map[string]*any) map[string]*any {
-//	newMap := make(map[string]*any)
-//	for key, value := range m {
-//		newKey := toSnakeCase(key)
-//		if value == nil {
-//			newMap[newKey] = nil
-//			continue
-//		}
-//		nestedMap, ok := (*value).(map[string]any)
-//		if ok {
-//			nestedResult := transformKeys(convertToMapValuesPtr(nestedMap))
-//			var nestedInterface any = nestedResult
-//			newMap[newKey] = &nestedInterface
-//		} else {
-//			newMap[newKey] = value
-//		}
-//	}
-//	return newMap
-//}
-
-//func toSnakeCase(str string) string {
-//	var result []rune
-//	for i, r := range str {
-//		if unicode.IsUpper(r) {
-//			if i > 0 {
-//				result = append(result, '_')
-//			}
-//			result = append(result, unicode.ToLower(r))
-//		} else {
-//			result = append(result, r)
-//		}
-//	}
-//	return string(result)
-//}
+func transformKeys(m map[string]*any, f func(string) string) map[string]*any {
+	newMap := make(map[string]*any)
+	for key, value := range m {
+		newKey := f(key)
+		if value == nil {
+			newMap[newKey] = nil
+			continue
+		}
+		nestedMap, ok := (*value).(map[string]any)
+		if ok {
+			nestedResult := transformKeys(convertToMapValuesPtr(nestedMap), f)
+			var nestedInterface any = nestedResult
+			newMap[newKey] = &nestedInterface
+		} else {
+			newMap[newKey] = value
+		}
+	}
+	return newMap
+}

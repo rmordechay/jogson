@@ -11,5 +11,5 @@ linter:
 	golangci-lint run
 
 push_tag:
-	git tag v1.0.3
+	git tag v1.0.4
 	git push --tags

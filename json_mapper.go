@@ -60,33 +60,33 @@ func FromBytes(data []byte) (JsonMapper, error) {
 
 	asString := string(data)
 	var mapper JsonMapper
-
+	// check if value is int
 	i, err := strconv.Atoi(asString)
 	if err == nil {
 		mapper.IsInt = true
 		mapper.AsInt = i
 		return JsonMapper{IsInt: true, AsInt: i}, nil
 	}
-
+	// check if value is float
 	f, err := strconv.ParseFloat(asString, 64)
 	if err == nil {
 		mapper.IsFloat = true
 		mapper.AsFloat = f
 		return JsonMapper{IsFloat: true, AsFloat: f}, nil
 	}
-
+	// check if value is bool
 	b, err := strconv.ParseBool(asString)
 	if err == nil {
 		mapper.IsBool = true
 		mapper.AsBool = b
 		return JsonMapper{IsBool: true, AsBool: b}, nil
 	}
-
+	// check if value is null
 	if asString == "null" {
 		mapper.IsNull = true
 		return JsonMapper{IsNull: true}, nil
 	}
-
+	// fallback to string if no other type was found
 	asString = strings.Trim(asString, `"`)
 	mapper.IsString = true
 	mapper.AsString = asString

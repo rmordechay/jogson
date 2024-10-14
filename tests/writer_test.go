@@ -1,9 +1,10 @@
 package tests
 
 import (
+	"testing"
+
 	"github.com/rmordechay/jsonmapper"
 	"github.com/stretchr/testify/assert"
-	"testing"
 )
 
 func TestWriteObjectToObject(t *testing.T) {

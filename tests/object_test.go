@@ -3,6 +3,7 @@ package tests
 import (
 	"testing"
 	"time"
+	"unicode"
 
 	"github.com/rmordechay/jsonmapper"
 	"github.com/stretchr/testify/assert"
@@ -43,7 +44,9 @@ func TestObjectAsIntMap(t *testing.T) {
 }
 
 func TestObjectAsFloatMap(t *testing.T) {
-	object, _ := jsonmapper.NewObjectFromString(jsonObjectOnlyFloatTest)
+	object, _ := jsonmapper.NewObjectFromString(jsonObjectTest)
+	object.GetArray("users").GetObject(0).GetString("name")
+
 	expectedMap := map[string]float64{"first": 5.3, "second": 1.4, "third": -0.3}
 	assert.Equal(t, expectedMap, object.AsFloatMap())
 	assert.Equal(t, 3, object.Length())
@@ -367,18 +370,22 @@ func TestElementNotFound(t *testing.T) {
 }
 
 func TestConvertKeysToSnakeCase(t *testing.T) {
-	//mapper, err := jsonmapper.FromString(jsonObjectKeysPascalCaseTest)
-	//assert.NoError(t, err)
-	//object := mapper.AsObject
-	//snakeCase := object.transformObjectKeys()
-	//assert.NoError(t, object.LastError)
-	//assert.ElementsMatch(t, []string{"children", "name", "age", "address", "second_address", "is_funny"}, snakeCase.Keys())
-	//children := snakeCase.GetObject("children")
-	//assert.NoError(t, snakeCase.LastError)
-	//rachel := children.GetObject("rachel")
-	//assert.NoError(t, children.LastError)
-	//age := rachel.GetInt("age")
-	//isFunny := rachel.GetBool("is_funny")
-	//assert.Equal(t, 15, age)
-	//assert.True(t, isFunny)
+	mapper, err := jsonmapper.FromString(jsonObjectKeysPascalCaseTest)
+	assert.NoError(t, err)
+	object := mapper.AsObject
+	snakeCase := object.TransformKeys(func(s string) string {
+		newString := []rune(s)
+		newString[0] = unicode.ToLower(newString[0])
+		return string(newString)
+	})
+	assert.NoError(t, object.LastError)
+	assert.ElementsMatch(t, []string{"children", "name", "age", "address", "secondAddress", "isFunny"}, snakeCase.Keys())
+	children := snakeCase.GetObject("children")
+	assert.NoError(t, snakeCase.LastError)
+	rachel := children.GetObject("rachel")
+	assert.NoError(t, children.LastError)
+	age := rachel.GetInt("age")
+	isFunny := rachel.GetBool("isFunny")
+	assert.Equal(t, 15, age)
+	assert.True(t, isFunny)
 }
