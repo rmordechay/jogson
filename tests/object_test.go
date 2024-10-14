@@ -44,9 +44,7 @@ func TestObjectAsIntMap(t *testing.T) {
 }
 
 func TestObjectAsFloatMap(t *testing.T) {
-	object, _ := jsonmapper.NewObjectFromString(jsonObjectTest)
-	object.GetArray("users").GetObject(0).GetString("name")
-
+	object, _ := jsonmapper.NewObjectFromString(jsonObjectOnlyFloatTest)
 	expectedMap := map[string]float64{"first": 5.3, "second": 1.4, "third": -0.3}
 	assert.Equal(t, expectedMap, object.AsFloatMap())
 	assert.Equal(t, 3, object.Length())
