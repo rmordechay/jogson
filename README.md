@@ -101,30 +101,47 @@ for key, child := range children.Elements() {
     fmt.Println(child.AsObject.GetInt("age"))         // 15, 19
     fmt.Println(child.AsObject.GetBool("is_funny"))   // false, true
 }
+```
 
+#### As Maps
+
+To get the object as a map of strings and scalars value, use one of the following.
+
+Note! values that are JSON null will be returned as Go zero value. If you want to 
+regard null values, call the function with the `N` suffix (see next section). This applies 
+only for the scalar types, for `JsonObject` and `JsonArray` you can use the `IsNull()` method
+that both structs have.
+
+```go
 // Get the JsonObject as map of string and string
 var stringMap map[string]string = object.AsStringMap()
-
-// Get the JsonObject as map of string and nullable string
-var nullableStringMap map[string]*string = object.AsStringMapN()
 
 // Get the JsonObject as map of string and int
 var intMap map[string]int = object.AsIntMap()
 
-// Get the JsonObject as map of string and nullable int
-var nullableSntMap map[string]*int = object.AsIntMapN()
-
 // Get the JsonObject as map of string and float
 var floatMap map[string]float64 = object.AsFloatMap()
-
-// Get the JsonObject as map of string and nullable float
-var nullableSloatMap map[string]*float64 = object.AsFloatMapN()
 
 // Get as a slice of JsonArray
 var nestedArray map[string]JsonArray = object.AsArrayMap()
 
 // Get as a slice of JsonObject
 var objectArray map[string]JsonObject = object.AsObjectMap()
+```
+
+#### As Maps with Nullable Values
+If the array contains null value and you , then use one of the following function that returns the
+values as a pointer rather than value which allows nil values.
+
+```go
+// Get the JsonObject as map of string and nullable strings
+var nullableStringMap map[string]*string = object.AsStringMapN()
+
+// Get the JsonObject as map of string and nullable ints
+var nullableIntMap map[string]*int = object.AsIntMapN()
+
+// Get the JsonObject as map of string and nullable floats
+var nullableSloatMap map[string]*float64 = object.AsFloatMapN()
 ```
 
 ### Arrays
@@ -143,30 +160,39 @@ secondElement := features.Get(1)
 for _, feature := range features.Elements() {
     fmt.Println(feature.AsString) // tall, ...
 }
+```
+
+#### As Arrays of Nullable Values
+
+```go
 
 // Get the JsonArray as a slice of string
 var stringArray []string = array.AsStringArray()
 
-// Get the JsonArray as a slice of nullable string
-var nullableStringArray []*string = array.AsStringArrayN()
-
 // Get the JsonArray as a slice of int
 var intArray []int = array.AsIntArray()
 
-// Get the JsonArray as a slice of nullable int
-var nullableSntArray []*int = array.AsIntArrayN()
-
 // Get the JsonArray as a slice of float
 var floatArray []float64 = array.AsFloatArray()
-
-// Get the JsonArray as a slice of nullable float
-var nullableSloatArray []*float64 = array.AsFloatArrayN()
 
 // Get the JsonArray as a slice of JsonArray
 var nestedArray []JsonArray = array.As2DArray()
 
 // Get the JsonArray as a slice of JsonObject
 var objectArray []JsonObject = array.AsObjectArray()
+```
+
+#### As Arrays of Nullable Values
+
+```go
+// Get the JsonArray as a slice of nullable strings
+var nullableStringArray []*string = array.AsStringArrayN()
+
+// Get the JsonArray as a slice of nullable ints
+var nullableIntArray []*int = array.AsIntArrayN()
+
+// Get the JsonArray as a slice of nullable floats
+var nullableSloatArray []*float64 = array.AsFloatArrayN()
 ```
 
 ### Scalars
