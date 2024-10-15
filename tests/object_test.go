@@ -98,6 +98,19 @@ func TestObjectAsFloatMapNullable(t *testing.T) {
 	assert.Equal(t, 3, len(object.AsFloatMap()))
 }
 
+func TestObjectAsArrayMap(t *testing.T) {
+	object, err := jogson.NewObjectFromString(jsonObjectWithArraysTest)
+	assert.NoError(t, err)
+	arrayMap := object.AsArrayMap()
+	assert.NoError(t, object.LastError)
+	array := arrayMap["names"].AsStringArray()
+	array2 := arrayMap["names2"].AsStringArray()
+	assert.Equal(t, "Jason", array[0])
+	assert.Equal(t, "Rachel", array[1])
+	assert.Equal(t, "Chris", array2[0])
+	assert.Equal(t, "Charlie", array2[1])
+}
+
 func TestObjectGetMapper(t *testing.T) {
 	mapper, _ := jogson.NewMapperFromString(jsonObjectTest)
 	array := mapper.AsObject

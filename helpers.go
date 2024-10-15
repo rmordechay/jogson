@@ -330,15 +330,15 @@ func convertAnyToObject(data *any, j jsonI) JsonObject {
 	return *obj
 }
 
-func convertAnyToArray(data *any, j jsonI) JsonArray {
+func convertAnyToArray(data *any, j jsonI) *JsonArray {
 	if data == nil {
 		j.setLastError(createTypeConversionErr(nil, JsonArray{}))
-		return *nullArray()
+		return nullArray()
 	}
 	v, ok := (*data).([]any)
 	if !ok {
 		j.setLastError(createTypeConversionErr(data, JsonArray{}))
-		return *nullArray()
+		return nullArray()
 	}
 
 	var array JsonArray
@@ -348,7 +348,7 @@ func convertAnyToArray(data *any, j jsonI) JsonArray {
 		elements = append(elements, &value)
 	}
 	array.elements = elements
-	return array
+	return &array
 }
 
 func convertSliceToJsonArray[T any](data []T) JsonArray {

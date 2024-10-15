@@ -141,7 +141,7 @@ func (o *JsonObject) AsFloatMapN() map[string]*float64 {
 }
 
 // AsArrayMap returns the object as map of (string, JsonArray)
-func (o *JsonObject) AsArrayMap() map[string]JsonArray {
+func (o *JsonObject) AsArrayMap() map[string]*JsonArray {
 	return getGenericMap(convertAnyToArray, *o)
 }
 
@@ -156,6 +156,20 @@ func (o *JsonObject) AsObjectMap() map[string]JsonObject {
 func (o *JsonObject) Get(key string) *JsonMapper {
 	v := getMapperFromField(o.object[key])
 	return &v
+}
+
+// ToStruct converts the JsonObject to the type v.
+func (o *JsonObject) ToStruct(v any) {
+	bytes, err := marshal(o.object)
+	if err != nil {
+		o.setLastError(err)
+		return
+	}
+	err = unmarshal(bytes, &v)
+	if err != nil {
+		o.setLastError(err)
+		return
+	}
 }
 
 // GetString retrieves the value associated with the specified key as string. JSON values that are not
@@ -234,20 +248,6 @@ func (o *JsonObject) GetUUID(key string) uuid.UUID {
 	return getObjectScalar(o, parseUUID, key)
 }
 
-// ToStruct converts the JsonObject to the type v.
-func (o *JsonObject) ToStruct(v any) {
-	bytes, err := marshal(o.object)
-	if err != nil {
-		o.setLastError(err)
-		return
-	}
-	err = unmarshal(bytes, &v)
-	if err != nil {
-		o.setLastError(err)
-		return
-	}
-}
-
 // GetObject retrieves a nested JsonObject associated with the specified key.
 // If the key does not exist, the value is invalid or is null, an error will be set to LastError.
 func (o *JsonObject) GetObject(key string) *JsonObject {
@@ -298,20 +298,19 @@ func (o *JsonObject) GetArray(key string) *JsonArray {
 	}
 }
 
-// Find searches for a key in the JsonObject and its nested objects.
-// Returns the JsonMapper associated with the key if found; otherwise, returns an empty JsonMapper.
-func (o *JsonObject) Find(key string) JsonMapper {
-	for k, v := range o.object {
-		field := getMapperFromField(v)
-		if k == key {
-			return field
-		}
-		if field.IsObject {
-			return field.AsObject.Find(key)
-		}
-	}
-	return JsonMapper{}
-}
+//// Find searches for a key in the JsonObject and its nested objects.
+//func (o *JsonObject) Find(key string) JsonMapper {
+//	for k, v := range o.object {
+//		field := getMapperFromField(v)
+//		if k == key {
+//			return field
+//		}
+//		if field.IsObject {
+//			return field.AsObject.Find(key)
+//		}
+//	}
+//	return JsonMapper{}
+//}
 
 // AddJsonObject adds a nested JsonObject to the JsonObject associated with the key.
 func (o *JsonObject) AddJsonObject(key string, jsonObject *JsonObject) {
@@ -380,14 +379,14 @@ func (o *JsonObject) ForEach(f func(key string, j JsonMapper)) {
 }
 
 // Filter returns a new JsonObject containing only the key-value pairs for which the provided function returns true.
-func (o *JsonObject) Filter(f func(key string, j JsonMapper) bool) JsonObject {
+func (o *JsonObject) Filter(f func(key string, j JsonMapper) bool) *JsonObject {
 	var obj = EmptyObject()
 	for k, element := range o.object {
 		if f(k, getMapperFromField(element)) {
 			obj.object[k] = element
 		}
 	}
-	return *obj
+	return obj
 }
 
 // PrettyString returns a pretty-printed string representation of the JsonObject.

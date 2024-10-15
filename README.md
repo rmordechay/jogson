@@ -8,9 +8,10 @@ A simple Go library to simplify working with JSON without the need to define str
 * [Installation](#Installation)
 * [Create Object, Array or Mapper](#Create-JsonObject-JsonArray-or-JsonMapper)
 * [Read from JSON](#Read-from-JSON)
+    * [Scalars](#Scalars)
     * [Objects](#Objects)
     * [Arrays](#Arrays)
-    * [Scalars](#Scalars)
+    * [Time](#time)
     * [Types](#types)
     * [Find Elements](#Find-Elements)
     * [Get JSON String](#get-json-string)
@@ -24,8 +25,7 @@ A simple Go library to simplify working with JSON without the need to define str
   * [JsonArray](#JsonArray)
 
 ## Installation
-
-To install the library, use:
+Go version must be at least `1.18`. To install the library use:
 ```bash
 go get github.com/rmordechay/jogson
 ```
@@ -85,6 +85,81 @@ jsonString := `{
     }
 }`
 ```
+
+### Scalars
+
+Getting scalars - `string`, `int`, etc. - is similar both for object and array and only differ
+in the parameter type (objects take `string` as key and arrays take `int` as index). You can get scalars by value or by reference, where the latter allows JSON null values. Nullable methods have
+the suffix 'N' in their names.
+
+#### From Object
+
+By value:
+
+```go
+// string 
+var name string = object.GetString("name") // Jason
+
+// int 
+var age int = object.GetInt("age") // 15
+
+// float64 
+var height float64 = object.GetFloat("height") // 1.87
+
+// bool 
+var isFunny bool = object.GetBool("is_funny") // false
+```
+
+By reference, which allows JSON null values (note the suffix 'N' at the end of the method names):
+
+```go
+// string
+var nameNullable *string = object.GetStringN("non-existent-key") // nil
+
+// int
+var ageNullable *int = object.GetIntN("non-existent-key") // nil
+
+// float64
+var heightNullable *float64 = object.GetFloatN("non-existent-key") // nil
+
+// bool
+var isFunnyNullable *bool = object.GetBoolN("non-existent-key") // nil
+```
+
+#### From Array
+
+By value:
+
+```go
+// string 
+var s string = array.GetString(0)
+
+// int 
+var i int = array.GetInt(2)
+
+// float64 
+var f float64 = array.GetFloat(5)
+
+// bool 
+var b bool = array.GetBool(7)
+```
+
+By reference, which allows JSON null values (Note the suffix 'N' at the end of the method names):
+
+```go
+// string
+var nameNullable *string = array.GetStringN(100) // nil
+
+// int
+var ageNullable *int = array.GetIntN(100) // nil
+
+// float64
+var heightNullable *float64 = array.GetFloatN(100) // nil
+
+// bool
+var isFunnyNullable *bool = array.GetBoolN(100) // nil
+```
+
 
 ### Objects
 
@@ -205,82 +280,7 @@ var nullableIntArray []*int = array.AsIntArrayN()
 var nullableSloatArray []*float64 = array.AsFloatArrayN()
 ```
 
-### Scalars
-
-Getting scalars - `string`, `int`, etc. - is similar both for object and array and only differ
-in the parameter type (objects take `string` as key and arrays take `int` as index). You can get scalars by value or by reference, where the latter allows JSON null values. Nullable methods have 
-the suffix 'N' in their names. 
-
-#### From Object
-
-By value:
-
-```go
-// string 
-var name string = object.GetString("name") // Jason
-
-// int 
-var age int = object.GetInt("age") // 15
-
-// float64 
-var height float64 = object.GetFloat("height") // 1.87
-
-// bool 
-var isFunny bool = object.GetBool("is_funny") // false
-```
-
-By reference, which allows JSON null values (note the suffix 'N' at the end of the method names):
-
-```go
-// string
-var nameNullable *string = object.GetStringN("non-existent-key") // nil
-
-// int
-var ageNullable *int = object.GetIntN("non-existent-key") // nil
-
-// float64
-var heightNullable *float64 = object.GetFloatN("non-existent-key") // nil
-
-// bool
-var isFunnyNullable *bool = object.GetBoolN("non-existent-key") // nil
-```
-
-#### From Array
-
-By value:
-
-```go
-// string 
-var s string = array.GetString(0)
-
-// int 
-var i int = array.GetInt(2)
-
-// float64 
-var f float64 = array.GetFloat(5)
-
-// bool 
-var b bool = array.GetBool(7)
-```
-
-By reference, which allows JSON null values (Note the suffix 'N' at the end of the method names):
-
-```go
-// string
-var nameNullable *string = array.GetStringN(100) // nil
-
-// int
-var ageNullable *int = array.GetIntN(100) // nil
-
-// float64
-var heightNullable *float64 = array.GetFloatN(100) // nil
-
-// bool
-var isFunnyNullable *bool = array.GetBoolN(100) // nil
-```
-
-
-#### Time
+### Time
 
 To get a string as `time.Time`
 

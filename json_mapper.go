@@ -34,10 +34,7 @@ type JsonMapper struct {
 	AsObject JsonObject
 	AsArray  JsonArray
 
-	buffer   []byte
-	offset   int
-	lastRead int
-	reader   io.Reader
+	reader io.Reader
 }
 
 // NewMapperFromBytes parses JSON data from a byte slice.
@@ -119,7 +116,6 @@ func NewMapperFromFile(path string) (JsonMapper, error) {
 func NewMapperFromBuffer(reader io.Reader) (JsonMapper, error) {
 	var m JsonMapper
 	m.reader = reader
-	m.buffer = make([]byte, bufferSize)
 	return m, nil
 }
 
@@ -148,9 +144,6 @@ func (m *JsonMapper) AsUUID() (uuid.UUID, error) {
 func (m *JsonMapper) ProcessObjectsWithArgs(numberOfWorkers int, f func(o JsonObject, args ...any), args ...any) error {
 	if m.reader == nil {
 		return errors.New("reader is not set")
-	}
-	if m.buffer == nil {
-		m.buffer = make([]byte, bufferSize)
 	}
 
 	dec := json.NewDecoder(m.reader)

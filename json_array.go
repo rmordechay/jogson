@@ -109,7 +109,7 @@ func (a *JsonArray) AsFloatArrayN() []*float64 {
 
 // As2DArray converts the elements of the JsonArray into a two-dimensional array, returning
 // a slice of JsonArray objects.
-func (a *JsonArray) As2DArray() []JsonArray {
+func (a *JsonArray) As2DArray() []*JsonArray {
 	return getGenericArray(convertAnyToArray, *a)
 }
 
