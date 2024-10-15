@@ -12,8 +12,8 @@ A simple Go library to simplify working with JSON without the need to define str
     * [Objects](#Objects)
     * [Arrays](#Arrays)
     * [Time](#time)
+    * [UUID](#uuid)
     * [Types](#types)
-    * [Find Elements](#Find-Elements)
     * [Get JSON String](#get-json-string)
 * [Write to JSON](#Write-to-JSON)
     * [Write Object](#Write-object)
@@ -75,6 +75,7 @@ Once you have an object, an array or a mapper, you can read the data easily. Con
 
 ```go
 jsonString := `{
+    "id": "748494b8-7d6e-4cad-8065-89e758797313",
     "name": "Jason",
     "age": 43,
     "height": 1.87,
@@ -285,11 +286,12 @@ var nullableSloatArray []*float64 = array.AsFloatArrayN()
 
 ### Time
 
-To get a string as `time.Time`
+To get a string value as `time.Time`
 
 ```go
+var birthday time.Time = object.GetTime("birthday") // 1981-10-08T00:00:00Z
 var birthday time.Time = array.GetTime(0)
-var birthday string = object.GetTime("birthday".Format(time.RFC3339)) // 1981-10-08T00:00:00Z
+var birthday time.Time = mapper.AsTime()
 ```
 
 The mapper will try to format the string against different time formats to increase the chance of correct parsing. The following 
@@ -297,8 +299,19 @@ formats are supported:
 
 `time.RFC3339` `time.RFC850` `time.RFC822` `time.RFC822Z` `time.RFC1123` `time.RFC1123Z` `time.RFC3339Nano` `time.ANSIC` `time.UnixDate` `time.RubyDate` `time.Layout` `time.Kitchen` `time.Stamp` `time.StampMilli` `time.StampMicro` `time.StampNano` `time.DateTime` `time.DateOnly` `time.TimeOnly`
 
-### Types
 
+### UUID
+
+You can also get a string value as `uuid.UUID` type
+
+```go
+var uuidValue uuid.UUID = object.GetUUID("id")
+var uuidValue uuid.UUID = array.GetUUID(0)
+var uuidValue uuid.UUID = mapper.AsUUID()
+```
+
+### Types
+To check which type is `JsonMapper` object use
 ```go
 fmt.Println(mapper.IsObject)    // true
 fmt.Println(mapper.IsBool)      // false
@@ -309,20 +322,10 @@ fmt.Println(mapper.IsArray)     // false
 fmt.Println(mapper.IsNull)      // false
 ```
 
-### Find Elements
-
-You can search for a nested element.
-
-```go
-element := mapper.AsObject.Find("Rachel")
-fmt.Println(element.IsObject) // true 
-fmt.Println(element.Contains("is_funny")) // true 
-```
-
 ### Get JSON String
 
-You can get a string from every JSON element with `String()`. The string will be printed as 
-a valid JSON
+Every JSON element - `JsonObject`, `JsonArray` or `JsonMapper` - have the method `String()` and `PrettyString()`. 
+The returned string from these methods will be a valid JSON. For example
 
 ```go
 fmt.Println(mapper.AsObject.String())
