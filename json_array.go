@@ -163,13 +163,14 @@ func (a *JsonArray) ContainsFloat(f float64) bool {
 
 // Get retrieves the value at index i and returns it as a JsonMapper
 // If the index is out of range, the value is invalid or is null, an error will be set to LastError.
-func (a *JsonArray) Get(i int) JsonMapper {
+func (a *JsonArray) Get(i int) *JsonMapper {
 	a.setLastError(nil)
 	if i >= a.Length() {
 		a.setLastError(createIndexOutOfRangeErr(i, a.Length()))
-		return JsonMapper{}
+		return &JsonMapper{}
 	}
-	return getMapperFromField(a.elements[i])
+	mapper := getMapperFromField(a.elements[i])
+	return &mapper
 }
 
 // GetString retrieves the string value from the element at the specified index. JSON values that are not

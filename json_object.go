@@ -154,12 +154,19 @@ func (o *JsonObject) AsObjectMap() map[string]JsonObject {
 // If the key does not exist, the value is invalid or is null, an error will be set to LastError.
 // In case of an error, the zero value will be returned.
 func (o *JsonObject) Get(key string) *JsonMapper {
-	v := getMapperFromField(o.object[key])
-	return &v
+	o.setLastError(nil)
+	v, ok := o.object[key]
+	if !ok {
+		o.setLastError(createKeyNotFoundErr(key))
+		return &JsonMapper{}
+	}
+	mapper := getMapperFromField(v)
+	return &mapper
 }
 
 // ToStruct converts the JsonObject to the type v.
 func (o *JsonObject) ToStruct(v any) {
+	o.setLastError(nil)
 	bytes, err := marshal(o.object)
 	if err != nil {
 		o.setLastError(err)
@@ -295,20 +302,6 @@ func (o *JsonObject) GetArray(key string) *JsonArray {
 		return EmptyArray()
 	}
 }
-
-//// Find searches for a key in the JsonObject and its nested objects.
-//func (o *JsonObject) Find(key string) JsonMapper {
-//	for k, v := range o.object {
-//		field := getMapperFromField(v)
-//		if k == key {
-//			return field
-//		}
-//		if field.IsObject {
-//			return field.AsObject.Find(key)
-//		}
-//	}
-//	return JsonMapper{}
-//}
 
 // AddJsonObject adds a nested JsonObject to the JsonObject associated with the key.
 func (o *JsonObject) AddJsonObject(key string, jsonObject *JsonObject) {

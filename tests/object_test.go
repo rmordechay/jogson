@@ -361,11 +361,22 @@ func TestObjectGetTime(t *testing.T) {
 }
 
 func TestObjectGetUUID(t *testing.T) {
-	mapper, err := jogson.NewMapperFromString(jsonUUIDTest)
+	mapper, err := jogson.NewMapperFromString(jsonUUIDObjectTest)
 	assert.NoError(t, err)
 	uuid, err := mapper.AsObject.Get("uuid").AsUUID()
 	assert.NoError(t, err)
 	assert.Equal(t, "870fb3fd-d177-4ac4-a648-a33afd5ab288", uuid.String())
+
+	obj, err := jogson.NewObjectFromString(jsonUUIDObjectTest)
+	assert.NoError(t, err)
+	assert.NoError(t, obj.LastError)
+	assert.Equal(t, "870fb3fd-d177-4ac4-a648-a33afd5ab288", obj.GetUUID("uuid").String())
+
+	obj2, err := jogson.NewObjectFromString(jsonInvalidUUIDObjectTest)
+	assert.NoError(t, err)
+	_ = obj2.GetUUID("uuid")
+	assert.Error(t, obj2.LastError)
+	assert.Equal(t, "'Z70fb3fd-d177-4ac4-a648-a33afd5ab288' could not be parsed as uuid.UUID. invalid UUID format", obj2.LastError.Error())
 }
 
 func TestObjectToStruct(t *testing.T) {
