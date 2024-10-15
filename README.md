@@ -34,23 +34,33 @@ go get github.com/rmordechay/jogson
 
 For more information, see [design](#Design).
 
+#### From String
+
 ```go
-// From string
 object, err := jogson.NewObjectFromString(jsonString)
 array, err := jogson.NewArrayFromString(jsonString)
 mapper, err := jogson.NewMapperFromString(jsonString)
+```
 
-// From bytes
+#### From Bytes
+
+```go
 object, err := jogson.NewObjectFromBytes(jsonBytes)
 array, err := jogson.NewArrayFromBytes(jsonBytes)
 mapper, err := jogson.NewMapperFromBytes(jsonBytes)
+```
 
-// From struct
+#### From Struct
+
+```go
 object, err := jogson.NewObjectFromStruct(jsonStruct)
 array, err := jogson.NewArrayFromStruct(jsonStruct)
 mapper, err := jogson.NewMapperFromStruct(jsonStruct)
+```
 
-// From file
+#### From File
+
+```go
 mapper, err := jogson.NewMapperFromFile(jsonFilePath)
 object, err := jogson.NewObjectFromFile(jsonFilePath)
 array, err := jogson.NewArrayFromFile(jsonFilePath)
