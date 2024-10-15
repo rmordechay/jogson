@@ -14,8 +14,6 @@ import (
 	"github.com/google/uuid"
 )
 
-const bufferSize = 4096
-
 // JsonMapper represents a generic JSON type. It contains fields for all supported JSON
 // types like bool, int, float, string, object, and array, as well as Go supported types.
 type JsonMapper struct {

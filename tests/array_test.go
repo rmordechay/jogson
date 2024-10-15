@@ -346,6 +346,10 @@ func TestArrayGetUUID(t *testing.T) {
 	assert.NoError(t, err)
 	assert.NoError(t, array.LastError)
 	assert.Equal(t, "870fb3fd-d177-4ac4-a648-a33afd5ab288", array.GetUUID(0).String())
+
+	assert.Zero(t, array.GetUUID(30))
+	assert.Error(t, array.LastError)
+	assert.Equal(t, "index out of range: [30] with length 1", array.LastError.Error())
 }
 
 func TestArrayIsNull(t *testing.T) {
