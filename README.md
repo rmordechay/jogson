@@ -1,5 +1,6 @@
 # Jogson - JSON Mapper Library for Go
 
+![Go Version](https://img.shields.io/badge/go%20version-%3E=1.18-61CFDD.svg)
 [![GoDoc](https://pkg.go.dev/badge/badge)](https://pkg.go.dev/github.com/rmordechay/jogson)
 [![Go Report Card](https://goreportcard.com/badge/github.com/rmordechay/jogson)](https://goreportcard.com/report/github.com/rmordechay/jogson)
 
@@ -194,12 +195,10 @@ for key, child := range children.Elements() {
 
 #### As Maps
 
-To get the object as a map of strings by scalar values, use one of the following.
-
-Note! values that are JSON null will be returned as Go zero value. If you want to 
-regard null values, call the function with the `N` suffix (see next section). This applies 
-only for the scalar types, for `JsonObject` and `JsonArray` you can use the `IsNull()` method
-that both structs have.
+You can also get the object as a map of strings by scalars (`string`, `int`, etc.) Values that 
+are JSON `null` will be returned as Go zero value. If you want to regard null values, call the 
+function with the suffix `N` (see next section). If a null was found, `LastError` will be set
+and report a null conversion error. For more information, see [error handling](#error-handling).
 
 ```go
 // Get the JsonObject as map of string and string
@@ -219,8 +218,13 @@ var objectArray map[string]JsonObject = object.AsObjectMap()
 ```
 
 #### As Maps with Nullable Values
-If the array contains null value and you , then use one of the following function that returns the
-values as a pointer rather than value which allows nil values.
+
+If the object contains null values, and you want to represent that as nil value instead of zero value, you can 
+use one of the following functions that returns a pointer rather than a value which allows nil. This set of methods 
+do not set the `LastError` when a null value was found but instead returns it without reporting an error. 
+
+Note! This applies only for the scalar types. `JsonObject` and `JsonArray` will return an instance anyway,
+and you should use the `IsNull()` method to check if they are null.
 
 ```go
 // Get the JsonObject as map of string and nullable strings
@@ -253,6 +257,11 @@ for _, feature := range features.Elements() {
 
 #### As Arrays
 
+You can also get the array as a slice of scalars (`string`, `int`, etc.). Values that
+are JSON `null` will be returned as Go zero value. If you want to regard null values, call the
+function with the suffix `N` (see next section). If a null was found, `LastError` will be set
+and report a null conversion error. For more information, see [error handling](#error-handling).
+
 ```go
 
 // Get the JsonArray as a slice of string
@@ -272,6 +281,13 @@ var objectArray []JsonObject = array.AsObjectArray()
 ```
 
 #### As Arrays of Nullable Values
+
+If the array contains null values, and you want to represent that as nil value instead of zero value, you can
+use one of the following functions that returns a pointer rather than a value which allows nil. This set of methods
+do not set the `LastError` when a null value was found but instead returns it without reporting an error.
+
+Note! This applies only for the scalar types. `JsonObject` and `JsonArray` will return an instance anyway, 
+and you should use the `IsNull()` method to check if they are null.
 
 ```go
 // Get the JsonArray as a slice of nullable strings

@@ -139,14 +139,12 @@ func getObjectScalar[T any](o *JsonObject, f jc[T], key string) T {
 
 func getObjectScalarN[T any](o *JsonObject, f jcn[T], key string) *T {
 	o.setLastError(nil)
-	var t T
 	v, ok := o.object[key]
 	if !ok {
 		o.setLastError(createKeyNotFoundErr(key))
 		return nil
 	}
 	if v == nil {
-		o.setLastError(createTypeConversionErr(nil, t))
 		return nil
 	}
 	return f(v, o)
@@ -169,14 +167,12 @@ func getArrayScalar[T any](a *JsonArray, f jc[T], i int) T {
 
 func getArrayScalarN[T any](a *JsonArray, f jcn[T], i int) *T {
 	a.setLastError(nil)
-	var t T
 	if i >= a.Length() {
 		a.setLastError(createIndexOutOfRangeErr(i, a.Length()))
 		return nil
 	}
 	data := a.elements[i]
 	if data == nil {
-		a.setLastError(createTypeConversionErr(nil, t))
 		return nil
 	}
 	return f(data, a)
@@ -204,7 +200,6 @@ func convertAnyToString(data *any, j jsonI) string {
 
 func convertAnyToStringN(data *any, j jsonI) *string {
 	if data == nil {
-		j.setLastError(createTypeConversionErr(nil, ""))
 		return nil
 	}
 	switch v := (*data).(type) {
@@ -243,7 +238,6 @@ func convertAnyToInt(data *any, j jsonI) int {
 
 func convertAnyToIntN(data *any, j jsonI) *int {
 	if data == nil {
-		j.setLastError(createTypeConversionErr(nil, 0))
 		return nil
 	}
 	switch v := (*data).(type) {
@@ -273,7 +267,6 @@ func convertAnyToFloat(data *any, j jsonI) float64 {
 
 func convertAnyToFloatN(data *any, j jsonI) *float64 {
 	if data == nil {
-		j.setLastError(createTypeConversionErr(nil, 0.0))
 		return nil
 	}
 	v, ok := (*data).(float64)
@@ -299,7 +292,6 @@ func convertAnyToBool(data *any, j jsonI) bool {
 
 func convertAnyToBoolN(data *any, j jsonI) *bool {
 	if data == nil {
-		j.setLastError(createTypeConversionErr(nil, false))
 		return nil
 	}
 	v, ok := (*data).(bool)

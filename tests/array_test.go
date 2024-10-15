@@ -123,6 +123,10 @@ func TestArrayGetStringN(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Nil(t, array.GetStringN(2))
 	assert.Equal(t, "Jason", *array.GetStringN(0))
+	assert.Equal(t, "15", *array.GetStringN(1))
+	assert.Nil(t, array.GetStringN(2))
+	assert.Equal(t, "1.81", *array.GetStringN(3))
+	assert.Equal(t, "true", *array.GetStringN(4))
 }
 
 func TestArrayGetIntN(t *testing.T) {
