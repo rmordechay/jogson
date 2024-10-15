@@ -311,7 +311,9 @@ var uuidValue uuid.UUID = mapper.AsUUID()
 ```
 
 ### Types
-To check which type is `JsonMapper` object use
+
+To check what type is your `JsonMapper` currently holding, use
+
 ```go
 fmt.Println(mapper.IsObject)    // true
 fmt.Println(mapper.IsBool)      // false
