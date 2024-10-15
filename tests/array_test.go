@@ -307,6 +307,22 @@ func TestArrayGetTime(t *testing.T) {
 	assert.Equal(t, expectedTime3, actualTime3)
 }
 
+func TestArrayIsNull(t *testing.T) {
+	mapper, _ := jogson.NewMapperFromString(jsonObjectTest)
+	object := mapper.AsObject
+	nullArray := object.GetArray("address")
+	assert.True(t, nullArray.IsNull())
+}
+
+func TestArrayIsEmpty(t *testing.T) {
+	array, _ := jogson.NewArrayFromFile(jsonEmptyArrayTest)
+	assert.True(t, array.IsEmpty())
+	obj, _ := jogson.NewObjectFromString(jsonEmptyArrayTest)
+	assert.True(t, array.IsEmpty())
+	assert.True(t, obj.IsEmpty())
+	assert.True(t, obj.IsNull())
+}
+
 func TestArrayPrintString(t *testing.T) {
 	mapper, err := jogson.NewMapperFromString(jsonObjectArrayTest)
 	assert.NoError(t, err)

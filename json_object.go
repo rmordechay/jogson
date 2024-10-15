@@ -18,7 +18,7 @@ func NewObjectFromBytes(data []byte) (*JsonObject, error) {
 	jsonObject := EmptyObject()
 	err := unmarshal(data, &jsonObject.object)
 	if err != nil {
-		return nil, err
+		return &JsonObject{}, err
 	}
 	return jsonObject, nil
 }
@@ -27,7 +27,7 @@ func NewObjectFromBytes(data []byte) (*JsonObject, error) {
 func NewObjectFromFile(path string) (*JsonObject, error) {
 	file, err := os.ReadFile(path)
 	if err != nil {
-		return nil, err
+		return &JsonObject{}, err
 	}
 	return NewObjectFromBytes(file)
 }
@@ -36,7 +36,7 @@ func NewObjectFromFile(path string) (*JsonObject, error) {
 func NewObjectFromStruct[T any](s T) (*JsonObject, error) {
 	jsonBytes, err := marshal(s)
 	if err != nil {
-		return nil, err
+		return &JsonObject{}, err
 	}
 	return NewObjectFromBytes(jsonBytes)
 }
@@ -168,26 +168,12 @@ func (o *JsonObject) GetString(key string) string {
 	return getObjectScalar(o, convertAnyToString, key)
 }
 
-// GetStringN is the nullable version of GetString, and returns a pointer instead of a zero value which
-// imitates JSON's null as Go's nil. A nil pointer is returned if the key was not found, it is null or
-// could not be converted to string. The type of the error will be stored in LastError.
-func (o *JsonObject) GetStringN(key string) *string {
-	return getObjectScalarN(o, convertAnyToStringN, key)
-}
-
 // GetInt retrieves the int value associated with the specified key.
 // If the key does not exist, the value is invalid or is null, an error will be set to LastError.
 // In case of an error, the zero value will be returned. If you want to regard null values as well,
 // use GetIntN()
 func (o *JsonObject) GetInt(key string) int {
 	return getObjectScalar(o, convertAnyToInt, key)
-}
-
-// GetIntN is the nullable version of GetInt, and returns a pointer instead of a zero value which
-// imitates JSON's null as Go's nil. A nil pointer is returned if the key was not found, it is null or
-// could not be converted to int. The type of the error will be stored in LastError.
-func (o *JsonObject) GetIntN(key string) *int {
-	return getObjectScalarN(o, convertAnyToIntN, key)
 }
 
 // GetFloat retrieves the float64 value associated with the specified key.
@@ -198,19 +184,33 @@ func (o *JsonObject) GetFloat(key string) float64 {
 	return getObjectScalar(o, convertAnyToFloat, key)
 }
 
-// GetFloatN is the nullable version of GetFloat, and returns a pointer instead of a zero value which
-// imitates JSON's null as Go's nil. A nil pointer is returned if the key was not found, it is null or
-// could not be converted to float64. The type of the error will be stored in LastError.
-func (o *JsonObject) GetFloatN(key string) *float64 {
-	return getObjectScalarN(o, convertAnyToFloatN, key)
-}
-
 // GetBool retrieves the bool value associated with the specified key.
 // If the key does not exist, the value is invalid or is null, an error will be set to LastError.
 // In case of an error, the zero value will be returned. If you want to regard null values as well,
 // use GetBoolN()
 func (o *JsonObject) GetBool(key string) bool {
 	return getObjectScalar(o, convertAnyToBool, key)
+}
+
+// GetStringN is the nullable version of GetString, and returns a pointer instead of a zero value which
+// imitates JSON's null as Go's nil. A nil pointer is returned if the key was not found, it is null or
+// could not be converted to string. The type of the error will be stored in LastError.
+func (o *JsonObject) GetStringN(key string) *string {
+	return getObjectScalarN(o, convertAnyToStringN, key)
+}
+
+// GetIntN is the nullable version of GetInt, and returns a pointer instead of a zero value which
+// imitates JSON's null as Go's nil. A nil pointer is returned if the key was not found, it is null or
+// could not be converted to int. The type of the error will be stored in LastError.
+func (o *JsonObject) GetIntN(key string) *int {
+	return getObjectScalarN(o, convertAnyToIntN, key)
+}
+
+// GetFloatN is the nullable version of GetFloat, and returns a pointer instead of a zero value which
+// imitates JSON's null as Go's nil. A nil pointer is returned if the key was not found, it is null or
+// could not be converted to float64. The type of the error will be stored in LastError.
+func (o *JsonObject) GetFloatN(key string) *float64 {
+	return getObjectScalarN(o, convertAnyToFloatN, key)
 }
 
 // GetBoolN is the nullable version of GetBool, and returns a pointer instead of a zero value which
@@ -281,11 +281,11 @@ func (o *JsonObject) GetArray(key string) *JsonArray {
 	v, ok := o.object[key]
 	if !ok {
 		o.setLastError(createKeyNotFoundErr(key))
-		return EmptyArray()
+		return nullArray()
 	}
 	if v == nil {
 		o.setLastError(createTypeConversionErr(nil, JsonArray{}))
-		return EmptyArray()
+		return nullArray()
 	}
 	switch castedValue := (*v).(type) {
 	case []any:

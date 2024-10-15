@@ -68,7 +68,7 @@ array, err := jogson.NewArrayFromFile(jsonFilePath)
 
 ## Read from JSON
 
-Once you have the `mapper`, you can read the data easily. Consider the following JSON
+Once you have an object, an array or a mapper, you can read the data easily. Consider the following JSON
 
 ```go
 jsonString := `{
@@ -115,7 +115,7 @@ for key, child := range children.Elements() {
 
 #### As Maps
 
-To get the object as a map of strings and scalars value, use one of the following.
+To get the object as a map of strings by scalar values, use one of the following.
 
 Note! values that are JSON null will be returned as Go zero value. If you want to 
 regard null values, call the function with the `N` suffix (see next section). This applies 

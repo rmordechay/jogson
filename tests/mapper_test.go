@@ -118,8 +118,9 @@ func TestJsonInvalid(t *testing.T) {
 	assert.Error(t, err)
 
 	obj, err := jogson.NewObjectFromString(jsonInvalidObjectTest)
-	assert.Zero(t, obj)
 	assert.Error(t, err)
+	assert.True(t, obj.IsNull())
+	assert.True(t, obj.IsEmpty())
 
 	arr, err := jogson.NewArrayFromString(jsonInvalidArrayTest)
 	assert.Empty(t, arr)

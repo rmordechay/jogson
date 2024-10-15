@@ -5,6 +5,7 @@ const jsonAnyArrayTest = `["Jason", 15, null, 1.81, true]`
 const jsonStringArrayTest = `["Jason", "Chris", "Rachel"]`
 const jsonStringArrayWithNullTest = `[null, "Chris", "Rachel"]`
 const jsonEmptyArrayTest = `[]`
+const jsonEmptyObjectTest = `{}`
 const jsonIntArrayTest = `[0, 15, -54, -346, 9223372036854775807]`
 const jsonIntArrayWithNullTest = `[0, null]`
 const jsonFloatArrayTest = `[15.13, 2, 45.3984, -1.81, 9.223372036854776]`

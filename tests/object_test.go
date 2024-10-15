@@ -265,7 +265,7 @@ func TestObjectGetArrayFails(t *testing.T) {
 
 	arr := object.GetArray("not found")
 	assert.ErrorIs(t, object.LastError, jogson.KeyNotFoundErr)
-	assert.Equal(t, jogson.EmptyArray(), arr)
+	assert.True(t, arr.IsNull())
 
 	arr = object.GetArray("name")
 	assert.ErrorIs(t, object.LastError, jogson.TypeConversionErr)
@@ -273,7 +273,7 @@ func TestObjectGetArrayFails(t *testing.T) {
 
 	arr = object.GetArray("address")
 	assert.ErrorIs(t, object.LastError, jogson.TypeConversionErr)
-	assert.Equal(t, jogson.EmptyArray(), arr)
+	assert.True(t, arr.IsNull())
 }
 
 func TestObjectGetObject(t *testing.T) {
@@ -340,9 +340,16 @@ func TestObjectToStruct(t *testing.T) {
 func TestObjectIsNull(t *testing.T) {
 	mapper, _ := jogson.NewMapperFromString(jsonObjectTest)
 	object := mapper.AsObject
+	nullObj := object.GetObject("address")
+	assert.True(t, nullObj.IsNull())
+}
 
-	obj := object.GetObject("address")
-	assert.True(t, obj.IsNull())
+func TestObjectIsEmpty(t *testing.T) {
+	object, _ := jogson.NewObjectFromString(jsonEmptyObjectTest)
+	array, _ := jogson.NewArrayFromString(jsonEmptyObjectTest)
+	assert.True(t, object.IsEmpty())
+	assert.True(t, array.IsEmpty())
+	assert.True(t, array.IsNull())
 }
 
 func TestObjectPrintString(t *testing.T) {
