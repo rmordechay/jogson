@@ -261,13 +261,11 @@ func (a *JsonArray) GetObject(i int) *JsonObject {
 		a.setLastError(createTypeConversionErr(nil, ""))
 		return nullObject()
 	}
-	switch (*element).(type) {
+	switch v := (*element).(type) {
 	case map[string]*any:
-		data := (*element).(map[string]*any)
-		return newObjectFromMap(data)
+		return newObjectFromMap(v)
 	case map[string]any:
-		data := convertToMapValuesPtr((*element).(map[string]any))
-		return newObjectFromMap(data)
+		return newObjectFromMap(convertToMapValuesPtr(v))
 	default:
 		a.setLastError(createTypeConversionErr(*element, JsonObject{}))
 		return nullObject()

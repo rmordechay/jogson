@@ -64,8 +64,6 @@ func getMapperFromField(data *any) JsonMapper {
 	case []any:
 		mapper.IsArray = true
 		mapper.AsArray = *newArrayFromSlice(convertToSlicePtr(value))
-	case nil:
-		mapper.IsNull = true
 	}
 	return mapper
 }

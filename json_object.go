@@ -261,13 +261,11 @@ func (o *JsonObject) GetObject(key string) *JsonObject {
 		o.setLastError(createTypeConversionErr(nil, JsonObject{}))
 		return nullObject()
 	}
-	switch (*v).(type) {
+	switch value := (*v).(type) {
 	case map[string]*any:
-		data := (*v).(map[string]*any)
-		return newObjectFromMap(data)
+		return newObjectFromMap(value)
 	case map[string]any:
-		dataPtr := convertToMapValuesPtr((*v).(map[string]any))
-		return newObjectFromMap(dataPtr)
+		return newObjectFromMap(convertToMapValuesPtr(value))
 	default:
 		o.setLastError(createTypeConversionErr(*v, JsonObject{}))
 		return nullObject()
@@ -287,11 +285,11 @@ func (o *JsonObject) GetArray(key string) *JsonArray {
 		o.setLastError(createTypeConversionErr(nil, JsonArray{}))
 		return nullArray()
 	}
-	switch castedValue := (*v).(type) {
+	switch value := (*v).(type) {
 	case []any:
-		return newArrayFromSlice(convertToSlicePtr(castedValue))
+		return newArrayFromSlice(convertToSlicePtr(value))
 	case []*any:
-		return newArrayFromSlice(castedValue)
+		return newArrayFromSlice(value)
 	default:
 		o.setLastError(createTypeConversionErr(*v, JsonArray{}))
 		return EmptyArray()

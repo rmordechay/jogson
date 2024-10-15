@@ -165,6 +165,13 @@ func TestObjectGetString(t *testing.T) {
 	assert.Equal(t, "true", s)
 }
 
+func TestObjectGetStringN(t *testing.T) {
+	obj, err := jogson.NewObjectFromString(jsonObjectTest)
+	assert.NoError(t, err)
+	assert.Nil(t, obj.GetStringN("address"))
+	assert.Equal(t, "Jason", *obj.GetStringN("name"))
+}
+
 func TestObjectGetStringFails(t *testing.T) {
 	mapper, _ := jogson.NewMapperFromString(jsonObjectTest)
 	object := mapper.AsObject
@@ -189,6 +196,13 @@ func TestObjectGetInt(t *testing.T) {
 	i = object.GetInt("height")
 	assert.NoError(t, object.LastError)
 	assert.Equal(t, 1, i)
+}
+
+func TestObjectGetIntN(t *testing.T) {
+	obj, err := jogson.NewObjectFromString(jsonObjectTest)
+	assert.NoError(t, err)
+	assert.Nil(t, obj.GetIntN("address"))
+	assert.Equal(t, 15, *obj.GetIntN("age"))
 }
 
 func TestObjectGetIntFails(t *testing.T) {
@@ -221,6 +235,13 @@ func TestObjectGetFloat(t *testing.T) {
 	assert.Equal(t, 1.81, f)
 }
 
+func TestObjectGetFloatN(t *testing.T) {
+	obj, err := jogson.NewObjectFromString(jsonObjectTest)
+	assert.NoError(t, err)
+	assert.Nil(t, obj.GetFloatN("address"))
+	assert.Equal(t, 1.81, *obj.GetFloatN("height"))
+}
+
 func TestObjectGetFloatFails(t *testing.T) {
 	mapper, _ := jogson.NewMapperFromString(jsonObjectTest)
 	object := mapper.AsObject
@@ -245,6 +266,13 @@ func TestObjectGetBool(t *testing.T) {
 	b := object.GetBool("is_funny")
 	assert.NoError(t, object.LastError)
 	assert.Equal(t, true, b)
+}
+
+func TestObjectGetBoolN(t *testing.T) {
+	obj, err := jogson.NewObjectFromString(jsonObjectTest)
+	assert.NoError(t, err)
+	assert.Nil(t, obj.GetBoolN("address"))
+	assert.Equal(t, true, *obj.GetBoolN("is_funny"))
 }
 
 func TestObjectGetBoolFails(t *testing.T) {

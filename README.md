@@ -25,7 +25,10 @@ A simple Go library to simplify working with JSON without the need to define str
   * [JsonArray](#JsonArray)
 
 ## Installation
-Go version must be at least `1.18`. To install the library use:
+`Jogson` requires Go version `1.18` or above. 
+
+To install the library use:
+
 ```bash
 go get github.com/rmordechay/jogson
 ```

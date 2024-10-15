@@ -118,6 +118,34 @@ func TestArrayGetMapper(t *testing.T) {
 	assert.True(t, elementMapper.IsBool)
 }
 
+func TestArrayGetStringN(t *testing.T) {
+	array, err := jogson.NewArrayFromString(jsonAnyArrayTest)
+	assert.NoError(t, err)
+	assert.Nil(t, array.GetStringN(2))
+	assert.Equal(t, "Jason", *array.GetStringN(0))
+}
+
+func TestArrayGetIntN(t *testing.T) {
+	array, err := jogson.NewArrayFromString(jsonAnyArrayTest)
+	assert.NoError(t, err)
+	assert.Nil(t, array.GetIntN(2))
+	assert.Equal(t, 15, *array.GetIntN(1))
+}
+
+func TestArrayGetFloatN(t *testing.T) {
+	array, err := jogson.NewArrayFromString(jsonAnyArrayTest)
+	assert.NoError(t, err)
+	assert.Nil(t, array.GetFloatN(2))
+	assert.Equal(t, 1.81, *array.GetFloatN(3))
+}
+
+func TestArrayGetBoolN(t *testing.T) {
+	array, err := jogson.NewArrayFromString(jsonAnyArrayTest)
+	assert.NoError(t, err)
+	assert.Nil(t, array.GetBoolN(2))
+	assert.Equal(t, true, *array.GetBoolN(4))
+}
+
 func TestArrayGetString(t *testing.T) {
 	mapper, _ := jogson.NewMapperFromString(jsonAnyArrayTest)
 	array := mapper.AsArray
