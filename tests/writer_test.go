@@ -109,13 +109,20 @@ func TestWriteArrayFloatToObject(t *testing.T) {
 	assert.Equal(t, 4.2, arrayElements[2].AsFloat)
 }
 
-func TestWriteFloatsArray(t *testing.T) {
+func TestWriteScalarToArray(t *testing.T) {
 	arr := jogson.EmptyArray()
 	arr.AddInt(1)
-	arr.AddInt(4)
-	arr.AddInt(6)
-	assert.Equal(t, 3, arr.Length())
+	arr.AddFloat(4.4)
+	arr.AddString("s")
+	arr.AddBool(true)
+	assert.Equal(t, 4, arr.Length())
 	assert.Equal(t, 1, arr.GetInt(0))
 	assert.Equal(t, 4, arr.GetInt(1))
-	assert.Equal(t, 6, arr.GetInt(2))
+	assert.Equal(t, 4.4, arr.GetFloat(1))
+	assert.Equal(t, "s", arr.GetString(2))
+	assert.Equal(t, true, arr.GetBool(3))
+	assert.Equal(t, "", arr.GetString(5))
+	assert.Equal(t, 0, arr.GetInt(5))
+	assert.Equal(t, 0.0, arr.GetFloat(5))
+	assert.Equal(t, false, arr.GetBool(5))
 }

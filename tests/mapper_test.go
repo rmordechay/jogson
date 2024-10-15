@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"math/rand"
-	"strings"
 	"sync"
 	"testing"
 	"time"
@@ -86,31 +85,31 @@ func TestMapperPrettyString(t *testing.T) {
 	assert.True(t, mapper.IsNull)
 }
 
-func TestProcessObjects(t *testing.T) {
-	n := 1000
-	array, _ := generateJSONArray(n)
-	mapper, _ := jogson.NewMapperFromBuffer(strings.NewReader(array))
-	c := 0
-	var mu sync.Mutex
-	err := mapper.ProcessObjects(10, func(o jogson.JsonObject) {
-		mu.Lock()
-		c++
-		mu.Unlock()
-	})
-	assert.NoError(t, err)
-	assert.Equal(t, n, c)
-}
-
-func TestProcessObjectsWithArgs(t *testing.T) {
-	n := 1000
-	array, _ := generateJSONArray(n)
-	mapper, _ := jogson.NewMapperFromBuffer(strings.NewReader(array))
-	c := 0
-	var mu sync.Mutex
-	err := mapper.ProcessObjectsWithArgs(10, worker, &c, &mu)
-	assert.NoError(t, err)
-	assert.Equal(t, n, c)
-}
+//func TestProcessObjects(t *testing.T) {
+//	n := 1000
+//	array, _ := generateJSONArray(n)
+//	mapper, _ := jogson.NewMapperFromBuffer(strings.NewReader(array))
+//	c := 0
+//	var mu sync.Mutex
+//	err := mapper.processObjects(10, func(o jogson.JsonObject) {
+//		mu.Lock()
+//		c++
+//		mu.Unlock()
+//	})
+//	assert.NoError(t, err)
+//	assert.Equal(t, n, c)
+//}
+//
+//func TestProcessObjectsWithArgs(t *testing.T) {
+//	n := 1000
+//	array, _ := generateJSONArray(n)
+//	mapper, _ := jogson.NewMapperFromBuffer(strings.NewReader(array))
+//	c := 0
+//	var mu sync.Mutex
+//	err := mapper.processObjectsWithArgs(10, worker, &c, &mu)
+//	assert.NoError(t, err)
+//	assert.Equal(t, n, c)
+//}
 
 func TestJsonInvalid(t *testing.T) {
 	mapper, err := jogson.NewMapperFromString(jsonInvalidObjectTest)

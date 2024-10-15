@@ -1,14 +1,11 @@
 package jogson
 
 import (
-	"encoding/json"
-	"errors"
 	"fmt"
 	"io"
 	"os"
 	"strconv"
 	"strings"
-	"sync"
 	"time"
 
 	"github.com/google/uuid"
@@ -111,11 +108,11 @@ func NewMapperFromFile(path string) (JsonMapper, error) {
 	return NewMapperFromBytes(file)
 }
 
-func NewMapperFromBuffer(reader io.Reader) (JsonMapper, error) {
-	var m JsonMapper
-	m.reader = reader
-	return m, nil
-}
+//func NewMapperFromBuffer(reader io.Reader) (JsonMapper, error) {
+//	var m JsonMapper
+//	m.reader = reader
+//	return m, nil
+//}
 
 // AsTime retrieves the value as uuid.UUID. Works only if the JSON value is a string.
 func (m *JsonMapper) AsTime() (time.Time, error) {
@@ -139,51 +136,51 @@ func (m *JsonMapper) AsUUID() (uuid.UUID, error) {
 	return uuid.Parse(m.AsString)
 }
 
-func (m *JsonMapper) ProcessObjectsWithArgs(numberOfWorkers int, f func(o JsonObject, args ...any), args ...any) error {
-	if m.reader == nil {
-		return errors.New("reader is not set")
-	}
-
-	dec := json.NewDecoder(m.reader)
-	_, err := dec.Token()
-	if err != nil {
-		return err
-	}
-
-	var wg sync.WaitGroup
-	sem := make(chan struct{}, numberOfWorkers)
-	for dec.More() {
-		var data map[string]*interface{}
-		err = dec.Decode(&data)
-		if err == io.EOF {
-			break
-		} else if err != nil {
-			return err
-		}
-		obj := newObjectFromMap(data)
-		wg.Add(1)
-		sem <- struct{}{}
-		go func(o JsonObject) {
-			defer wg.Done()
-			defer func() { <-sem }()
-			f(o, args...)
-		}(*obj)
-	}
-
-	_, err = dec.Token()
-	if err != nil {
-		return err
-	}
-
-	wg.Wait()
-	return nil
-}
-
-func (m *JsonMapper) ProcessObjects(numberOfWorkers int, f func(o JsonObject)) error {
-	return m.ProcessObjectsWithArgs(numberOfWorkers, func(o JsonObject, args ...any) {
-		f(o)
-	})
-}
+//func (m *JsonMapper) ProcessObjectsWithArgs(numberOfWorkers int, f func(o JsonObject, args ...any), args ...any) error {
+//	if m.reader == nil {
+//		return errors.New("reader is not set")
+//	}
+//
+//	dec := json.NewDecoder(m.reader)
+//	_, err := dec.Token()
+//	if err != nil {
+//		return err
+//	}
+//
+//	var wg sync.WaitGroup
+//	sem := make(chan struct{}, numberOfWorkers)
+//	for dec.More() {
+//		var data map[string]*interface{}
+//		err = dec.Decode(&data)
+//		if err == io.EOF {
+//			break
+//		} else if err != nil {
+//			return err
+//		}
+//		obj := newObjectFromMap(data)
+//		wg.Add(1)
+//		sem <- struct{}{}
+//		go func(o JsonObject) {
+//			defer wg.Done()
+//			defer func() { <-sem }()
+//			f(o, args...)
+//		}(*obj)
+//	}
+//
+//	_, err = dec.Token()
+//	if err != nil {
+//		return err
+//	}
+//
+//	wg.Wait()
+//	return nil
+//}
+//
+//func (m *JsonMapper) ProcessObjects(numberOfWorkers int, f func(o JsonObject)) error {
+//	return m.ProcessObjectsWithArgs(numberOfWorkers, func(o JsonObject, args ...any) {
+//		f(o)
+//	})
+//}
 
 // PrettyString returns a valid, pretty JSON string representation of the JsonMapper underlying value.
 func (m *JsonMapper) PrettyString() string {

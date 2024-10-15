@@ -5,24 +5,24 @@
 
 A simple Go library to simplify working with JSON without the need to define structs.
 
-* [Installation](#Installation)
-* [Create Object, Array or Mapper](#Create-JsonObject-JsonArray-or-JsonMapper)
-* [Read from JSON](#Read-from-JSON)
-    * [Scalars](#Scalars)
-    * [Objects](#Objects)
-    * [Arrays](#Arrays)
+* [Installation](#installation)
+* [Create Object, Array or Mapper](#create-jsonobject-jsonarray-or-jsonmapper)
+* [Read from JSON](#read-from-json)
+    * [Scalars](#scalars)
+    * [Objects](#objects)
+    * [Arrays](#arrays)
     * [Time](#time)
     * [UUID](#uuid)
     * [Types](#types)
     * [Get JSON String](#get-json-string)
-* [Write to JSON](#Write-to-JSON)
-    * [Write Object](#Write-object)
-    * [Write Array](#Write-array)
-* [Error Handling](#Error-handling)
-* [Design](#Design)
-  * [JsonMapper](#JsonMapper)
-  * [JsonObject](#JsonObject)
-  * [JsonArray](#JsonArray)
+* [Write to JSON](#write-to-JSON)
+    * [Write Object](#write-object)
+    * [Write Array](#write-array)
+* [Error Handling](#error-handling)
+* [Design](#design)
+  * [JsonMapper](#jsonmapper)
+  * [JsonObject](#jsonobject)
+  * [JsonArray](#jsonarray)
 
 ## Installation
 Jogson requires Go version `1.18` or above. 
@@ -251,7 +251,7 @@ for _, feature := range features.Elements() {
 }
 ```
 
-#### As Arrays of Nullable Values
+#### As Arrays
 
 ```go
 
