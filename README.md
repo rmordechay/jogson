@@ -356,7 +356,7 @@ fmt.Println(mapper.AsObject.Get("children").String())
 or with `PrettyString()`
 
 ```go
-fmt.Println(mapper.AsObject.Get("children").PrettyString())
+fmt.Println(object.GetObject("children").PrettyString())
 // output:
 // {
 //   "address": null,
