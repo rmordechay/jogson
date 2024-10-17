@@ -97,7 +97,7 @@ Getting scalars - `string`, `int`, etc. - is similar both for object and array a
 in the parameter type (objects take `string` as key and arrays take `int` as index). You can get scalars by value or by reference, where the latter allows JSON null values. Nullable methods have
 the suffix 'N' in their names.
 
-#### From Object
+#### From `JsonObject`
 
 By value:
 
@@ -131,7 +131,7 @@ var heightNullable *float64 = object.GetFloatN("non-existent-key") // nil
 var isFunnyNullable *bool = object.GetBoolN("non-existent-key") // nil
 ```
 
-#### From Array
+#### From `JsonArray`
 
 By value:
 
@@ -165,6 +165,32 @@ var heightNullable *float64 = array.GetFloatN(100) // nil
 var isFunnyNullable *bool = array.GetBoolN(100) // nil
 ```
 
+
+#### From `JsonMapper`
+
+`JsonMapper` is used when the data type is unknown.
+
+```go
+// string
+if mapper.IsString {
+    var s string = mapper.AsString
+}
+
+// int
+if mapper.IsInt {
+    var i int = mapper.AsInt
+}
+
+// float64
+if mapper.IsFloat {
+    var f float64 = mapper.AsFloat
+}
+
+// bool
+if mapper.IsBool {
+    var b bool = mapper.AsBool
+}
+```
 
 ### Objects
 
@@ -439,12 +465,16 @@ There are 3 structs that are important to know when working with the library
 
 `JsonMapper` is a struct that holds JSON data and serves as a generic type for all possible JSON types. It has `AsX` and `IsX` 
 fields with which you can get the data and check the type, respectively. For example, if your data is a JSON object, 
-you can call `JsonMapper.AsObject`, or if it's a string, `JsonMapper.AsString`. This struct is best used when you don't 
-know the type at compile time and want to check it dynamically. In this case you can use `JsonMapper.IsArray`, 
-`JsonMapper.IsString`, `JsonMapper.IsFloat`, etc. 
+you can call `JsonMapper.AsObject`, or if it's a string, `JsonMapper.AsString`, etc. This struct is best used when you don't 
+know the type at compile time and want to check it dynamically. To check for the type, you can use the `IsX` fields. For example, 
+`JsonMapper.IsString`, `JsonMapper.IsFloat`, etc.  
 
-Note, in any case, `AsX` never returns nil, but always the zero value. If the underlying data is null, then `IsNull` will 
-be set to true. 
+Note, in any case, `AsX` never returns nil. If the underlying data is null, then `IsNull` will be set to true.
+
+There are 3 ways to get a `JsonMapper` instance:
+1. With one of the `jogson.NewMapper` methods. For example, `jogson.NewMapperFromFile("file.json")`
+2. From `JsonObject` with the `Get(key string)` method. For example, `object.Get("name")`
+3. From `JsonArray` with the `Get(i int)` method. For example, `array.Get(3)`
 
 `JsonMapper` is also returned in cases where the return type can be any JSON type. For example, `JsonArray.Elements()` 
 returns a slice `[]JsonMapper` over which you can iterate or query specific elements. Other methods that return `JsonMapper` 
@@ -453,8 +483,11 @@ returns a slice `[]JsonMapper` over which you can iterate or query specific elem
 #### JsonObject
 
 `JsonObject` holds JSON object data and has different methods to read from JSON object and write to it. Once you have an instance, 
-you can use the various methods to read or write data to you object. There are multiple ways to get a `JsonObject`. You can parse 
-it directly, get it as an element of an array, or a value in a parent object.
+you can use the various methods to read or write data to you object. There are multiple ways to get a `JsonObject`.
+
+1. With one of the `jogson.NewMapper` methods. For example, `jogson.NewObjectFromString(jsonString)`
+2. From `JsonObject` with the `GetObject(key string)` method. For example, `object.GetObject("name")`
+3. From `JsonArray` with the `GetObject(i int)` method. For example, `array.GetObject(3)`
 
 There are 3 sets of methods that you can use when working with `JsonObject`.
 * `GetX(key string)`: gets a value in the object as the requested type. For example, GetString("key") gets the value associated with `key` as type `string` 
@@ -462,29 +495,16 @@ There are 3 sets of methods that you can use when working with `JsonObject`.
 * `AddX(key string, value X)`: adds `value`, associated with `key`, to the object as the requested type. For example, `AddString("key", "string_value")` adds the string `string_value` associated with the `key`   
 
 #### JsonArray
-`JsonArray` is in many ways almost identical to `JsonObject`. It also contains the underlying array and methods to read and 
-write data, and both also keep the same names for the methods. However, they have some minor differences. You can read more about them 
-in the next section.
+`JsonArray` is in many ways almost identical to `JsonObject`. Same as `JsonObject`, it also contains the underlying JSON data and has methods, 
+mostly with the same name, to read from the data and write to it. For example, both structs have the `GetString()`, `GetInt()`, `GetFloat()`, 
+`IsNull()`, `IsEmpty()` and other methods that are identical in names and their semantics. Getting an instance of `JsonArray` is again (almost) 
+the same as `JsonObject`, with a small difference in naming, for example, `object.GetObject()` will simply become `object.GetArray()`. 
 
-#### `JsonObject` and `JsonArray` Similarities and Differences
-The structs `JsonObject` and `JsonArray` have very similar methods, both in naming and semantics. For example, both structs
-have `GetString()`, `GetInt()`, `GetFloat()`, `IsNull()`, `IsEmpty()` and other methods that are identical in names. Additionally, 
-they both have similar method names with the similar semantics. For example, `JsonObject.AsStringMap` will return `map[string]string`,
-whereas `JsonArray.AsStringArray` will return `[]string`.
-
-
-As a rule of thumb, they have 2 differences:
+However, they have 2 differences:
   * **Input**:
-    * `JsonObject`'s methods mostly take a `string` as the key, e.g. `GetInt("age")`.
-    * `JsonArray`'s methods mostly take an `int` as the index, e.g. `GetBool(1)`.
+    * `JsonObject`'s methods mostly take a `string` as the key, e.g. `object.GetInt("age")`.
+    * `JsonArray`'s methods mostly take an `int` as the index, e.g. `array.GetBool(1)`.
   * **Output**:
-    * `JsonObject`'s methods mostly return a `map` or `JsonObject`, e.g. `GetFloatMap() -> map[string]string`. 
-    * `JsonArray`'s methods mostly return a `slice` or `JsonArray`, e.g. `GetFloatArray(1)  -> []float`.
+    * `JsonObject`'s methods mostly return a `map` or `JsonObject`, e.g. `object.AsFloatMap()` -> `map[string]string`. 
+    * `JsonArray`'s methods mostly return a `slice` or `JsonArray`, e.g. `array.AsFloatArray()`  -> `[]float`.
 
-#### Methods and Variables Prefix
-The prefixes, `As`, `Is`, `Get` and `Add` have similar semantics across the library and can be found in `JsonMapper`, `JsonObject`
-and `JsonArray`.
-* `IsX`: checks for the value's type. For example `JsonMapper.IsBool`
-* `AsX`: converts the current data to other type representation. For example, `JsonArray.AsStringArray()` converts JsonArray to `[]string`.
-* `GetX`: Fetches the data, usually with some sort of search in the underlying data.
-* `AddX`: Adds the data to the JSON array or object
